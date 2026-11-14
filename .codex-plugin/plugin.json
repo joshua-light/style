@@ -1,0 +1,21 @@
+{
+  "name": "style",
+  "version": "0.1.0",
+  "description": "Personal visual style guide for slides, designs, charts, and diagrams.",
+  "author": { "name": "Joshua Light" },
+  "repository": "https://github.com/joshua-light/style",
+  "license": "MIT",
+  "keywords": ["design", "style", "presentations", "charts", "dataviz"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Style",
+    "shortDescription": "Personal visual style guide",
+    "longDescription": "Applies Joshua Light's visual taste to slides, designs, charts, and diagrams.",
+    "developerName": "Joshua Light",
+    "category": "Creativity",
+    "capabilities": ["Read", "Write"],
+    "brandColor": "#000000",
+    "logo": "./assets/icon.png",
+    "composerIcon": "./assets/icon.svg"
+  }
+}

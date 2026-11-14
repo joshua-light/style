@@ -1,0 +1,725 @@
+/* style — dark gray, black ink, Warrior-tan accent, Melli data fills, outlined Expressway.
+   Rules live in ../SKILL.md; markup for every component in showcase.html.
+   scripts/build.py inlines this file and embeds the fonts as data URIs. */
+
+@font-face {
+  font-family: "Expressway";
+  font-weight: 400;
+  src: url("fonts/expressway.woff2") format("woff2"), url("fonts/expressway.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Expressway";
+  font-weight: 700;
+  src: url("fonts/expressway-xb.woff2") format("woff2"), url("fonts/expressway-xb.ttf") format("truetype");
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Gray surfaces, darkest to lightest. Ink is the only black. */
+  --ink: #000000;
+  --sunken: #1a1a1a;   /* bar tracks, code, wells */
+  --page: #242424;
+  --panel: #2e2e2e;
+  --raised: #3a3a3a;   /* neutral tags, hover */
+  --head: var(--sunken);  /* table heads: flat and much darker than the body */
+
+  --text: #f2f2f2;
+  --text-dim: #b8b8b8;
+  --text-faint: #8f8f8f;
+
+  /* The accent is the Warrior class colour. It dresses text only: links and
+     eyebrows. No chart, bar, or state may use it, so changing the accent never
+     recolours data. */
+  --accent: #c69b6d;
+
+  /* Data and state colours: three metals and five enamels. There is no yellow,
+     amber, or lime: none separates from gold, least of all for colour-blind
+     readers. */
+  --gold: #cfb53b;
+  --silver: #c9cdd2;
+  --copper: #db7c3d;
+  --azure: #5fa5de;
+  --amethyst: #9964c4;
+  --rose: #df8db5;
+  --crimson: #e13c5b;
+  /* A plain light green, by request: never drift it toward teal or blue. It sits
+     close to gold for red-green colour-blind readers, so it always comes with a
+     word or a delta triangle. */
+  --green: #5bc663;
+
+  --good: var(--green);  /* green and crimson mark state only; never a series */
+  --warn: var(--copper);
+  --bad: var(--crimson);
+  --info: var(--azure);
+
+  /* Series colours, assigned in this order. A 7th series folds into --c-other. */
+  --c1: var(--azure);
+  --c2: var(--gold);
+  --c3: var(--amethyst);
+  --c4: var(--copper);
+  --c5: var(--silver);
+  --c6: var(--rose);
+  --c-other: #7a7a7a;
+
+  /* Melli: the texture's luminance curve as a black overlay, so it multiplies
+     whatever colour sits under it — the way a WoW status bar tints its texture.
+     Colour fills only: gray surfaces, heads included, stay flat. */
+  --melli-stops:
+    rgba(0, 0, 0, 0.314) 0.8%, rgba(0, 0, 0, 0.271) 16.4%, rgba(0, 0, 0, 0.165) 39.8%,
+    rgba(0, 0, 0, 0.075) 58.6%, rgba(0, 0, 0, 0.027) 72.7%, rgba(0, 0, 0, 0.004) 83.6%,
+    rgba(0, 0, 0, 0.004) 89.8%, rgba(0, 0, 0, 0.027) 91.4%, rgba(0, 0, 0, 0.063) 93%,
+    rgba(0, 0, 0, 0.2) 97.7%, rgba(0, 0, 0, 0.239) 99.2%;
+  --melli: linear-gradient(to bottom, var(--melli-stops));
+
+  /* Type: six sizes, one meaning each. Line heights sit on the 4px grid. */
+  --font: "Expressway", "Overpass", "Barlow", "Arial Narrow", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs-title: 40px;      --lh-title: 48px;       /* the name of the whole piece; once */
+  --fs-heading: 28px;    --lh-heading: 36px;     /* section heads and hero numbers */
+  --fs-subheading: 20px; --lh-subheading: 28px;  /* subsections, lead sentence */
+  --fs-body: 16px;       --lh-body: 24px;        /* prose read in sentences */
+  --fs-label: 14px;      --lh-label: 20px;       /* anything scanned: cells, bars, legends */
+  --fs-note: 12px;       --lh-note: 16px;        /* captions, ticks, units, eyebrows */
+
+  /* Ink outline: headings and titles only (panel heads, stat labels). Running
+     small text looked heavy and uneven with one. The outline is a stroke painted under
+     the fill (stacked text-shadows looked lumpy), 7% of the font size so it
+     reads equally heavy at each heading size, capped at the weight that suits
+     a title. */
+  --outline: clamp(1.25px, 0.07em, 2px);
+  /* A text run paints every stroke, then every fill, so letters closer than the
+     outline swallow the line between them. Outlined text opens each gap to 2px;
+     0.06em is Expressway's own gap between straight stems. */
+  --fit: max(0px, calc(2px - 0.06em));
+  /* The same 1px ink ring for non-text shapes: chart lines, markers, icons. */
+  --ink-ring:
+    drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink))
+    drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
+
+  /* Space: seven steps, one meaning each. */
+  --s1: 4px;   /* touch: bar to bar, swatch to label */
+  --s2: 8px;   /* item: rows in a group, label to value */
+  --s3: 12px;  /* cell: horizontal padding of cells, heads, bars */
+  --s4: 16px;  /* panel: panel padding and the gutter between panels */
+  --s5: 24px;  /* block: between blocks in the flow */
+  --s6: 32px;  /* subsection: above a subheading */
+  --s7: 48px;  /* section: above a heading; page margin */
+
+  --border: 1px solid var(--ink);
+  --page-width: 960px;
+  --measure: 640px;      /* widest a line of prose may run */
+  --head-height: 28px;   /* table heads */
+  --bar-height: 16px;
+
+  /* Motion: three durations, one meaning each. */
+  --t-fast: 120ms;  /* state change: hover, press */
+  --t-base: 240ms;  /* an element enters */
+  --t-slow: 480ms;  /* data draws: bars fill, lines trace */
+  --t-step: 40ms;   /* stagger between siblings */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; border-radius: 0; }
+
+html { background: var(--page); }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font: 400 var(--fs-body) / var(--lh-body) var(--font);
+  /* Nothing else here on purpose. Plain text keeps the browser's own rendering:
+     font-smoothing, text-rendering, paint-order, and even a zero-width stroke
+     made it look soft in Chrome. */
+}
+
+h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre, table { margin: 0; }
+img, svg { display: block; max-width: 100%; }
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+
+.page {
+  max-width: calc(var(--page-width) + 2 * var(--s7));
+  margin: 0 auto;
+  padding: var(--s7) var(--s7) calc(var(--s7) + var(--s4));
+}
+.page.wide { --page-width: 1200px; }
+
+/* Flow: blocks sit one block-gap apart; headings open a wider gap above
+   and a tighter one below, so each binds to what it introduces. */
+.page > * + *, .flow > * + * { margin-top: var(--s5); }
+.page > * + h2, .flow > * + h2 { margin-top: var(--s7); }
+.page > * + h3, .flow > * + h3 { margin-top: var(--s6); }
+.page > h2 + *, .flow > h2 + * { margin-top: var(--s4); }
+.page > h3 + *, .flow > h3 + * { margin-top: var(--s2); }
+.page > p + p, .flow > p + p { margin-top: var(--s4); }
+.page > .eyebrow + *, .flow > .eyebrow + * { margin-top: var(--s1); }
+.page > h1 + .lead, .flow > h1 + .lead { margin-top: var(--s2); }
+/* A panel's title and a stat's label hang half a line above the box, so a box
+   needs a full block gap above it even right after a heading. */
+:is(.page, .flow) > :is(h2, h3) + :is(.grid, .panel, .callout, blockquote) { margin-top: var(--s5); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  /* Rows sit a block apart: titles on the top border need the room. */
+  gap: var(--s5) var(--s4);
+}
+.grid > * { grid-column: span 12; min-width: 0; }
+.grid > .span-3 { grid-column: span 3; }
+.grid > .span-4 { grid-column: span 4; }
+.grid > .span-6 { grid-column: span 6; }
+.grid > .span-8 { grid-column: span 8; }
+.grid > .span-9 { grid-column: span 9; }
+
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
+
+@media (max-width: 760px) {
+  .page { padding: var(--s5) var(--s4) var(--s7); }
+  .grid > .span-3 { grid-column: span 6; }
+  .grid > .span-4, .grid > .span-6, .grid > .span-8, .grid > .span-9 { grid-column: span 12; }
+  /* A phone cannot hold 16:9 at a readable size; the slide becomes a tall panel. */
+  .slide { aspect-ratio: auto; padding: var(--s5); }
+}
+
+/* ── Text ─────────────────────────────────────────────────────────────── */
+
+h1, .title, h2, .heading, h3, .subheading, .stat-value,
+.panel-head, .stat-label, .stat-foot > .delta, .meter-label, .meter-value,
+blockquote::before {
+  -webkit-text-stroke: calc(2 * var(--outline)) var(--ink);
+  paint-order: stroke fill;
+  letter-spacing: var(--fit);
+}
+h1, .title {
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+  font-weight: 700;
+}
+h2, .heading {
+  font-size: var(--fs-heading);
+  line-height: var(--lh-heading);
+  font-weight: 700;
+}
+h3, .subheading, .lead {
+  font-size: var(--fs-subheading);
+  line-height: var(--lh-subheading);
+}
+h3, .subheading { font-weight: 700; }
+.lead { color: var(--text-dim); }
+.label { font-size: var(--fs-label); line-height: var(--lh-label); }
+/* :not(.callout) because .callout.note is a callout kind, not a caption. */
+small, .note:not(.callout), figcaption {
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  color: var(--text-dim);
+}
+.eyebrow {
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+p, li, blockquote, .lead { max-width: var(--measure); }
+.dim { color: var(--text-dim); }
+.faint { color: var(--text-faint); }
+strong, b { font-weight: 700; }
+
+/* A border, not text-decoration: a heading's outline would stroke an underline too. */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  transition: color var(--t-fast) var(--ease);
+}
+a:hover { color: var(--text); }
+
+ul, ol { padding-left: var(--s5); }
+ul { list-style: square; }
+li + li, li > ul, li > ol { margin-top: var(--s2); }
+li::marker { color: var(--text-faint); }
+/* Numbers are read, bullets are not, so numbers take the stronger colour. */
+ol > li::marker { color: var(--text-dim); }
+ol ol { list-style: lower-alpha; }
+
+/* A quote is its own box with an outlined opening mark on the top border.
+   A bare rule beside dim text did not read as a quote. */
+blockquote {
+  position: relative;
+  padding: var(--s5) var(--s4) var(--s4);
+  background: var(--panel);
+  border: var(--border);
+}
+blockquote::before {
+  content: "\201C";
+  position: absolute;
+  /* The mark is an ornament, not text, so it sits off the type scale: at title
+     size the glyph is only 14px wide. It fills just the top of its line box;
+     this offset centres it on the border. */
+  top: -20px;
+  left: var(--s3);
+  color: var(--accent);
+  font-size: 80px;
+  line-height: 1;
+  font-weight: 700;
+}
+blockquote > * + * { margin-top: var(--s2); }
+blockquote cite {
+  display: block;
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  font-style: normal;
+  color: var(--text-dim);
+}
+
+hr { height: 1px; margin: 0; border: 0; background: var(--ink); }
+
+code, kbd, pre {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  -webkit-text-stroke: 0;
+  letter-spacing: normal;
+}
+code, kbd {
+  padding: 0 var(--s1);
+  background: var(--sunken);
+  border: var(--border);
+}
+pre {
+  padding: var(--s3) var(--s4);
+  background: var(--sunken);
+  border: var(--border);
+  line-height: var(--lh-label);
+  overflow-x: auto;
+}
+pre code { padding: 0; background: none; border: 0; }
+
+figure > * + figcaption { margin-top: var(--s2); }
+
+/* ── Panels and callouts ──────────────────────────────────────────────── */
+
+.panel, .callout {
+  background: var(--panel);
+  border: var(--border);
+}
+.panel, .callout { position: relative; }
+/* A panel's title sits across its top border, not in a bar: outlined text
+   that looks laid on top of the frame. A tag in the head lands on the same
+   border at the right. The offset is half the line height in whole pixels; a
+   transform would land on half pixels and blur the text. */
+.panel-head {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--lh-subheading) / -2);
+  left: var(--s3);
+  right: var(--s3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  font-size: var(--fs-subheading);
+  line-height: var(--lh-subheading);
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* A tag is a solid chip, so it drops the title's outline and weight. */
+.panel-head > .tag {
+  font-weight: 400;
+  -webkit-text-stroke: 0;
+  paint-order: normal;
+  letter-spacing: 0.03em;
+}
+/* A callout names its kind in a coloured tag on its top border. The tag keeps
+   it apart from a panel, whose title is outlined text. */
+.callout-head {
+  position: absolute;
+  z-index: 1;
+  top: -10px;
+  left: var(--s3);
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--s2);
+  background: var(--melli), var(--fill, var(--raised));
+  border: var(--border);
+  color: var(--ink);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.panel-body, .callout-body { padding: var(--s4); }
+.panel-body > * + *, .callout-body > * + * { margin-top: var(--s3); }
+/* The title or tag reaches half a line into the body. */
+.panel-head + .panel-body, .callout-head + .callout-body { padding-top: var(--s5); }
+/* A table may run edge to edge inside a panel. Under a title it starts below
+   the title. The strip above it takes the table head's colour, and the head
+   keeps its own black line on top, so it still reads as a bordered row. */
+.panel-body.flush { padding: 0; overflow-x: auto; }
+.panel-head + .panel-body.flush { padding-top: 0; border-top: var(--s4) solid var(--head); }
+.panel-head + .panel-body.flush > .table { border-top: var(--border); }
+
+.callout-body { font-size: var(--fs-label); line-height: var(--lh-label); }
+.callout.note { --fill: var(--info); }
+.callout.tip { --fill: var(--good); }
+.callout.warn { --fill: var(--warn); }
+.callout.bad { --fill: var(--bad); }
+
+/* ── Tags ─────────────────────────────────────────────────────────────── */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--s2);
+  background: var(--raised);
+  border: var(--border);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tag.good { --fill: var(--good); }
+.tag.warn { --fill: var(--warn); }
+.tag.bad { --fill: var(--bad); }
+.tag.info { --fill: var(--info); }
+/* A coloured tag is a colour fill: Melli over it, ink text on it. */
+.tag.good, .tag.warn, .tag.bad, .tag.info, .tag[style*="--fill"] {
+  background: var(--melli), var(--fill);
+  color: var(--ink);
+}
+
+/* ── Stats ────────────────────────────────────────────────────────────── */
+
+/* A stat wears its label on the top border at the left and its delta or tag
+   on the same border at the right. */
+.stat { padding: var(--s4); }
+.stat-label {
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--lh-note) / -2);
+  left: var(--s3);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  /* No tracking of its own: the outline's --fit already opens the letters. */
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.stat-value {
+  font-size: var(--fs-heading);
+  line-height: var(--lh-heading);
+  font-weight: 700;
+}
+/* Holds one delta or one tag. 20px tall, centred on the border. */
+.stat-foot {
+  position: absolute;
+  z-index: 1;
+  top: -10px;
+  right: var(--s3);
+  display: flex;
+  align-items: center;
+  height: 20px;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  white-space: nowrap;
+}
+/* What the delta compares against: a plain caption at the bottom left. */
+.stat-note {
+  margin-top: var(--s1);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  color: var(--text-dim);
+}
+.stat > .bar, .stat > .spark { margin-top: var(--s3); }
+
+/* Expressway has no arrow glyphs, so deltas draw their own triangle. */
+.delta { display: inline-flex; align-items: center; gap: var(--s1); }
+.delta::before {
+  content: "";
+  border: 5px solid transparent;
+  filter: var(--ink-ring);
+}
+.delta.up { color: var(--good); }
+.delta.up::before { border-top-width: 0; border-bottom: 8px solid currentColor; }
+.delta.down { color: var(--bad); }
+.delta.down::before { border-bottom-width: 0; border-top: 8px solid currentColor; }
+
+/* ── Tables ───────────────────────────────────────────────────────────── */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+}
+.table th, .table td {
+  padding: var(--s2) var(--s3);
+  border-bottom: var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+.table th {
+  height: var(--head-height);
+  padding-block: 0;
+  background: var(--head);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr { transition: background-color var(--t-fast) var(--ease); }
+.table tbody tr:hover { background: var(--raised); }
+.table .num { text-align: right; }
+.table td.fit, .table th.fit { width: 1%; white-space: nowrap; }
+.table .bar { min-width: 64px; }
+
+/* ── Bars: the Melli status bar ───────────────────────────────────────── */
+
+/* No plain text on a bar: white fails on the fills, ink fails on the track.
+   A meter's outlined name and value may cross a bar's top edge. */
+.bar {
+  position: relative;
+  display: flex;
+  height: var(--bar-height);
+  background: var(--sunken);
+  border: var(--border);
+  overflow: hidden;
+}
+.bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--v, 0) * 1%);
+  background: var(--melli), var(--fill, var(--c1));
+  box-shadow: 1px 0 0 var(--ink);
+}
+.bar.thin { height: 8px; }
+
+/* Stacked: segments share one bar and split it by weight. A segment is all
+   fill, so it may hold an ink label. */
+.bar.stack { height: 24px; }
+.bar-seg {
+  flex: var(--v, 1) 0 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 0 var(--s2);
+  background: var(--melli), var(--fill, var(--c1));
+  color: var(--ink);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  overflow: hidden;
+  white-space: nowrap;
+}
+.bar-seg + .bar-seg { border-left: var(--border); }
+
+/* A meter is a ranked list of bars: the horizontal bar chart. Each bar wears
+   its name on its top edge at the left and its value on the same edge at the
+   right, the way a unit frame names a health bar. */
+.meter {
+  display: grid;
+  gap: var(--s2);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+}
+/* The padding holds the half line of text that hangs above the bar. */
+.meter-row { position: relative; padding-top: calc(var(--lh-label) / 2); }
+.meter-row > .bar { height: 20px; }
+.meter-label, .meter-value { position: absolute; z-index: 1; top: 0; white-space: nowrap; }
+.meter-label { left: var(--s2); }
+.meter-value { right: var(--s2); }
+
+/* ── Columns ──────────────────────────────────────────────────────────── */
+
+.cols {
+  --h: 160px;
+  --max: 100;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: var(--s2);
+}
+.col {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: center;
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+}
+.col-value { margin-bottom: var(--s1); font-size: var(--fs-label); line-height: var(--lh-label); }
+.col-fill {
+  height: calc(var(--v, 0) / var(--max) * var(--h));
+  background: var(--melli), var(--fill, var(--c1));
+  border: var(--border);
+}
+.col-label {
+  margin: 0 calc(-1 * var(--s1));
+  padding-top: var(--s1);
+  border-top: var(--border);
+  color: var(--text-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.col-fill + .col-label { margin-top: -1px; }
+
+/* ── SVG charts: lines, sparklines ────────────────────────────────────── */
+
+.chart { width: 100%; height: auto; overflow: visible; }
+.chart text {
+  fill: var(--text-dim);
+  font-family: var(--font);
+  font-size: var(--fs-note);
+}
+.chart text.end { text-anchor: end; }
+.chart text.mid { text-anchor: middle; }
+.chart text.series { fill: var(--text); font-size: var(--fs-label); }
+.chart .gridline { stroke: var(--sunken); stroke-width: 1px; shape-rendering: crispEdges; }
+.chart .axis { stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+.chart .line, .spark .line {
+  fill: none;
+  stroke: var(--fill, var(--c1));
+  stroke-width: 2px;
+  stroke-linejoin: miter;
+  stroke-linecap: butt;
+  filter: var(--ink-ring);
+}
+.chart .dot {
+  fill: var(--fill, var(--c1));
+  stroke: var(--ink);
+  stroke-width: 1px;
+}
+
+.spark { width: 100%; height: 32px; overflow: visible; filter: var(--ink-ring); }
+/* The sparkline stretches to fit, so its ring sits on the svg, in CSS pixels. */
+.spark .line { vector-effect: non-scaling-stroke; filter: none; }
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--text-dim);
+}
+.legend-item { display: inline-flex; align-items: center; gap: var(--s2); }
+/* A legend as a column, one series per row, with room for a value at the right. */
+.legend.list { display: grid; gap: var(--s2); min-width: 160px; }
+.legend.list .legend-item { display: flex; }
+.legend-value { margin-left: auto; padding-left: var(--s4); color: var(--text); }
+.swatch {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  background: var(--melli), var(--fill, var(--c1));
+  border: var(--border);
+}
+
+/* ── Pie ──────────────────────────────────────────────────────────────── */
+
+/* The one round shape in the style. Each slice is a circle whose thick stroke
+   draws the wedge, so no arc geometry is needed: --v is the slice's share in
+   percent and --at the sum of the shares before it. A .pie-cut line at each
+   --at inks the boundary. Slices start at 12 o'clock and run clockwise. */
+.chart-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s5); }
+.pie { position: relative; flex: none; width: 160px; aspect-ratio: 1; }
+.pie > svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.pie-slice {
+  fill: none;
+  stroke: var(--fill, var(--c1));
+  stroke-width: 100;
+  stroke-dasharray: var(--v, 0) 100;
+  stroke-dashoffset: calc(-1 * var(--at, 0));
+}
+.pie-cut {
+  stroke: var(--ink);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  transform: rotate(calc(var(--at, 0) * 3.6deg));
+}
+/* Melli and the ink rim sit over the whole disc. */
+.pie::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--melli);
+  border: var(--border);
+  border-radius: 50%;
+}
+
+/* ── Slides ───────────────────────────────────────────────────────────── */
+
+.slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  aspect-ratio: 16 / 9;
+  padding: var(--s7);
+  background: var(--panel);
+  border: var(--border);
+}
+.slide > * + * { margin-top: var(--s5); }
+.slide > .eyebrow + * { margin-top: var(--s1); }
+.slide > h1 + .lead, .slide > h2 + .lead { margin-top: var(--s2); }
+
+/* ── Motion ───────────────────────────────────────────────────────────── */
+
+/* Opt in with .anim on a container. Everything plays once, on entry. */
+.stagger > :nth-child(2) { --i: 1; }
+.stagger > :nth-child(3) { --i: 2; }
+.stagger > :nth-child(4) { --i: 3; }
+.stagger > :nth-child(5) { --i: 4; }
+.stagger > :nth-child(6) { --i: 5; }
+.stagger > :nth-child(7) { --i: 6; }
+.stagger > :nth-child(8) { --i: 7; }
+.stagger > :nth-child(9) { --i: 8; }
+.stagger > :nth-child(10) { --i: 9; }
+.stagger > :nth-child(11) { --i: 10; }
+.stagger > :nth-child(12) { --i: 11; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .anim .enter {
+    animation: enter var(--t-base) var(--ease) both;
+    animation-delay: calc(var(--i, 0) * var(--t-step));
+  }
+  .anim .bar-fill {
+    animation: fill-x var(--t-slow) var(--ease) both;
+    animation-delay: calc(var(--i, 0) * var(--t-step));
+  }
+  /* Needs pathLength="100" on the circle. */
+  .anim .pie-slice { animation: pie var(--t-slow) var(--ease) both; }
+  .anim .col-fill {
+    animation: fill-y var(--t-slow) var(--ease) both;
+    animation-delay: calc(var(--i, 0) * var(--t-step));
+  }
+  /* Needs pathLength="1" on the path. */
+  .anim .line {
+    stroke-dasharray: 1;
+    animation: trace var(--t-slow) linear both;
+    animation-delay: calc(var(--i, 0) * var(--t-step));
+  }
+  /* A stretched sparkline measures dashes in screen pixels, so it cannot trace. */
+  .anim .spark .line { stroke-dasharray: none; animation: none; }
+  .anim .dot {
+    animation: enter var(--t-fast) var(--ease) both;
+    animation-delay: var(--t-slow);
+  }
+}
+
+@keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+@keyframes fill-x { from { width: 0; } }
+@keyframes fill-y { from { height: 0; } }
+@keyframes pie { from { stroke-dasharray: 0 100; } }
+@keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }

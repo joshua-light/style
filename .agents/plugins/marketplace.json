@@ -1,0 +1,12 @@
+{
+  "name": "j-light-style",
+  "interface": { "displayName": "Joshua Light — Style" },
+  "plugins": [
+    {
+      "name": "style",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Creativity"
+    }
+  ]
+}

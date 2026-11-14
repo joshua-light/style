@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Style Showcase</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Reference markup for every component. Copy structure from here.
+     .anim on the page opts every bar, column and line into its entry animation. -->
+<main class="page anim">
+
+  <!-- ── Text ── -->
+  <p class="eyebrow">Design system · draft 1</p>
+  <h1>Raid performance report</h1>
+  <p class="lead">Six sizes, seven spacings, one border. Dark gray surfaces, black ink, a tan accent, Melli fills.</p>
+
+  <h2>Text</h2>
+  <p>Body text runs at 16px on a 24px line and never wider than 640px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Extra-bold marks emphasis</strong>; nothing is italic.</p>
+  <p>A second paragraph sits 16px below the first. Blocks of other kinds sit 24px apart.</p>
+
+  <h3>Lists</h3>
+  <!-- Lists nest up to three levels. Numbered lists switch to letters one level down. -->
+  <div class="grid">
+    <div class="span-6">
+      <ul>
+        <li>Lists use square markers.</li>
+        <li>Items sit 8px apart.
+          <ul>
+            <li>A nested list indents one step.</li>
+            <li>It keeps the same marker.
+              <ul>
+                <li>Three levels is the limit.</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li>The list picks up again after a nested one.</li>
+      </ul>
+    </div>
+    <div class="span-6">
+      <ol>
+        <li>Numbered lists are for steps and ranks.</li>
+        <li>Numbers are dim, not faint: they are read.
+          <ol>
+            <li>Nested steps use letters.</li>
+            <li>They indent one step.</li>
+          </ol>
+        </li>
+        <li>The count picks up again after a nested list.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Quote</h3>
+  <!-- Quote: its own box, with an outlined opening mark on the top border. <cite> names the source. -->
+  <blockquote>
+    <p>Wipe it. We go again with two healers, and this time nobody stands in the fire.</p>
+    <cite>Tukz, raid lead</cite>
+  </blockquote>
+  <p>Inline <code>code</code> and blocks use a monospace face:</p>
+<pre><code>python3 scripts/build.py report.html</code></pre>
+
+  <!-- ── Callouts ── -->
+  <h2>Callouts</h2>
+  <div class="grid">
+    <aside class="callout note span-6">
+      <div class="callout-head">Note</div>
+      <div class="callout-body"><p>Context the reader can skip without losing the thread.</p></div>
+    </aside>
+    <aside class="callout tip span-6">
+      <div class="callout-head">Tip</div>
+      <div class="callout-body"><p>A shortcut or a better way to do the same thing.</p></div>
+    </aside>
+    <aside class="callout warn span-6">
+      <div class="callout-head">Warning</div>
+      <div class="callout-body"><p>Something that goes wrong if ignored.</p></div>
+    </aside>
+    <aside class="callout bad span-6">
+      <div class="callout-head">Danger</div>
+      <div class="callout-body"><p>Something that cannot be undone.</p></div>
+    </aside>
+  </div>
+
+  <!-- ── Dashboard ── -->
+  <h2>Dashboard</h2>
+  <!-- Stat: the label sits on the top border at the left; .stat-foot holds one delta or tag on the same border at the right.
+       .stat-note says what the delta compares against, at the bottom left. -->
+  <div class="grid stagger">
+    <div class="panel stat span-3 enter">
+      <div class="stat-label">Boss kills</div>
+      <div class="stat-value">8 / 8</div>
+      <div class="stat-note">vs last week</div>
+      <div class="stat-foot"><span class="delta up">+2</span></div>
+    </div>
+    <div class="panel stat span-3 enter">
+      <div class="stat-label">Raid DPS</div>
+      <div class="stat-value">41.8M</div>
+      <div class="stat-note">vs last week</div>
+      <div class="stat-foot"><span class="delta up">+6.4%</span></div>
+    </div>
+    <div class="panel stat span-3 enter">
+      <div class="stat-label">Deaths</div>
+      <div class="stat-value">37</div>
+      <div class="stat-note">vs last week</div>
+      <div class="stat-foot"><span class="delta down">+9</span></div>
+    </div>
+    <div class="panel stat span-3 enter">
+      <div class="stat-label">Clear time</div>
+      <div class="stat-value">2h 14m</div>
+      <div class="stat-foot"><span class="tag">74%</span></div>
+      <div class="bar thin" style="--v:74"><span class="bar-fill"></span></div>
+    </div>
+
+    <!-- Meter: the horizontal bar chart. One row per bar: label, bar, value.
+         The name and value sit on the bar's top edge. A tag in a panel head sits on the panel's top border. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Damage done <span class="tag">Top 6</span></div>
+      <div class="panel-body">
+        <div class="meter stagger">
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">4.92M</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:91; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">4.48M</span></div>
+          <div class="meter-row"><span class="meter-label">Melli</span><div class="bar" style="--v:84; --fill:var(--c3)"><span class="bar-fill"></span></div><span class="meter-value">4.13M</span></div>
+          <div class="meter-row"><span class="meter-label">Elv</span><div class="bar" style="--v:72; --fill:var(--c4)"><span class="bar-fill"></span></div><span class="meter-value">3.54M</span></div>
+          <div class="meter-row"><span class="meter-label">Simpy</span><div class="bar" style="--v:63; --fill:var(--c5)"><span class="bar-fill"></span></div><span class="meter-value">3.10M</span></div>
+          <div class="meter-row"><span class="meter-label">Azilroka</span><div class="bar" style="--v:41; --fill:var(--c6)"><span class="bar-fill"></span></div><span class="meter-value">2.02M</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table: flush inside its panel; numbers right-aligned; a bar may sit in a cell. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Encounters <span class="tag warn">2 / 5</span></div>
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th>Boss</th><th class="num">Pulls</th><th>Best</th><th class="fit">State</th></tr></thead>
+          <tbody>
+            <tr><td>Plexus Sentinel</td><td class="num">1</td><td><div class="bar thin" style="--v:100; --fill:var(--good)"><span class="bar-fill"></span></div></td><td class="fit"><span class="tag good">Kill</span></td></tr>
+            <tr><td>Loom'ithar</td><td class="num">3</td><td><div class="bar thin" style="--v:100; --fill:var(--good)"><span class="bar-fill"></span></div></td><td class="fit"><span class="tag good">Kill</span></td></tr>
+            <tr><td>Forgeweaver Araz</td><td class="num">11</td><td><div class="bar thin" style="--v:82; --fill:var(--warn)"><span class="bar-fill"></span></div></td><td class="fit"><span class="tag warn">18%</span></td></tr>
+            <tr><td>Dimensius</td><td class="num">24</td><td><div class="bar thin" style="--v:39; --fill:var(--bad)"><span class="bar-fill"></span></div></td><td class="fit"><span class="tag bad">61%</span></td></tr>
+            <tr><td>Nexus-King</td><td class="num">0</td><td><div class="bar thin" style="--v:0"><span class="bar-fill"></span></div></td><td class="fit"><span class="tag">Locked</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── Charts ── -->
+  <h2>Charts</h2>
+  <div class="grid">
+    <!-- Columns: values labelled directly, so there is no y-axis. --max sets the scale. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Pulls per night</div>
+      <div class="panel-body">
+        <div class="cols stagger" style="--max:30">
+          <div class="col"><span class="col-value">12</span><span class="col-fill" style="--v:12"></span><span class="col-label">Mon</span></div>
+          <div class="col"><span class="col-value">18</span><span class="col-fill" style="--v:18"></span><span class="col-label">Tue</span></div>
+          <div class="col"><span class="col-value">9</span><span class="col-fill" style="--v:9"></span><span class="col-label">Wed</span></div>
+          <div class="col"><span class="col-value">27</span><span class="col-fill" style="--v:27"></span><span class="col-label">Thu</span></div>
+          <div class="col"><span class="col-value">21</span><span class="col-fill" style="--v:21"></span><span class="col-label">Fri</span></div>
+          <div class="col"><span class="col-value">14</span><span class="col-fill" style="--v:14"></span><span class="col-label">Sat</span></div>
+          <div class="col"><span class="col-value">6</span><span class="col-fill" style="--v:6"></span><span class="col-label">Sun</span></div>
+        </div>
+        <figcaption>One colour: the bars differ by day, not by kind.</figcaption>
+      </div>
+    </figure>
+
+    <!-- Line chart: inline SVG on a 440×200 viewBox. Plot area x 32–428, y 8–168.
+         Each line carries pathLength="1" so .anim can trace it. Series are labelled at the line end. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Raid DPS by pull</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull for two nights">
+          <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
+          <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
+          <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
+          <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
+          <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
+          <text class="end" x="24" y="12">40M</text>
+          <text class="end" x="24" y="52">30M</text>
+          <text class="end" x="24" y="92">20M</text>
+          <text class="end" x="24" y="132">10M</text>
+          <text class="end" x="24" y="172">0</text>
+          <text class="mid" x="32" y="188">1</text>
+          <text class="mid" x="131" y="188">4</text>
+          <text class="mid" x="230" y="188">7</text>
+          <text class="mid" x="329" y="188">10</text>
+          <text class="mid" x="428" y="188">13</text>
+          <path class="line" pathLength="1" style="--fill:var(--c2)" d="M32 132 L65 124 L98 128 L131 108 L164 112 L197 96 L230 100 L263 84 L296 88 L329 76 L362 80 L395 68 L428 72"/>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M32 120 L65 100 L98 104 L131 80 L164 72 L197 76 L230 52 L263 56 L296 40 L329 44 L362 28 L395 32 L428 20"/>
+          <rect class="dot" style="--fill:var(--c2)" x="424" y="68" width="8" height="8"><title>Tuesday, pull 13: 24.0M</title></rect>
+          <rect class="dot" style="--fill:var(--c1)" x="424" y="16" width="8" height="8"><title>Thursday, pull 13: 37.0M</title></rect>
+          <text class="series end" x="352" y="22">Thursday</text>
+          <text class="series end" x="416" y="94">Tuesday</text>
+        </svg>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Thursday</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c2)"></span>Tuesday</span>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Stacked bar: parts of one whole. Use it where a pie would go. -->
+    <figure class="panel span-12">
+      <div class="panel-head">Damage by school</div>
+      <div class="panel-body">
+        <div class="bar stack">
+          <span class="bar-seg" style="--v:38; --fill:var(--c1)">Nature 38%</span>
+          <span class="bar-seg" style="--v:27; --fill:var(--c2)">Frost 27%</span>
+          <span class="bar-seg" style="--v:19; --fill:var(--c3)">Holy 19%</span>
+          <span class="bar-seg" style="--v:11; --fill:var(--c4)">Arcane 11%</span>
+          <span class="bar-seg" style="--v:5; --fill:var(--c-other)" title="Other 5%"></span>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Nature</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c2)"></span>Frost</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c3)"></span>Holy</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c4)"></span>Arcane</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c-other)"></span>Other</span>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Pie: parts of one whole, five slices at most. Each slice is a circle with r="50" and pathLength="100":
+         --v is its share in percent, --at the sum of the shares before it. One .pie-cut per slice, at the same --at.
+         Largest slice first, "other" last. The legend carries the names and values. -->
+    <figure class="panel span-8">
+      <div class="panel-head">Interrupts by player</div>
+      <div class="panel-body">
+        <div class="chart-row">
+          <div class="pie" role="img" aria-label="Interrupts by player: Ellesmere 34%, Tukz 26%, Melli 18%, Elv 14%, other 8%">
+            <svg viewBox="-100 -100 200 200">
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:34; --at:0; --fill:var(--c1)"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:26; --at:34; --fill:var(--c2)"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:18; --at:60; --fill:var(--c3)"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:14; --at:78; --fill:var(--c4)"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:8; --at:92; --fill:var(--c-other)"/>
+              <line class="pie-cut" x2="100" style="--at:0"/>
+              <line class="pie-cut" x2="100" style="--at:34"/>
+              <line class="pie-cut" x2="100" style="--at:60"/>
+              <line class="pie-cut" x2="100" style="--at:78"/>
+              <line class="pie-cut" x2="100" style="--at:92"/>
+            </svg>
+          </div>
+          <div class="legend list">
+            <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Ellesmere<span class="legend-value">34%</span></span>
+            <span class="legend-item"><span class="swatch" style="--fill:var(--c2)"></span>Tukz<span class="legend-value">26%</span></span>
+            <span class="legend-item"><span class="swatch" style="--fill:var(--c3)"></span>Melli<span class="legend-value">18%</span></span>
+            <span class="legend-item"><span class="swatch" style="--fill:var(--c4)"></span>Elv<span class="legend-value">14%</span></span>
+            <span class="legend-item"><span class="swatch" style="--fill:var(--c-other)"></span>Other<span class="legend-value">8%</span></span>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Sparkline: a trend with no axes, inside a stat. viewBox is the data's own box. -->
+    <div class="panel stat span-4">
+      <div class="stat-label">Wipes per night</div>
+      <div class="stat-value">6</div>
+      <svg class="spark" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true">
+        <path class="line" pathLength="1" style="--fill:var(--c5)" d="M0 4 L10 8 L20 6 L30 14 L40 12 L50 22 L60 26"/>
+      </svg>
+    </div>
+    <div class="panel span-12">
+      <div class="panel-head">Series colours</div>
+      <div class="panel-body">
+        <div class="row">
+          <span class="tag" style="--fill:var(--c1)">c1</span>
+          <span class="tag" style="--fill:var(--c2)">c2</span>
+          <span class="tag" style="--fill:var(--c3)">c3</span>
+          <span class="tag" style="--fill:var(--c4)">c4</span>
+          <span class="tag" style="--fill:var(--c5)">c5</span>
+          <span class="tag" style="--fill:var(--c6)">c6</span>
+          <span class="tag" style="--fill:var(--c-other)">other</span>
+        </div>
+        <p class="note">Assign in this order. A seventh series folds into "other".</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Slide ── -->
+  <h2>Slide</h2>
+  <section class="slide">
+    <p class="eyebrow">Week 12 · Mythic</p>
+    <h1>Eight of eight, with a night to spare</h1>
+    <p class="lead">One title, one supporting line, one figure. A slide is a 16:9 panel with section-sized padding.</p>
+    <div class="meter" style="max-width: var(--measure)">
+      <div class="meter-row"><span class="meter-label">Progress</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">8 / 8</span></div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
