@@ -11,6 +11,10 @@ without. Without -o the page is rewritten in place.
 
 Expressway is not redistributable, so its files may be absent. The page then
 falls back to Overpass from Google Fonts and this script says so on stderr.
+
+Expressway Regular is never embedded: its licence allows desktop use only. The
+page reads it from the reader's installed fonts and falls back to the embedded
+Bold where it is not installed.
 """
 import argparse
 import base64
@@ -21,15 +25,18 @@ from pathlib import Path
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
 FONTS = ASSETS / "fonts"
 
-# weight -> file stem; the first extension found wins.
-FACES = {400: "expressway", 700: "expressway-xb"}
+# weight -> file stem; the first extension found wins. 400 is the fallback for
+# text where Expressway Regular is not installed, so Bold is embedded twice.
+FACES = {400: "expressway", 700: "expressway", 800: "expressway-xb"}
+# Installed-font names tried before a face's embedded file.
+LOCAL = {400: ("Expressway Regular", "Expressway-Regular")}
 FORMATS = {".woff2": ("font/woff2", "woff2"), ".ttf": ("font/ttf", "truetype"), ".otf": ("font/otf", "opentype")}
 
 LINK = re.compile(r"<link\b[^>]*href=[\"'][^\"']*style\.css[\"'][^>]*>", re.I)
 BLOCK = re.compile(r"<style data-style>.*?</style>", re.S)
 SCRIPT = re.compile(r"<script\b[^>]*src=[\"'][^\"']*style\.js[\"'][^>]*>\s*</script>", re.I)
 SCRIPT_BLOCK = re.compile(r"<script data-style>.*?</script>", re.S)
-FALLBACK = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;800&display=swap">'
+FALLBACK = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;700;800&display=swap">'
 
 
 def font_faces():
@@ -38,13 +45,15 @@ def font_faces():
     for weight, stem in FACES.items():
         path = next((FONTS / (stem + ext) for ext in FORMATS if (FONTS / (stem + ext)).exists()), None)
         if path is None:
-            missing.append(stem)
+            if stem not in missing:
+                missing.append(stem)
             continue
         mime, fmt = FORMATS[path.suffix]
         data = base64.b64encode(path.read_bytes()).decode("ascii")
+        local = "".join(f'local("{name}"),' for name in LOCAL.get(weight, ()))
         css.append(
             f'@font-face{{font-family:"Expressway";font-weight:{weight};'
-            f'src:url("data:{mime};base64,{data}") format("{fmt}")}}'
+            f'src:{local}url("data:{mime};base64,{data}") format("{fmt}")}}'
         )
     return "\n".join(css), missing
 

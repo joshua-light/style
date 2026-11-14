@@ -23,6 +23,8 @@ Expressway is licensed by Typodermic and its files carry a "do not distribute" n
 | `skills/guide/assets/fonts/expressway.{woff2,ttf,otf}` | Expressway Bold, the file ElvUI ships as `Expressway.ttf`. |
 | `skills/guide/assets/fonts/expressway-xb.{woff2,ttf,otf}` | Expressway Extra Bold. |
 
+Text is set in Expressway Regular, a free download from [DaFont](https://www.dafont.com/expressway.font) or 1001 Fonts. Its desktop licence forbids converting or embedding the file, so do not put it in this repo: install it on your machine (for example in `~/.local/share/fonts/`) and the stylesheet finds it by name. On a machine without it, text falls back to Expressway Bold.
+
 Without them, pages fall back to Overpass. Embedding the font in pages you publish may need a web licence from Typodermic.
 
 ## Layout

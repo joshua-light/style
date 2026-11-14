@@ -14,6 +14,9 @@ use() returns the font family in use. Expressway ships only as woff2, which
 matplotlib cannot read, so use() converts it once into a cache directory (this
 needs fontTools and brotli). Without them, or without the font files, text
 falls back to matplotlib's default sans and use() says so on stderr.
+
+Text is Expressway Regular where that cut is installed on the machine (its
+licence forbids bundling it here), and Expressway Bold where it is not.
 """
 import sys
 from pathlib import Path
@@ -54,6 +57,13 @@ def _font():
                     print(f"mpl_style: cannot convert {source.name}: {error}", file=sys.stderr)
                     continue
         font_manager.fontManager.addfont(str(path))
+    # An Expressway installed after matplotlib built its font cache is not in the list yet.
+    for installed in font_manager.findSystemFonts():
+        if "expressway" in Path(installed).name.lower():
+            try:
+                font_manager.fontManager.addfont(installed)
+            except Exception:  # an unreadable file is not worth failing the chart for
+                pass
     names = {f.name for f in font_manager.fontManager.ttflist}
     return next((name for name in ("Expressway", "Expressway Rg", "Overpass") if name in names), None)
 
@@ -66,8 +76,10 @@ def use():
         print("mpl_style: Expressway is not available; using matplotlib's default sans", file=sys.stderr)
         family = plt.rcParams["font.sans-serif"][0]
     plt.rcParams["font.family"] = family
-    if family.startswith("Expressway"):
-        # The style's regular weight is Expressway Bold; the font has nothing lighter.
+    regular = any(f.name == family and f.style == "normal" and f.weight in (400, "normal", "regular")
+                  for f in font_manager.fontManager.ttflist)
+    if family.startswith("Expressway") and not regular:
+        # Without the Regular cut installed, the lightest Expressway here is Bold.
         plt.rcParams["font.weight"] = "bold"
     return family
 

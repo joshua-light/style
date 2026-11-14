@@ -3,14 +3,26 @@
    style.js adds hover tooltips and linked highlighting.
    scripts/build.py inlines both files and embeds the fonts as data URIs. */
 
+/* Three cuts: Regular 400, Bold 700, Extra-bold 800. Regular is licensed for
+   desktop use only: its file may not be converted or embedded, so it is read
+   from the reader's installed fonts. Where it is not installed, text falls
+   back to the Bold file, and the page looks as it did with two cuts. Chrome
+   does not try a sibling weight when a face fails, so the fallback has to be
+   a second source here. */
 @font-face {
   font-family: "Expressway";
   font-weight: 400;
-  src: url("fonts/expressway.woff2") format("woff2"), url("fonts/expressway.ttf") format("truetype");
+  src: local("Expressway Regular"), local("Expressway-Regular"),
+       url("fonts/expressway.woff2") format("woff2"), url("fonts/expressway.ttf") format("truetype");
 }
 @font-face {
   font-family: "Expressway";
   font-weight: 700;
+  src: url("fonts/expressway.woff2") format("woff2"), url("fonts/expressway.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Expressway";
+  font-weight: 800;
   src: url("fonts/expressway-xb.woff2") format("woff2"), url("fonts/expressway-xb.ttf") format("truetype");
 }
 
@@ -19,42 +31,49 @@
 
   /* Gray surfaces, darkest to lightest. Ink is the only black. */
   --ink: #000000;
-  --sunken: #1a1a1a;   /* bar tracks, code, wells */
-  --page: #1e1e1e;
-  --inset: #222222;    /* a box inside a box: nested panels, table rows */
-  --panel: #2e2e2e;    /* top-level boxes: panels, slides, callouts */
-  --raised: #3a3a3a;   /* neutral tags */
+  --sunken: #212121;   /* bar tracks, code, wells */
+  --page: #262626;
+  --inset: #2b2b2b;    /* a box inside a box: nested panels, table rows */
+  --panel: #333333;    /* top-level boxes: panels, slides, callouts */
+  --raised: #3f3f3f;   /* neutral tags */
   --head: var(--sunken);  /* table heads: flat, one step darker than the rows */
 
-  --text: #f2f2f2;
-  --text-dim: #b8b8b8;
-  --text-faint: #8f8f8f;
+  /* Text stops short of white, and the surfaces above stop short of black:
+     near-white on near-black glared in a bold face. Content sits near 11:1 on
+     the page, where the first palette sat near 15:1. */
+  --text: #d9d9d9;
+  --text-prose: #bcbcbc;  /* long prose: a shade down, so <strong> can stand out in --text */
+  --text-dim: #a3a3a3;
+  --text-faint: #888888;
 
-  /* The accent is the Warrior class colour. It dresses text only: links and
-     eyebrows. No chart, bar, or state may use it, so changing the accent never
+  /* The accent is the Warrior class colour (#c69b6d), softened like the data
+     colours below. It dresses text only: links and eyebrows. No chart, bar, or state may use it, so changing the accent never
      recolours data. */
-  --accent: #c69b6d;
+  --accent: #bb966e;
 
   /* Data and state colours: three metals and six enamels. There is no amber or
-     lime: neither separates from gold, least of all for colour-blind readers. */
-  --gold: #cfb53b;
-  --silver: #c9cdd2;
-  --copper: #db7c3d;
-  --azure: #5fa5de;
-  --amethyst: #9964c4;
-  --rose: #df8db5;
-  --crimson: #e13c5b;
-  /* A plain light green, by request: never drift it toward teal or blue. It sits
-     close to gold for red-green colour-blind readers, so it always comes with a
-     word or a delta triangle. */
-  --green: #5bc663;
+     lime: neither separates from gold, least of all for colour-blind readers.
+     Each is its pure hue mixed 12% toward mid gray (#707070, in OKLab), so the
+     fills sit with the softened text. Soften a new colour by the same share. */
+  --gold: #c3ad48;
+  --silver: #bec1c6;
+  --copper: #ce7b47;
+  --azure: #639fd0;
+  --amethyst: #9466ba;
+  --rose: #d28aac;
+  /* Red and green both lean toward yellow, by request: a warm red, not a
+     crimson, and a warm green. Never drift the green toward teal or blue, or
+     further toward lime. It sits close to gold for red-green colour-blind
+     readers, so it always comes with a word or a delta triangle. */
+  --red: #d64c3b;
+  --green: #7fb64d;
   /* Warning yellow, by request. Much lighter than gold so the two stay apart;
      darkening it merges them. */
-  --yellow: #ffeb4e;
+  --yellow: #eddc59;
 
-  --good: var(--green);  /* green, yellow and crimson mark state only; never a series */
+  --good: var(--green);  /* green, yellow and red mark state only; never a series */
   --warn: var(--yellow);
-  --bad: var(--crimson);
+  --bad: var(--red);
   --info: var(--azure);
 
   /* Series colours, assigned in this order. A 7th series folds into --c-other. */
@@ -76,13 +95,17 @@
     rgba(0, 0, 0, 0.2) 97.7%, rgba(0, 0, 0, 0.239) 99.2%;
   --melli: linear-gradient(to bottom, var(--melli-stops));
 
-  /* Type: six sizes, one meaning each. Line heights sit on the 4px grid. */
+  /* Type: seven sizes, one meaning each. Line heights are even whole pixels:
+     text on a border is offset by half a line, and a half pixel there blurs
+     it. A scale a tenth larger was tried while text was set in the Bold cut;
+     Regular text reads well at these sizes. */
   --font: "Expressway", "Overpass", "Barlow", "Arial Narrow", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --fs-title: 40px;      --lh-title: 48px;       /* the name of the whole piece; once */
   --fs-heading: 28px;    --lh-heading: 36px;     /* section heads and hero numbers */
   --fs-subheading: 20px; --lh-subheading: 28px;  /* subsections, lead sentence */
-  --fs-body: 16px;       --lh-body: 24px;        /* prose read in sentences */
+  --fs-prose: 18px;      --lh-prose: 30px;       /* long prose in the page's flow */
+  --fs-body: 16px;       --lh-body: 24px;        /* sentences inside a box or column */
   --fs-label: 14px;      --lh-label: 20px;       /* anything scanned: cells, bars, legends */
   --fs-note: 12px;       --lh-note: 16px;        /* captions, ticks, units, eyebrows */
 
@@ -124,13 +147,12 @@
   --border: 1px solid var(--ink);
   --icon: 24px;  /* picture icons: one size everywhere */
   --page-width: 960px;
-  --measure: 640px;      /* widest a line of prose may run */
+  --measure: 560px;      /* widest a line of prose may run: about 65 characters */
   --head-height: 28px;   /* table heads */
   --bar-height: 16px;
 
   /* Motion: three durations, one meaning each. */
   --t-fast: 120ms;  /* state change: hover, press */
-  --t-base: 240ms;  /* an element enters */
   --t-slow: 480ms;  /* data draws: bars fill, lines trace */
   --t-step: 40ms;   /* stagger between siblings */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -226,21 +248,24 @@ blockquote::before {
   paint-order: stroke fill;
   letter-spacing: var(--fit);
 }
+/* Outlined text is never Regular: the stroke eats into thin stems. Small
+   outlined text takes Bold; headings take Extra-bold below. */
+.stat-label, .stat-foot > .delta, .meter-label, .meter-value { font-weight: 700; }
 h1, .title {
   font-size: var(--fs-title);
   line-height: var(--lh-title);
-  font-weight: 700;
+  font-weight: 800;
 }
 h2, .heading {
   font-size: var(--fs-heading);
   line-height: var(--lh-heading);
-  font-weight: 700;
+  font-weight: 800;
 }
 h3, .subheading, .lead {
   font-size: var(--fs-subheading);
   line-height: var(--lh-subheading);
 }
-h3, .subheading { font-weight: 700; }
+h3, .subheading { font-weight: 800; }
 .lead { color: var(--text-dim); }
 .label { font-size: var(--fs-label); line-height: var(--lh-label); }
 /* :not(.callout) because .callout.note is a callout kind, not a caption. */
@@ -258,9 +283,22 @@ small, .note:not(.callout), figcaption {
 }
 
 p, li, blockquote, .lead { max-width: var(--measure); }
+/* Prose: paragraphs and lists set straight in the page's flow, outside any
+   box. A long read runs a size above body text and a shade below --text,
+   which leaves --text for <strong>. */
+:is(.page, .flow) > :is(p, ul, ol):not([class]) {
+  font-size: var(--fs-prose);
+  line-height: var(--lh-prose);
+  color: var(--text-prose);
+}
+:is(.page, .flow) > :is(p, ul, ol):not([class]) strong { color: var(--text); }
+/* A list's indent sits inside the measure, so its lines end where prose ends. */
+:is(ul, ol):not([class]) { max-width: var(--measure); }
 .dim { color: var(--text-dim); }
 .faint { color: var(--text-faint); }
-strong, b { font-weight: 700; }
+/* Emphasis is Extra-bold, not Bold: where Regular is not installed, text is
+   already Bold and a Bold word would vanish in it. */
+strong, b { font-weight: 800; }
 /* A highlight colours the name of a thing inside a sentence, as game text
    colours an item's name. Names only, and colour only: no background. */
 mark { background: none; color: var(--accent); }
@@ -301,7 +339,7 @@ blockquote::before {
   color: var(--accent);
   font-size: 80px;
   line-height: 1;
-  font-weight: 700;
+  font-weight: 800;
 }
 blockquote > * + * { margin-top: var(--s2); }
 blockquote cite {
@@ -417,6 +455,33 @@ pre {
 }
 pre code { padding: 0; background: none; border: 0; }
 
+/* Maths is not code: no chip, real exponents, and the text face, so an n in
+   a formula matches an n in the sentence. A sign the text face lacks falls
+   back to the mono face. */
+code.math { padding: 0; background: none; border: 0; font-family: var(--font), var(--font-mono); font-size: inherit; white-space: nowrap; }
+sup, sub { font-size: 0.75em; line-height: 0; }
+/* A formula on its own line, at heading size. Each term is a span. A fraction
+   in an exponent is stacked (sup.frac holding two spans): on one line with a
+   slash, nested exponents ran together. Scripts step down the type scale, and
+   their offsets are whole pixels so the text stays crisp. */
+.formula {
+  display: flex;
+  align-items: baseline;
+  column-gap: var(--s2);
+  max-width: var(--measure);
+  padding: var(--s4) var(--s5);
+  background: var(--sunken);
+  border: var(--border);
+  font-size: var(--fs-heading);
+  line-height: var(--lh-heading);
+  white-space: nowrap;
+}
+.formula sup { margin-left: 2px; font-size: var(--fs-subheading); vertical-align: 13px; }
+.formula sup sup { margin-left: 1px; font-size: var(--fs-label); vertical-align: 8px; }
+.formula .frac { display: inline-grid; line-height: var(--lh-body); text-align: center; vertical-align: 42px; }
+.formula .frac > span { padding: 0 var(--s1); }
+.formula .frac > span + span { padding-top: 3px; border-top: 1px solid currentColor; }
+
 /* Syntax colours. scripts/highlight.py emits Pygments' token classes; these
    rules fold them into eight roles. Names keep the text colour. */
 :is(pre, code) :is(.c, .c1, .cm, .ch, .cs, .cp, .cpf, .sd) { color: var(--code-comment); }
@@ -462,7 +527,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   gap: var(--s3);
   font-size: var(--fs-subheading);
   line-height: var(--lh-subheading);
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
 }
 /* A tag is a solid chip, so it drops the title's outline and weight. */
@@ -483,7 +548,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   align-items: center;
   height: 20px;
   padding: 0 var(--s2);
-  background: var(--melli), var(--fill, var(--raised));
+  background: var(--fill, var(--raised));
   border: var(--border);
   color: var(--ink);
   font-size: var(--fs-note);
@@ -532,9 +597,10 @@ figure > * + figcaption { margin-top: var(--s2); }
 .tag.warn { --fill: var(--warn); }
 .tag.bad { --fill: var(--bad); }
 .tag.info { --fill: var(--info); }
-/* A coloured tag is a colour fill: Melli over it, ink text on it. */
+/* A coloured tag is a flat chip with ink text. Melli is for data marks: on a
+   20px chip it muddied the colour behind the word. */
 .tag.good, .tag.warn, .tag.bad, .tag.info, .tag[style*="--fill"] {
-  background: var(--melli), var(--fill);
+  background: var(--fill);
   color: var(--ink);
 }
 
@@ -607,7 +673,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .stat-value {
   font-size: var(--fs-heading);
   line-height: var(--lh-heading);
-  font-weight: 700;
+  font-weight: 800;
 }
 /* Holds one delta or one tag. 20px tall, centred on the border. */
 .stat-foot {
@@ -663,8 +729,10 @@ figure > * + figcaption { margin-top: var(--s2); }
   height: var(--head-height);
   padding-block: 0;
   background: var(--head);
-  font-size: var(--fs-note);
-  line-height: var(--lh-note);
+  /* One step below the note size, the only text there: a row of capitals at
+     note size read larger than the cells under it. */
+  font-size: 11px;
+  line-height: 16px;
   font-weight: 400;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -678,7 +746,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .table td.fit, .table th.fit { width: 1%; white-space: nowrap; }
 .table .bar { min-width: 64px; }
 /* Totals: a foot as dark as the head, in extra-bold. */
-.table tfoot td { background: var(--head); border-top: var(--border); border-bottom: 0; font-weight: 700; }
+.table tfoot td { background: var(--head); border-top: var(--border); border-bottom: 0; font-weight: 800; }
 /* A group heading is a <th> row inside the body; it takes the head's look. */
 .table tbody th { border-top: var(--border); }
 .table tbody tr:first-child th { border-top: 0; }
@@ -743,7 +811,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   box-shadow: 0 0 0 1px var(--ink);
 }
 /* Diverging: the fill grows from the middle, right for a gain and left (.neg)
-   for a loss. --v is a share of one half. Gains are green and losses crimson. */
+   for a loss. --v is a share of one half. Gains are green and losses red. */
 .bar.diverge .bar-fill { inset: 0 auto 0 50%; width: calc(var(--v, 0) * 0.5%); background: var(--melli), var(--good); }
 .bar.diverge .bar-fill.neg { inset: 0 50% 0 auto; background: var(--melli), var(--bad); box-shadow: -1px 0 0 var(--ink); }
 .bar.diverge::after { content: ""; position: absolute; inset: 0 auto 0 50%; width: 1px; background: var(--ink); }
@@ -1023,7 +1091,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .hero-number {
   font-size: 80px;
   line-height: 88px;
-  font-weight: 700;
+  font-weight: 800;
   -webkit-text-stroke: 8px var(--ink);
   paint-order: stroke fill;
 }
@@ -1134,8 +1202,11 @@ select.input {
 
 /* ── Motion ───────────────────────────────────────────────────────────── */
 
-/* Opt in with .anim on a container. Everything plays once: when its panel
-   scrolls into view if style.js is loaded, on page load if not. */
+/* Motion is for data marks only: bars fill, columns rise, lines trace, pies
+   sweep. Panels and text never animate in: a fade and rise held text between
+   pixels, so it looked blurred until it settled. Opt in with .anim on a
+   container. Everything plays once: when its panel scrolls into view if
+   style.js is loaded, on page load if not. */
 .stagger > :nth-child(2) { --i: 1; }
 .stagger > :nth-child(3) { --i: 2; }
 .stagger > :nth-child(4) { --i: 3; }
@@ -1149,10 +1220,6 @@ select.input {
 .stagger > :nth-child(12) { --i: 11; }
 
 @media (prefers-reduced-motion: no-preference) {
-  .anim .enter {
-    animation: enter var(--t-base) var(--ease) both;
-    animation-delay: calc(var(--i, 0) * var(--t-step));
-  }
   .anim .bar-fill {
     animation: fill-x var(--t-slow) var(--ease) both;
     animation-delay: calc(var(--i, 0) * var(--t-step));
@@ -1172,18 +1239,18 @@ select.input {
   /* A stretched sparkline measures dashes in screen pixels, so it cannot trace. */
   .anim .spark .line { stroke-dasharray: none; animation: none; }
   .anim .dot {
-    animation: enter var(--t-fast) var(--ease) both;
+    animation: fade var(--t-fast) var(--ease) both;
     animation-delay: var(--t-slow);
   }
 }
 
 /* style.js sets js-reveal and holds each animation at its first frame until
    the panel around it gets in-view. */
-.js-reveal .anim :is(.enter, .bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: paused; }
-.js-reveal .anim .in-view:is(.enter, .bar-fill, .col-fill, .line, .dot, .pie-slice),
-.js-reveal .anim .in-view :is(.enter, .bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: running; }
+.js-reveal .anim :is(.bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: paused; }
+.js-reveal .anim .in-view:is(.bar-fill, .col-fill, .line, .dot, .pie-slice),
+.js-reveal .anim .in-view :is(.bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: running; }
 
-@keyframes enter { from { opacity: 0; transform: translateY(8px); } }
+@keyframes fade { from { opacity: 0; } }
 @keyframes fill-x { from { width: 0; } }
 @keyframes fill-y { from { height: 0; } }
 @keyframes pie { from { stroke-dasharray: 0 100; } }

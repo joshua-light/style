@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETH, and OpenAI's Claim</title>
+<meta name="description" content="What the Exponential Time Hypothesis is, why so much rests on it, and how to read OpenAI's claim that it is false. For novices in complexity theory.">
+<link rel="stylesheet" href="../skills/guide/assets/style.css">
+<script src="../skills/guide/assets/style.js" defer></script>
+<style>
+/* Page-specific parts: chapters, disclosures, quizzes, and three diagrams the
+   stylesheet has no component for. Tokens only. */
+
+.page > section + section { margin-top: var(--s7); }
+section[id], h3[id] { scroll-margin-top: var(--s5); }
+.stack > * + * { margin-top: var(--s3); }
+.stack > .heading + .note { margin-top: 0; }
+.panel-body > * + blockquote { margin-top: var(--s5); }
+.math, .more, .quiz, .narrow { max-width: var(--measure); }
+
+/* Text the reader must read and answer is prose, not a label. */
+.quiz .callout-body, .more > p { font-size: var(--fs-body); line-height: var(--lh-body); }
+/* Prose is not tracked. The font trial's Prose tracking select sets this
+   variable, to compare. */
+:root { --track-prose: 0px; }
+.flow > :is(p:not([class]), ul, ol), .quiz .callout-body, .more > p { letter-spacing: var(--track-prose); }
+:is(p, li) code:not(.math) { letter-spacing: 0; }
+
+.tab:disabled { color: var(--text-faint); cursor: default; }
+
+/* Steppers: tabs with data-go set data-step on the figure. data-on lists the
+   steps an element shows on; data-vis does the same but keeps its room, so a
+   ladder does not jump when a bracket appears. */
+[data-step="1"] [data-on]:not([data-on~="1"]),
+[data-step="2"] [data-on]:not([data-on~="2"]),
+[data-step="3"] [data-on]:not([data-on~="3"]),
+[data-step="4"] [data-on]:not([data-on~="4"]),
+[data-step="5"] [data-on]:not([data-on~="5"]),
+[data-step="6"] [data-on]:not([data-on~="6"]) { display: none; }
+[data-step="1"] [data-vis]:not([data-vis~="1"]),
+[data-step="2"] [data-vis]:not([data-vis~="2"]),
+[data-step="3"] [data-vis]:not([data-vis~="3"]) { visibility: hidden; }
+
+/* Optional depth: closed by default, so the main line stays short. */
+.more { background: var(--panel); border: var(--border); font-size: var(--fs-label); line-height: var(--lh-label); }
+.more > summary { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); list-style: none; cursor: pointer; }
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary:focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
+.more[open] > summary { border-bottom: var(--border); }
+.more > p { max-width: none; padding: var(--s3) var(--s4); }
+
+/* A quiz is a callout. The right option turns green and a wrong pick red;
+   the verdict line says which in words. */
+.button.is-right { background: var(--melli), var(--good); color: var(--ink); }
+.button.is-wrong { background: var(--melli), var(--bad); color: var(--ink); }
+/* A locked primary button drops its fill: faint text on azure does not read. */
+.button.primary:disabled { background: var(--raised); }
+.feedback > * + * { margin-top: var(--s2); }
+.sort-item + .sort-item { margin-top: var(--s3); padding-top: var(--s3); border-top: var(--border); }
+.sort-item > * + * { margin-top: var(--s2); }
+
+.panel-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); padding: var(--s3) var(--s4); border-top: var(--border); font-size: var(--fs-label); line-height: var(--lh-label); }
+
+/* The family: 3-SAT above, a bus of wires, four problems below. */
+.family-root { width: 280px; max-width: 100%; margin: 0 auto; }
+.family .node > * + * { margin-top: var(--s1); }
+.family .grid > .node { flex: none; }
+.pic { width: 72px; height: auto; }
+.pic .edge { stroke: var(--text-faint); stroke-width: 2px; }
+.pic .route { fill: none; stroke: var(--text); stroke-width: 2px; stroke-linejoin: miter; filter: var(--ink-ring); }
+.pic .dot { fill: var(--fill, var(--c-other)); }
+.pic .cell { fill: var(--sunken); stroke: var(--ink); stroke-width: 1px; }
+.pic .cell.on { fill: var(--c1); }
+.chart text.code { font-family: var(--font-mono); }
+
+/* The ladder: rungs in the first column, one bracket per bet beside them. */
+.ladder { display: grid; grid-template-columns: minmax(0, 1fr) 144px 144px; gap: var(--s2) var(--s3); font-size: var(--fs-label); line-height: var(--lh-label); }
+.rung { grid-column: 1; display: grid; grid-template-columns: 128px minmax(0, 1fr) auto; align-items: center; gap: var(--s1) var(--s3); min-height: 64px; padding: var(--s2) var(--s3); background: var(--inset); border: var(--border); }
+.rung > code { justify-self: start; font-size: var(--fs-subheading); line-height: var(--lh-subheading); }
+.rung-mult { grid-column: 2; font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.rung > .tag { justify-self: end; }
+.eth-line { grid-column: 1; display: flex; align-items: center; gap: var(--s3); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.eth-line::before, .eth-line::after { content: ""; height: 2px; background: var(--text-dim); filter: var(--ink-ring); }
+.eth-line::before { width: var(--s3); }
+.eth-line::after { flex: 1; }
+.eth-line > strong { color: var(--text); }
+.bracket { position: relative; padding: var(--s1) 0 var(--s1) var(--s5); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.bracket::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--s2); border: 2px solid var(--text-dim); border-left: 0; filter: var(--ink-ring); }
+.bracket > strong { display: block; color: var(--text); }
+.bracket.eth { grid-column: 2; }
+.bracket.pnp { grid-column: 3; }
+
+/* The foundation: results sit on the assumption they rest on. */
+.found { display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--s1); font-size: var(--fs-label); line-height: var(--lh-label); }
+.found > div { padding: var(--s2) var(--s3); background: var(--inset); border: var(--border); }
+.found > div > * + * { margin-top: var(--s1); }
+.found p { max-width: none; }
+.found .slab { background: var(--raised); }
+.found .slab.fallen { background: var(--sunken); color: var(--text-faint); }
+.found .slab > strong { margin-right: var(--s2); }
+
+@media screen and (max-width: 760px) {
+  /* A title with tabs cannot share the top border on a phone: both drop into the box and wrap. */
+  .panel-head:has(.tabs) { position: static; flex-wrap: wrap; padding: var(--s3) var(--s4) 0; white-space: normal; }
+  .panel-head:has(.tabs) > .tabs { flex-wrap: wrap; row-gap: var(--s1); }
+  .panel-head:has(.tabs) + .panel-body { padding-top: var(--s3); }
+  .stack > .heading { overflow-wrap: anywhere; }
+  .family-wires { display: none; }
+  .family-root { margin-bottom: var(--s5); }
+  .ladder { grid-template-columns: minmax(0, 1fr); }
+  .ladder > * { grid-column: 1 !important; grid-row: auto !important; }
+  .rung { grid-template-columns: minmax(0, 1fr); }
+  .rung > * { grid-column: 1; justify-self: start !important; }
+  [data-step="1"] [data-vis]:not([data-vis~="1"]),
+  [data-step="2"] [data-vis]:not([data-vis~="2"]),
+  [data-step="3"] [data-vis]:not([data-vis~="3"]) { display: none; }
+  .found { grid-template-columns: minmax(0, 1fr); }
+  .found > div { grid-column: 1 !important; grid-row: auto !important; }
+}
+</style>
+</head>
+<body>
+<main class="page anim">
+
+  <!-- ── Hero ── -->
+  <p class="eyebrow">Explainer · Computational complexity</p>
+  <h1>The Exponential Time Hypothesis, and OpenAI's claim that it is false</h1>
+  <p class="lead">A 27-year-old assumption about how hard one puzzle is has held up many results in theoretical computer science. OpenAI says one of its models has knocked it down. Here is what the assumption says, why it mattered, and how much weight the claim can bear today.</p>
+  <p class="note">For novices in complexity theory · about 17 minutes</p>
+
+  <div class="grid">
+    <section class="panel span-8">
+      <div class="panel-head">The manuscript <span class="tag warn">Claim · under review</span></div>
+      <div class="panel-body">
+        <p class="subheading">The Exponential Time Hypothesis is False</p>
+        <dl class="kv">
+          <dt>Author line</dt><dd>OpenAI</dd>
+          <dt>Dated</dt><dd>25 October 2026</dd>
+          <dt>Made public</dt><dd>26 October 2026</dd>
+          <dt>Found by</dt><dd>an unnamed internal OpenAI model</dd>
+          <dt>Checked by</dt><dd>the Lean proof assistant</dd>
+          <dt>Being reviewed by</dt><dd>Russell Impagliazzo and Ramamohan Paturi (who proposed ETH), and Ryan Williams</dd>
+          <dt>Status</dt><dd>a claim until that review is done</dd>
+        </dl>
+      </div>
+    </section>
+    <nav class="panel span-4" aria-label="Chapters">
+      <div class="panel-head">Chapters</div>
+      <div class="panel-body">
+        <ol class="label">
+          <li><a href="#paper">A blunt title</a></li>
+          <li><a href="#puzzle">The puzzle</a></li>
+          <li><a href="#wall">The doubling wall</a></li>
+          <li><a href="#bet">The bet</a></li>
+          <li><a href="#built">What was built on it</a></li>
+          <li><a href="#claim">The claim</a></li>
+          <li><a href="#fallout">What falls, what stands</a></li>
+          <li><a href="#verified">Is it true?</a></li>
+          <li><a href="#recap">Five statements</a></li>
+        </ol>
+      </div>
+    </nav>
+  </div>
+
+  <!-- ── 1 ── -->
+  <section id="paper" class="flow">
+    <p class="eyebrow">Chapter 1 / 9</p>
+    <h2>A paper with a blunt title</h2>
+    <p>On 26 October 2026, OpenAI made public a manuscript called <mark>The Exponential Time Hypothesis is False</mark>. Its author line says only “OpenAI”.</p>
+    <p>According to OpenAI's own repository, an unnamed, unreleased internal model produced it. <mark>Lean</mark>, a program that verifies mathematical proofs step by step, has checked a version of its main theorem. Two other claimed results came out alongside it, in mathematics and physics; this piece leaves them aside.</p>
+    <p>The unusual part is who is checking it. Russell Impagliazzo and Ramamohan Paturi proposed the hypothesis in 1999. Together with Ryan Williams, they now lead an independent working group that will examine the proof.</p>
+    <p>The group asked for the materials to be released immediately, and has reportedly said that taking part is not an endorsement. <strong>Until that review is done, this is a claim</strong>, and the rest of this page treats it as one.</p>
+    <p>To make sense of it, we'll take four questions in order:</p>
+    <ol>
+      <li>What is the puzzle at the centre of all this?</li>
+      <li>What exactly is the Exponential Time Hypothesis, or ETH?</li>
+      <li>Why did anyone care whether it was true?</li>
+      <li>What would follow if OpenAI is right, and how sure can we be?</li>
+    </ol>
+  </section>
+
+  <!-- ── 2 ── -->
+  <section id="puzzle" class="flow">
+    <p class="eyebrow">Chapter 2 / 9</p>
+    <h2>The puzzle: three switches, four rules</h2>
+    <p>Let's start with something you can solve in your head.</p>
+    <ul>
+      <li><strong>Three switches</strong>, x, y and z. Each one is either T (true) or F (false).</li>
+      <li><strong>Four rules.</strong> A rule is satisfied when at least one of its parts holds.</li>
+      <li><strong>Your goal:</strong> a setting of the switches that satisfies all four rules at once.</li>
+    </ul>
+    <details class="more">
+      <summary><span class="tag">More</span>How to read NOT and OR</summary>
+      <p>“x OR y OR z” is satisfied when at least one of x, y, z is T. “NOT x” holds when x is F. So “NOT x OR y” is satisfied unless x is T and y is F at the same time.</p>
+    </details>
+
+    <!-- Switchboard: T/F tabs flip a switch; the table lights each rule. -->
+    <div class="grid" id="switchboard">
+      <section class="panel span-4">
+        <div class="panel-head">Switches</div>
+        <div class="panel-body">
+          <dl class="kv">
+            <dt>Switch x</dt><dd><span class="tabs" role="group" aria-label="Switch x"><button class="tab" type="button" data-var="x" data-val="T" aria-pressed="true">T</button><button class="tab" type="button" data-var="x" data-val="F" aria-pressed="false">F</button></span></dd>
+            <dt>Switch y</dt><dd><span class="tabs" role="group" aria-label="Switch y"><button class="tab" type="button" data-var="y" data-val="T" aria-pressed="false">T</button><button class="tab" type="button" data-var="y" data-val="F" aria-pressed="true">F</button></span></dd>
+            <dt>Switch z</dt><dd><span class="tabs" role="group" aria-label="Switch z"><button class="tab" type="button" data-var="z" data-val="T" aria-pressed="false">T</button><button class="tab" type="button" data-var="z" data-val="F" aria-pressed="true">F</button></span></dd>
+          </dl>
+          <output class="stack" aria-live="polite">
+            <p class="stat-value" id="sb-count">3 of 4</p>
+            <p class="stat-note">rules lit. Press T or F to flip a switch.</p>
+          </output>
+        </div>
+      </section>
+      <section class="panel span-8">
+        <div class="panel-head">Rules</div>
+        <div class="panel-body flush">
+          <table class="table">
+            <thead><tr><th class="fit">Rule</th><th>Needs at least one of</th><th class="fit">Lamp</th></tr></thead>
+            <tbody>
+              <tr data-rule="1"><td class="fit">Rule 1</td><td><code>x OR y OR z</code></td><td class="fit"><span class="tag good">Lit</span></td></tr>
+              <tr data-rule="2"><td class="fit">Rule 2</td><td><code>NOT x OR y</code></td><td class="fit"><span class="tag">Off</span></td></tr>
+              <tr data-rule="3"><td class="fit">Rule 3</td><td><code>NOT y OR z</code></td><td class="fit"><span class="tag good">Lit</span></td></tr>
+              <tr data-rule="4"><td class="fit">Rule 4</td><td><code>NOT z OR NOT x</code></td><td class="fit"><span class="tag good">Lit</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <aside class="callout note quiz" data-quiz data-check="k-01">
+      <div class="callout-head">Predict</div>
+      <div class="callout-body">
+        <p>There are 2 × 2 × 2 = 8 ways to set the three switches. How many of them light all four rules?</p>
+        <div class="row options" role="group" aria-label="Your prediction">
+          <button type="button" class="button">None of them</button>
+          <button type="button" class="button" data-correct>Exactly 2</button>
+          <button type="button" class="button">About half (4)</button>
+          <button type="button" class="button">All 8</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>Exactly 2: (x, y, z) = (F, F, T) and (F, T, T). The only way to be sure was to check every setting, which is what the sweep below does. That's brute force. With 3 switches it's 8 rows; every extra switch doubles the table.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Sweep: brute force over all eight settings, one row at a time. -->
+    <figure class="panel" id="sweep">
+      <div class="panel-head">Brute force: every setting <span class="tag" id="sweep-count">0 of 8 checked</span></div>
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th class="fit">x</th><th class="fit">y</th><th class="fit">z</th><th>Result</th></tr></thead>
+          <tbody>
+            <tr data-set="FFF"><td class="fit">F</td><td class="fit">F</td><td class="fit">F</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="FFT"><td class="fit">F</td><td class="fit">F</td><td class="fit">T</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="FTF"><td class="fit">F</td><td class="fit">T</td><td class="fit">F</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="FTT"><td class="fit">F</td><td class="fit">T</td><td class="fit">T</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="TFF"><td class="fit">T</td><td class="fit">F</td><td class="fit">F</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="TFT"><td class="fit">T</td><td class="fit">F</td><td class="fit">T</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="TTF"><td class="fit">T</td><td class="fit">T</td><td class="fit">F</td><td class="faint">Not checked yet</td></tr>
+            <tr data-set="TTT"><td class="fit">T</td><td class="fit">T</td><td class="fit">T</td><td class="faint">Not checked yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel-foot">
+        <button type="button" class="button primary" id="sweep-go" disabled data-gate-enable="k-01">Try all 8</button>
+        <span class="dim" data-gate-hide="k-01">Answer the question above to unlock.</span>
+        <output class="dim" id="sweep-out" aria-live="polite"></output>
+      </div>
+    </figure>
+
+    <p>What you just solved is a <strong>satisfiability</strong> puzzle. You have some yes/no switches and a list of rules, each saying “at least one of these must hold”. The question is whether some setting satisfies every rule at once.</p>
+    <p>When each rule mentions at most three switches, computer scientists call the puzzle <mark>3-SAT</mark>: SAT for satisfiability, 3 for at most three switches per rule. They also rename the parts:</p>
+    <section class="panel narrow">
+      <div class="panel-head">Same puzzle, their words</div>
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th>In the puzzle</th><th>In computer science</th></tr></thead>
+          <tbody>
+            <tr><td>Switch</td><td>Variable</td></tr>
+            <tr><td>Rule</td><td>Clause</td></tr>
+            <tr><td>A setting that works</td><td>Satisfying assignment</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <p>The only sure-fire method we have met is the one the table used: try every setting. That is <strong>brute force</strong>. With n switches there are <code class="math">2<sup>n</sup></code> settings, so brute force takes on the order of <code class="math">2<sup>n</sup></code> steps. Three switches give 8 rows; thirty give about a billion.</p>
+
+    <h3 id="family">One puzzle stands for a whole family</h3>
+    <p>Notice something about what you just did. <strong>Checking</strong> a setting took a glance: go down the rules one by one. <strong>Finding</strong> a setting meant trying them.</p>
+    <p>Many famous problems have that same shape: an answer is quick to check, but finding one seems to need a search. Colour the dots of a network so that no two linked dots match. Plan a route that visits every city exactly once.</p>
+    <p>Computer scientists call the problems where a proposed answer is quick to check <mark>NP</mark>. Being in NP doesn't make a problem hard, since easy problems are in it too. But for its hardest members, finding an answer seems to need a search.</p>
+    <p>Those hardest members, the <mark>NP-complete</mark> problems, are tied together tightly: they can all be rewritten as one another. A 3-SAT formula can be turned into a colouring problem with the same answer, and a colouring problem into a 3-SAT formula.</p>
+    <p>For the four problems below, the rewrite <strong>from</strong> 3-SAT stays about the same size: a formula becomes a graph with about as many dots as it has switches and rules. The rewrites back into 3-SAT aren't guaranteed to stay that small.</p>
+
+    <!-- Family: 3-SAT above a bus of wires that drops into four problems. The wire strip is drawn at 894px, the panel's inner width. -->
+    <figure class="panel">
+      <div class="panel-head">Quick to check, slow to find</div>
+      <div class="panel-body">
+        <div class="family" role="img" aria-label="3-SAT, the switches puzzle, rewrites into four problems at about the same size: graph colouring, Hamiltonian cycle, vertex cover and clique. Each is quick to check and seems to need a search to find.">
+          <div class="node family-root">
+            <svg class="chart pic" viewBox="0 0 72 20" aria-hidden="true"><rect class="cell on" x="0.5" y="2.5" width="20" height="14"/><rect class="cell" x="26.5" y="2.5" width="20" height="14"/><rect class="cell on" x="52.5" y="2.5" width="19" height="14"/></svg>
+            <strong>3-SAT</strong>
+            <span>The switches puzzle.</span>
+            <span>Check: read each rule. Find: try settings.</span>
+          </div>
+          <svg class="chart family-wires" viewBox="0 0 894 64" aria-hidden="true">
+            <path class="wire" d="M447 0 V24 H106 V56"/>
+            <path class="wire" d="M447 24 H333 V56"/>
+            <path class="wire" d="M447 24 H561 V56"/>
+            <path class="wire" d="M447 24 H788 V56"/>
+            <polygon class="arrow" points="102,56 106,64 110,56"/>
+            <polygon class="arrow" points="329,56 333,64 337,56"/>
+            <polygon class="arrow" points="557,56 561,64 565,56"/>
+            <polygon class="arrow" points="784,56 788,64 792,56"/>
+            <text x="460" y="14">3-SAT rewrites into each, at about the same size</text>
+          </svg>
+          <div class="grid">
+            <div class="node span-3">
+              <svg class="chart pic" viewBox="0 0 72 44" aria-hidden="true"><line class="edge" x1="10" y1="12" x2="34" y2="6"/><line class="edge" x1="34" y1="6" x2="60" y2="12"/><line class="edge" x1="60" y1="12" x2="50" y2="36"/><line class="edge" x1="50" y1="36" x2="20" y2="36"/><line class="edge" x1="20" y1="36" x2="10" y2="12"/><line class="edge" x1="34" y1="6" x2="20" y2="36"/><line class="edge" x1="34" y1="6" x2="50" y2="36"/><rect class="dot" style="--fill:var(--c1)" x="6" y="8" width="8" height="8"/><rect class="dot" style="--fill:var(--c2)" x="30" y="2" width="8" height="8"/><rect class="dot" style="--fill:var(--c3)" x="56" y="8" width="8" height="8"/><rect class="dot" style="--fill:var(--c1)" x="46" y="32" width="8" height="8"/><rect class="dot" style="--fill:var(--c3)" x="16" y="32" width="8" height="8"/></svg>
+              <strong>Graph colouring</strong>
+              <span>Give each dot one of 3 colours so that no two linked dots match.</span>
+              <span>Check: look at each link. Find: try colourings.</span>
+            </div>
+            <div class="node span-3">
+              <svg class="chart pic" viewBox="0 0 72 44" aria-hidden="true"><line class="edge" x1="12" y1="10" x2="46" y2="38"/><line class="edge" x1="36" y1="6" x2="22" y2="38"/><polyline class="route" points="12,10 36,6 62,14 46,38 22,38 12,10"/><rect class="dot" x="8" y="6" width="8" height="8"/><rect class="dot" x="32" y="2" width="8" height="8"/><rect class="dot" x="58" y="10" width="8" height="8"/><rect class="dot" x="42" y="34" width="8" height="8"/><rect class="dot" x="18" y="34" width="8" height="8"/></svg>
+              <strong>Hamiltonian cycle</strong>
+              <span>A route through every city exactly once, ending where it started.</span>
+              <span>Check: walk the route. Find: try routes.</span>
+            </div>
+            <div class="node span-3">
+              <svg class="chart pic" viewBox="0 0 72 44" aria-hidden="true"><line class="edge" x1="10" y1="10" x2="30" y2="22"/><line class="edge" x1="30" y1="22" x2="56" y2="8"/><line class="edge" x1="30" y1="22" x2="14" y2="38"/><line class="edge" x1="14" y1="38" x2="50" y2="34"/><line class="edge" x1="56" y1="8" x2="50" y2="34"/><line class="edge" x1="10" y1="10" x2="50" y2="34"/><rect class="dot" x="6" y="6" width="8" height="8"/><rect class="dot" style="--fill:var(--c1)" x="26" y="18" width="8" height="8"/><rect class="dot" x="52" y="4" width="8" height="8"/><rect class="dot" x="10" y="34" width="8" height="8"/><rect class="dot" style="--fill:var(--c1)" x="46" y="30" width="8" height="8"/></svg>
+              <strong>Vertex cover</strong>
+              <span>Pick a few dots that touch every link.</span>
+              <span>Check: look at each link. Find: try sets of dots.</span>
+            </div>
+            <div class="node span-3">
+              <svg class="chart pic" viewBox="0 0 72 44" aria-hidden="true"><line class="edge" x1="54" y1="36" x2="66" y2="10"/><line class="edge" x1="40" y1="38" x2="54" y2="36"/><path class="route" d="M8 8 H40 V38 H8 Z M8 8 L40 38 M40 8 L8 38"/><rect class="dot" style="--fill:var(--c1)" x="4" y="4" width="8" height="8"/><rect class="dot" style="--fill:var(--c1)" x="36" y="4" width="8" height="8"/><rect class="dot" style="--fill:var(--c1)" x="4" y="34" width="8" height="8"/><rect class="dot" style="--fill:var(--c1)" x="36" y="34" width="8" height="8"/><rect class="dot" x="50" y="32" width="8" height="8"/><rect class="dot" x="62" y="6" width="8" height="8"/></svg>
+              <strong>Clique</strong>
+              <span>Find k dots that are all linked to each other.</span>
+              <span>Check: look at each pair. Find: try groups.</span>
+            </div>
+          </div>
+        </div>
+        <figcaption>All five problems are NP-complete. “Size” counts switches and rules for 3-SAT, and dots for the others.</figcaption>
+      </div>
+    </figure>
+
+    <p>That is why a puzzle about switches matters. The paper itself calls k-SAT “the canonical NP-complete problem”: the standard stand-in for the whole family.</p>
+    <p>Because the members rewrite into one another, a genuinely fast way to solve 3-SAT would hand you fast ways to solve all of them. “Fast” here means work that grows like a fixed power of n instead of doubling with every switch. And a fast way to solve any one of them would hand you one for 3-SAT.</p>
+  </section>
+
+  <!-- ── 3 ── -->
+  <section id="wall" class="flow">
+    <p class="eyebrow">Chapter 3 / 9</p>
+    <h2>The doubling wall</h2>
+    <p>Brute force is fine for three switches. Step through the tabs and watch what each step up in n does to the table. There is no log scale here: each new bar fills its track, and the one before it is redrawn at its true size under it.</p>
+
+    <!-- Wall: one tab per step. Steps 4 to 6 unlock with the question below. -->
+    <figure class="panel" data-step="1">
+      <div class="panel-head">Rows to check
+        <span class="tabs">
+          <button class="tab" type="button" data-go="1" aria-pressed="true">n = 3</button>
+          <button class="tab" type="button" data-go="2" aria-pressed="false">n = 20</button>
+          <button class="tab" type="button" data-go="3" aria-pressed="false">n = 100</button>
+          <button class="tab" type="button" data-go="4" aria-pressed="false" disabled data-gate-enable="k-02">n = 110</button>
+          <button class="tab" type="button" data-go="5" aria-pressed="false" disabled data-gate-enable="k-02">n = 1,000</button>
+          <button class="tab" type="button" data-go="6" aria-pressed="false" disabled data-gate-enable="k-02">Best known</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <div class="stack" data-on="1">
+          <p class="heading">8 rows</p>
+          <p class="note">3 switches · <code class="math">2<sup>3</sup></code></p>
+          <div class="meter">
+            <div class="meter-row"><span class="meter-label">n = 3</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">8 rows</span></div>
+          </div>
+          <p class="label">Three switches: the puzzle you just swept. <strong>Instant:</strong> you checked every row by hand.</p>
+        </div>
+        <div class="stack" data-on="2">
+          <p class="heading">1,048,576 rows</p>
+          <p class="note">20 switches · <code class="math">2<sup>20</sup></code></p>
+          <div class="meter">
+            <div class="meter-row"><span class="meter-label">n = 20</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">1,048,576 rows</span></div>
+            <div class="meter-row"><span class="meter-label">n = 3</span><div class="bar" style="--v:0.0008"><span class="bar-fill"></span></div><span class="meter-value">8 rows · too small to see</span></div>
+          </div>
+          <p class="label">Twenty switches means seventeen more doublings. A laptop gets through these rows in <strong>well under a second</strong>. And look what happened to your 8 rows: under this bar, they're too small to see.</p>
+        </div>
+        <div class="stack" data-on="3">
+          <p class="heading">1,267,650,600,228,229,401,496,703,205,376 rows</p>
+          <p class="note">100 switches · <code class="math">2<sup>100</sup></code></p>
+          <div class="meter">
+            <div class="meter-row"><span class="meter-label">n = 100</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">a 31-digit number of rows</span></div>
+            <div class="meter-row"><span class="meter-label">n = 20</span><div class="bar" style="--v:0"><span class="bar-fill"></span></div><span class="meter-value">1,048,576 rows · too small to see</span></div>
+          </div>
+          <p class="label">A hundred switches, and the bar for twenty has vanished. Suppose a billion computers each checked a billion rows every second, all on this one formula. They would need <strong>tens of thousands of years</strong>.</p>
+          <p class="note" data-gate-hide="k-02">Answer the question below to continue the climb.</p>
+        </div>
+        <div class="stack" data-on="4">
+          <p class="heading">1,298,074,214,633,706,907,132,624,082,305,024 rows</p>
+          <p class="note">110 switches · <code class="math">2<sup>110</sup></code></p>
+          <div class="meter">
+            <div class="meter-row"><span class="meter-label">n = 110</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">a 34-digit number of rows</span></div>
+            <div class="meter-row"><span class="meter-label">n = 100</span><div class="bar" style="--v:0.0977"><span class="bar-fill"></span></div><span class="meter-value">1,024 times fewer · a sliver</span></div>
+          </div>
+          <p class="label">Ten more switches, 1,024 times the work: <strong>tens of millions of years</strong> on the same billion computers. The input grew by a tenth; the work grew a thousandfold.</p>
+        </div>
+        <div class="stack" data-on="5 6">
+          <p class="heading">A 302-digit number of rows</p>
+          <p class="note">1,000 switches · <code class="math">2<sup>1000</sup></code>, written out in full</p>
+<pre>107150860718626732094842504906000181056140481170553360744375
+038837035105112493612249319837881569585812759467291755314682
+518714528569231404359845775746985748039345677748242309854210
+746050623711418779541821530464749835819412673987675591655439
+460770629145711964776865421676604298316526243868372056680693
+76</pre>
+          <p class="note" data-on="6"><code class="math">1.307<sup>1000</sup></code>, the best known before the claim: a 117-digit number of steps</p>
+<pre data-on="6">188619930521448902707108377155409147189281733505018684482888
+234247050553268204471420879267118830657902790934842900986</pre>
+          <p class="note"><code class="math">10<sup>80</sup></code>, about the atoms in the observable universe: an 81-digit number</p>
+<pre>100000000000000000000000000000000000000000000000000000000000
+000000000000000000000</pre>
+          <p class="label" data-on="5">A thousand switches. No bar can hold this, so here is the number of rows written out in full. For scale, the observable universe holds only about <code class="math">10<sup>80</sup></code> atoms, a number with 81 digits.</p>
+          <p class="label" data-on="6">Cleverer algorithms do exist. The best known before OpenAI's claim, from the <mark>PPSZ</mark> family of randomised algorithms, takes about <code class="math">1.307<sup>n</sup></code> steps. At a thousand switches that is a 117-digit number: far shorter, and still far beyond the atoms.</p>
+          <p class="label" data-on="6">Its multiplier per switch is smaller, ×1.307 instead of ×2, but it is still a fixed multiplier. A lower wall, not a way around it.</p>
+        </div>
+      </div>
+    </figure>
+
+    <aside class="callout note quiz" data-quiz data-check="k-02">
+      <div class="callout-head">Predict</div>
+      <div class="callout-body">
+        <p>Brute force on 100 switches already needs about <code class="math">10<sup>30</sup></code> checks. Add 10 more switches. How much more work is that?</p>
+        <div class="row options" role="group" aria-label="Your prediction">
+          <button type="button" class="button">About 10% more</button>
+          <button type="button" class="button">About 10× more</button>
+          <button type="button" class="button" data-correct>About 1,000× more</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>About 1,000× (<code class="math">2<sup>10</sup> = 1,024</code>). The tempting answer is 10%, because 110 is only 10% bigger than 100. But each switch doubles the table, so 10 switches double it ten times. That is what “exponential” means in practice: adding a little input multiplies the work.</p>
+          <p>The last three tabs above are now unlocked.</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ── 4 ── -->
+  <section id="bet" class="flow">
+    <p class="eyebrow">Chapter 4 / 9</p>
+    <h2>The bet: “you can't get under the wall”</h2>
+    <p>Clever algorithms have lowered the multiplier per switch, from ×2 for brute force to about ×1.307. But every one found so far still pays some fixed multiplier for each extra switch. Is that a law, or have we just not been clever enough?</p>
+    <p>In 1999, Russell Impagliazzo and Ramamohan Paturi made a precise bet, the <mark>Exponential Time Hypothesis (ETH)</mark>. It says that every algorithm for 3-SAT, however clever, pays on average at least <strong>some</strong> fixed multiplier for each extra switch, on the hardest puzzles of each size. That multiplier might be tiny, ×1.001, but it never fades to ×1.</p>
+    <p>Notice the word “hypothesis”. Nobody has proved ETH. It is an unproven assumption, a foundation stone that researchers chose to build on.</p>
+    <p>You have probably heard of a famous cousin, <code class="math">P ≠ NP</code>. Both are bets about the same unknown, because nobody knows the fastest <strong>possible</strong> algorithm for 3-SAT. Where could it sit?</p>
+    <p>The figure shows four possible answers, sorted by how quickly the work grows as you add switches. Two are algorithms we have, and two are speeds nobody has found.</p>
+
+    <!-- Ladder: rungs ordered by growth, fastest-growing first. Brackets mark what each bet allows. -->
+    <figure class="panel" data-step="1">
+      <div class="panel-head">Where could the best possible 3-SAT algorithm sit?
+        <span class="tabs">
+          <button class="tab" type="button" data-go="1" aria-pressed="true">Candidates</button>
+          <button class="tab" type="button" data-go="2" aria-pressed="false">The P vs NP bet</button>
+          <button class="tab" type="button" data-go="3" aria-pressed="false">ETH's bet</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <p class="note">Top: the work grows fastest as you add switches. The order is for large n.</p>
+        <div class="ladder">
+          <div class="rung" style="grid-row:1">
+            <code class="math">2<sup>n</sup></code><span>Brute force: try every setting</span><span class="tag good">We have this</span>
+            <span class="rung-mult">×2 per extra switch</span>
+          </div>
+          <div class="rung" style="grid-row:2">
+            <code class="math">1.307<sup>n</sup></code><span>Best known before the claim (PPSZ)</span><span class="tag good">We have this</span>
+            <span class="rung-mult">×1.307 per extra switch</span>
+          </div>
+          <div class="eth-line" style="grid-row:3" data-vis="3"><span><strong>ETH's line.</strong> Above it, a fixed multiplier per switch; below it, the multiplier fades.</span></div>
+          <div class="rung" style="grid-row:4">
+            <code class="math">2<sup>√n</sup></code><span>Subexponential example</span><span class="tag">Nobody has found this</span>
+            <span class="rung-mult">The multiplier fades toward ×1</span><span class="tag bad" data-vis="3">Ruled out by ETH only</span>
+          </div>
+          <div class="rung" style="grid-row:5">
+            <code class="math">n<sup>3</sup></code><span>Polynomial: what P = NP would need</span><span class="tag">Nobody has found this</span>
+            <span class="rung-mult">Doubling the switches: ×8 work</span><span class="tag bad" data-vis="2 3">Ruled out</span>
+          </div>
+          <div class="bracket eth" style="grid-row:1 / 3" data-vis="3"><strong>ETH bets</strong>the best algorithm is up here, paying a fixed multiplier per switch.</div>
+          <div class="bracket pnp" style="grid-row:1 / 5" data-vis="2 3"><strong>The P vs NP bet</strong><code class="math">P ≠ NP</code> bets the best algorithm is somewhere up here.</div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <p data-on="1">Higher on the ladder means the work grows faster as you add switches. We already have the top two, so the best possible algorithm is at least that good. Whether anything lower can exist is what the bets are about.</p>
+        <p data-on="2"><code class="math">P ≠ NP</code> bets that no algorithm solves 3-SAT in polynomial time, the kind of growth <code class="math">n<sup>3</sup></code> stands for. So the best possible algorithm sits somewhere above the bottom rung.</p>
+        <p data-on="3">ETH bets more. Below ETH's line, the multiplier per switch fades toward ×1 as n grows; computer scientists call that growth <strong>subexponential</strong>. ETH says the best algorithm stays above the line, so even <code class="math">2<sup>√n</sup></code>, which still outgrows every polynomial, is ruled out.</p>
+        <p data-on="3">That is why ETH's bracket is shorter: it is the bolder bet. If ETH is true, <code class="math">P ≠ NP</code> follows. The reverse doesn't hold.</p>
+      </div>
+    </figure>
+
+    <details class="more">
+      <summary><span class="tag">More</span>The formal statement</summary>
+      <p>ETH: there is some constant <code class="math">s &gt; 0</code> such that every algorithm that correctly solves 3-SAT needs at least <code class="math">2<sup>s·n</sup></code> steps on some formulas with n variables. Since <code class="math">2<sup>s·n</sup> = (2<sup>s</sup>)<sup>n</sup></code>, that is an average multiplier of at least <code class="math">2<sup>s</sup> &gt; 1</code> per variable on the hardest formulas. Equivalently, there is no <code class="math">2<sup>o(n)</sup></code> algorithm for 3-SAT, where <code class="math">o(n)</code> means something that grows more slowly than any fixed fraction of n. Running times of the form <code class="math">2<sup>o(n)</sup></code> are the subexponential ones: their average multiplier per variable fades toward ×1.</p>
+    </details>
+
+    <aside class="callout note quiz" data-quiz data-check="k-03">
+      <div class="callout-head">Apply</div>
+      <div class="callout-body">
+        <p>Suppose someone proved that 3-SAT can be solved in about <code class="math">2<sup>√n</sup></code> steps. Which assumption would be broken?</p>
+        <div class="row options" role="group" aria-label="Your answer">
+          <button type="button" class="button">The P vs NP bet (so P = NP)</button>
+          <button type="button" class="button" data-correct>ETH only</button>
+          <button type="button" class="button">Both</button>
+          <button type="button" class="button">Neither</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>ETH only. With <code class="math">2<sup>√n</sup></code> the multiplier per switch fades toward ×1, so it sits below ETH's line, exactly where ETH bet nothing could be. But it still grows faster than any polynomial, so it stays above the <code class="math">n<sup>3</sup></code> rung, and <code class="math">P ≠ NP</code> is untouched. That's why a broken ETH, by itself, says nothing about P vs NP. It's the trap headlines fall into.</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ── 5 ── -->
+  <section id="built" class="flow">
+    <p class="eyebrow">Chapter 5 / 9</p>
+    <h2>What was built on the bet</h2>
+    <h3 id="link">A link, not a proof</h3>
+    <p>Researchers usually can't prove outright that a problem has no fast algorithm. (If they could do that for 3-SAT, P vs NP would be settled.) What they can prove is a link.</p>
+    <p>Remember the family from chapter 2, and graph colouring in it? 3-SAT can be rewritten as colouring at about the same size. That lets a result read:</p>
+    <aside class="callout note quiz">
+      <div class="callout-head">Theorem</div>
+      <div class="callout-body"><p>Graph colouring has no <code class="math">2<sup>o(n)</sup></code> algorithm on graphs with n vertices, <strong>unless ETH fails</strong>.</p></div>
+    </aside>
+    <p>The proof is the rewrite from the family figure. It turns any 3-SAT formula into a colouring problem with about as many dots as the formula has switches and rules. So a much faster colouring algorithm, one whose multiplier per dot fades toward ×1, would also be a much faster 3-SAT algorithm, and that would break ETH.</p>
+    <p>As long as ETH holds, colouring is stuck paying a fixed multiplier per dot too. The same move, with other rewrites, gives lower bounds for Hamiltonian cycle, vertex cover, clique and many more problems.</p>
+
+    <aside class="callout note quiz" data-check="k-04">
+      <div class="callout-head">Explain · think, then reveal</div>
+      <div class="callout-body">
+        <p>A paper proves “graph colouring has no <code class="math">2<sup>o(n)</sup></code> algorithm, unless ETH fails.” In your own words: what did it actually prove, and what would make the statement stop telling us anything about hardness?</p>
+        <div class="row"><button type="button" class="button reveal">Show a model answer</button></div>
+        <div class="feedback" hidden aria-live="polite">
+          <p>It proved a link, not hardness itself: any much-faster colouring algorithm could be turned into a much-faster 3-SAT algorithm. Colouring is “hard” only as long as ETH is true. If ETH fails, the statement is still true, but it no longer shows that colouring is hard.</p>
+        </div>
+      </div>
+    </aside>
+
+    <h3 id="seth">A bolder bet: SETH</h3>
+    <p>ETH only says that 3-SAT's multiplier never fades to ×1. There is a much bolder bet, the <mark>Strong Exponential Time Hypothesis (SETH)</mark>. Let the rules get wider, with 4, 5 or 10 switches each, and SETH says the best possible multiplier climbs toward ×2, getting as close to it as you like. For wide rules, brute force is essentially unbeatable.</p>
+
+    <!-- SETH scale: drawn at 894px, the panel's inner width. x = 60 + (multiplier - 1) * 774. -->
+    <figure class="panel">
+      <div class="panel-head">Multiplier per extra switch, for the best possible algorithm</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 894 232" role="img" aria-label="Scale of the multiplier per extra switch, from times 1, no growth, to times 2, brute force. Squares mark the best algorithms so far: times 1.307 for 3 switches per rule, 1.469 for 4, 1.569 for 5, 1.638 for 6. ETH's bracket, for 3-SAT, runs from just above times 1 up to times 1.307. SETH's arrow runs on toward times 2 as rules get wider.">
+          <text class="name" x="64" y="24">ETH, for 3-SAT: the best possible is in here,</text>
+          <text x="64" y="42">above ×1 by a fixed amount (and at most ×1.307,</text>
+          <text x="64" y="60">since we already have that)</text>
+          <path class="wire" d="M66 74 V84 H297 V74"/>
+          <text class="name end" x="834" y="24">SETH: as rules get wider, the best possible</text>
+          <text class="end" x="834" y="42">multiplier is pushed up to ×2:</text>
+          <text class="end" x="834" y="60">brute force is about the best you can do</text>
+          <path class="wire" d="M574 112 H822"/>
+          <polygon class="arrow" points="822,108 830,112 822,116"/>
+          <text class="mid" x="698" y="100">wider rules</text>
+          <line class="axis" x1="60" x2="834" y1="160.5" y2="160.5"/>
+          <line class="axis" x1="60.5" x2="60.5" y1="152" y2="169"/>
+          <line class="axis" x1="833.5" x2="833.5" y1="152" y2="169"/>
+          <line class="axis" x1="137.5" x2="137.5" y1="157" y2="165"/><line class="axis" x1="214.5" x2="214.5" y1="157" y2="165"/><line class="axis" x1="292.5" x2="292.5" y1="157" y2="165"/><line class="axis" x1="369.5" x2="369.5" y1="157" y2="165"/><line class="axis" x1="447.5" x2="447.5" y1="157" y2="165"/><line class="axis" x1="524.5" x2="524.5" y1="157" y2="165"/><line class="axis" x1="601.5" x2="601.5" y1="157" y2="165"/><line class="axis" x1="679.5" x2="679.5" y1="157" y2="165"/><line class="axis" x1="756.5" x2="756.5" y1="157" y2="165"/>
+          <rect class="dot" x="293.5" y="156.5" width="8" height="8" data-tip="3 switches per rule" data-tip-value="×1.307"/>
+          <rect class="dot" x="419.5" y="156.5" width="8" height="8" data-tip="4 switches per rule" data-tip-value="×1.469"/>
+          <rect class="dot" x="496.5" y="156.5" width="8" height="8" data-tip="5 switches per rule" data-tip-value="×1.569"/>
+          <rect class="dot" x="549.5" y="156.5" width="8" height="8" data-tip="6 switches per rule" data-tip-value="×1.638"/>
+          <text class="series mid" x="298" y="144">×1.307</text>
+          <text class="series mid" x="424" y="144">×1.469</text>
+          <text class="series mid" x="501" y="144">×1.569</text>
+          <text class="series mid" x="554" y="144">×1.638</text>
+          <text class="mid" x="298" y="186">3 per rule</text>
+          <text class="mid" x="424" y="186">4</text>
+          <text class="mid" x="501" y="186">5</text>
+          <text class="mid" x="554" y="186">6</text>
+          <text class="series mid" x="60" y="188">×1</text>
+          <text class="mid" x="60" y="204">no growth</text>
+          <text class="series mid" x="834" y="188">×2</text>
+          <text class="mid" x="834" y="204">brute force</text>
+          <text class="mid" x="447" y="226">Squares: best algorithms so far, by switches per rule</text>
+        </svg>
+        <figcaption>The squares are what the best algorithms so far achieve (the PPSZ algorithm), not proof of what is possible, so they are not evidence for SETH. SETH bets that the true floor climbs to ×2. Beyond 6 switches per rule, the arrow is schematic.</figcaption>
+      </div>
+    </figure>
+
+    <p>Bolder bets buy stronger results. The most famous one built on SETH is about <strong>edit distance</strong>, the measure of how different two strings are and a close relative of what <code>diff</code> computes. Backurs and Indyk proved that it can't be computed in much less than quadratic time, unless SETH fails.</p>
+    <p><strong>Hold on to SETH and edit distance.</strong> They come back in chapter 7.</p>
+
+    <details class="more">
+      <summary><span class="tag">More</span>Why does SETH imply ETH?</summary>
+      <p>ETH only says 3-SAT needs some exponential <code class="math">c<sup>n</sup></code> with <code class="math">c &gt; 1</code>, and <code class="math">c</code> could be close to 1. SETH says that for wide enough clauses the base gets arbitrarily close to 2. If SETH is true, wide-clause SAT needs exponential time, and that in turn forces 3-SAT to need exponential time, which is ETH. So SETH implies ETH.</p>
+    </details>
+
+    <aside class="callout note quiz" data-quiz data-check="k-09">
+      <div class="callout-head">Compare</div>
+      <div class="callout-body">
+        <p>ETH and SETH are both unproven bets. Which one is riskier, that is, easier to turn out wrong?</p>
+        <div class="row options" role="group" aria-label="Your answer">
+          <button type="button" class="button">ETH: it's the original</button>
+          <button type="button" class="button" data-correct>SETH: it claims more</button>
+          <button type="button" class="button">Equally risky: they're about the same problem</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>SETH. It claims more: not just “some fixed multiplier per switch” but “for wide rules, ×2, brute force”. A bigger claim has more ways to fail. And anything that breaks ETH breaks SETH too, since SETH implies ETH. The payoff for the risk is stronger results, like the edit-distance bound. Keep this in mind for chapter 7.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Foundation: each result sits on the block it rests on. -->
+    <figure class="panel">
+      <div class="panel-head">What rests on ETH and SETH</div>
+      <div class="panel-body">
+        <div class="found" style="--cols:10" role="img" aria-label="On ETH rest: graph colouring, Hamiltonian cycle and vertex cover have no 2^o(n) algorithm; k-Clique has no n^o(k) algorithm. SETH, the bolder bet, which implies ETH, sits on top of ETH and holds up: edit distance has no O(n^(2−δ)) algorithm. Many more results are not shown.">
+          <div style="grid-column:1 / 4; grid-row:1 / 3"><p>Graph colouring, Hamiltonian cycle, vertex cover: no <code class="math">2<sup>o(n)</sup></code> algorithm</p><p class="note">unless ETH fails</p></div>
+          <div style="grid-column:4 / 7; grid-row:1 / 3"><p>k-Clique: no <code class="math">n<sup>o(k)</sup></code> algorithm, so brute-force search is essentially optimal</p><p class="note">unless ETH fails</p></div>
+          <div style="grid-column:7 / 10; grid-row:1"><p>Edit distance (a close relative of <code>diff</code>): no <code class="math">O(n<sup>2−δ</sup>)</code> algorithm</p><p class="note">unless SETH fails</p></div>
+          <div style="grid-column:10; grid-row:1 / 3"><p class="faint">… and many more</p></div>
+          <div class="slab" style="grid-column:7 / 10; grid-row:2"><strong>SETH</strong><span class="note">bolder · SETH implies ETH</span></div>
+          <div class="slab" style="grid-column:1 / 11; grid-row:3"><strong>ETH</strong><span class="note">the Exponential Time Hypothesis</span></div>
+        </div>
+        <figcaption>Each result sits on the assumption it rests on. SETH sits on top of ETH because SETH implies ETH.</figcaption>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ── 6 ── -->
+  <section id="claim" class="flow">
+    <p class="eyebrow">Chapter 6 / 9</p>
+    <h2>The claim</h2>
+    <p>Now OpenAI's claim, stated precisely. The symbols first:</p>
+    <section class="panel narrow">
+      <div class="panel-head">Symbols</div>
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th class="fit">Symbol</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td class="fit"><code class="math">n</code></td><td>The number of variables.</td></tr>
+            <tr><td class="fit"><code class="math">m</code></td><td>The number of clauses.</td></tr>
+            <tr><td class="fit"><code class="math">log n</code></td><td>The logarithm of n. It grows very slowly: going from a thousand variables to a million only doubles it.</td></tr>
+            <tr><td class="fit"><code class="math">o(1)</code></td><td>A small term that shrinks toward zero as n grows.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <p>The manuscript claims an algorithm for any SAT formula whose clauses have a fixed width k, 3-SAT included. The algorithm is <strong>deterministic</strong> (no coin flips), it <strong>counts</strong> the satisfying assignments, and it uses only a polynomial amount of memory. Its running time is</p>
+<p class="formula" role="math" aria-label="(n + m) to the power O(1), times 2 to the power of a fraction: n over (log n) to the power 1/2 + o(1)"><span>(n + m)<sup>O(1)</sup></span><span>·</span><span>2<sup class="frac"><span>n</span><span>(log n)<sup>1/2 + o(1)</sup></span></sup></span></p>
+    <p>The first factor is an ordinary polynomial, which barely matters next to the second. In plain terms the cost is roughly <code class="math">2<sup>n/√log n</sup></code>.</p>
+    <p>Counting is at least as hard as deciding: if the count is above zero, the formula is satisfiable. And <code class="math">n/√log n</code> grows more slowly than any fixed fraction of n, so the 3-SAT case is a <code class="math">2<sup>o(n)</sup></code> algorithm for 3-SAT.</p>
+    <p>In per-switch terms, its multiplier fades toward ×1 as n grows: very slowly, but it does fade. That is exactly what ETH bet could never happen. The repository's summary puts it in one line: “The case of 3-SAT refutes the Exponential Time Hypothesis.”</p>
+    <details class="more">
+      <summary><span class="tag">More</span>What the paper actually proves</summary>
+      <p>The theorem covers every fixed clause width <code class="math">k ≥ 2</code>: a deterministic algorithm counts the satisfying assignments of a k-CNF formula (a k-SAT formula) with n variables and m clauses in the time above, in polynomial space. The main theorem gives <code class="math">2<sup>O<sub>k</sub>(n log log n / √log n)</sup></code> in general, improving to <code class="math">2<sup>O(n/√log n)</sup></code> when the number of clauses is at most a constant times n. The paper states that this refutes ETH, SETH, and two related hypotheses, Gap-ETH and NSETH.</p>
+    </details>
+
+    <p>Where does that land on the ladder?</p>
+    <figure class="panel" data-step="1">
+      <div class="panel-head">Where the claim lands
+        <span class="tabs">
+          <button class="tab" type="button" data-go="1" aria-pressed="true">As we left it</button>
+          <button class="tab" type="button" data-go="2" aria-pressed="false">The claim</button>
+          <button class="tab" type="button" data-go="3" aria-pressed="false">P vs NP</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <p class="note">Top: the work grows fastest as you add switches. The order is for large n.</p>
+        <div class="ladder">
+          <div class="rung" style="grid-row:1">
+            <code class="math">2<sup>n</sup></code><span>Brute force: try every setting</span><span class="tag good">We have this</span>
+            <span class="rung-mult">×2 per extra switch</span>
+          </div>
+          <div class="rung" style="grid-row:2">
+            <code class="math">1.307<sup>n</sup></code><span>Best known before the claim (PPSZ)</span><span class="tag good">We have this</span>
+            <span class="rung-mult">×1.307 per extra switch</span>
+          </div>
+          <div class="eth-line" style="grid-row:3"><span><strong>ETH's line.</strong> Above it, a fixed multiplier per switch; below it, the multiplier fades.</span></div>
+          <div class="rung" style="grid-row:4" data-on="2 3">
+            <code class="math">2<sup>n/√log n</sup></code><span>OpenAI's claimed algorithm (roughly)</span><span class="tag warn">Claimed</span>
+            <span class="rung-mult">The multiplier fades toward ×1, slowly</span><span class="tag bad">Breaks ETH if it holds</span>
+          </div>
+          <div class="rung" style="grid-row:5">
+            <code class="math">2<sup>√n</sup></code><span>Subexponential example</span><span class="tag">Nobody has found this</span>
+            <span class="rung-mult">The multiplier fades toward ×1</span>
+          </div>
+          <div class="rung" style="grid-row:6">
+            <code class="math">n<sup>3</sup></code><span>Polynomial: what P = NP would need</span><span class="tag">Nobody has found this</span>
+            <span class="rung-mult">Doubling the switches: ×8 work</span><span class="tag info" data-vis="3">Still far below</span>
+          </div>
+          <div class="bracket eth" style="grid-row:1 / 3"><strong>ETH bets</strong>the best algorithm is up here, paying a fixed multiplier per switch.</div>
+          <div class="bracket pnp" style="grid-row:1 / 6"><strong>The P vs NP bet</strong><code class="math">P ≠ NP</code> bets the best algorithm is somewhere up here.</div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <p data-on="1">The ladder as we left it: both bets, and ETH's line.</p>
+        <p data-on="2">OpenAI's claimed algorithm lands below ETH's line, where ETH bet nothing could be. Its place is by order alone: as n gets large it grows more slowly than <code class="math">1.307<sup>n</sup></code> but faster than <code class="math">2<sup>√n</sup></code>. The ladder says nothing about which is quicker at any particular size.</p>
+        <p data-on="3">The polynomial rung is still far below. A broken ETH, on its own, says nothing about P vs NP.</p>
+      </div>
+    </figure>
+
+    <aside class="callout note quiz" data-quiz data-check="k-05">
+      <div class="callout-head">Predict</div>
+      <div class="callout-body">
+        <p>The claimed algorithm is subexponential, and the old best was exponential. When do you expect it to beat the old best (<code class="math">1.307<sup>n</sup></code>) on real formulas?</p>
+        <div class="row options" role="group" aria-label="Your prediction">
+          <button type="button" class="button">Immediately: SAT solvers get faster</button>
+          <button type="button" class="button">Within a few dozen variables</button>
+          <button type="button" class="button" data-correct>Only at enormous sizes, if ever</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>Only at enormous sizes. Even with every hidden constant generously set to 1, the new bound only edges past <code class="math">1.307<sup>n</sup></code> at around 800 variables for sparse formulas, and around <code class="math">n = 10<sup>79</sup></code> for the general bound.</p>
+          <p>By then both step counts are astronomically large, and nobody knows the real constants, which could push the crossover much further out. The exponent shrinks by only about a <code class="math">√log n</code> factor.</p>
+          <p>Real SAT solvers also don't run worst-case algorithms; they exploit structure in real instances. The win is about the shape of the curve, not the speed. (Press coverage, e.g. <a href="https://www.unite.ai/openai-says-its-models-produced-three-proofs-in-math-cs-and-physics/">Unite.AI</a>, says turning this into practical speedups would take substantial further research.)</p>
+        </div>
+      </div>
+    </aside>
+
+    <p class="note" data-gate-hide="k-05">The growth chart appears once you've answered.</p>
+    <!-- Growth chart: log-log, drawn at 894px. Plot area x 64–744 (n from 10 to a million), y 16–296 (1 to a million digits). -->
+    <figure class="panel" data-gate="k-05" hidden>
+      <div class="panel-head">How the curves compare
+        <span class="tabs">
+          <button class="tab" type="button" data-tab="sparse" aria-pressed="true">Sparse formulas</button>
+          <button class="tab" type="button" data-tab="general" aria-pressed="false">General bound</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <div data-tab-panel="sparse">
+        <svg class="chart" viewBox="0 0 894 340" role="img" aria-label="Digits in the step count against the number of variables, both on log scales, for brute force, the best earlier algorithm, and the claimed bound.">
+          <line class="gridline" x1="64" x2="744" y1="16.5" y2="16.5"/>
+          <line class="gridline" x1="64" x2="744" y1="62.5" y2="62.5"/>
+          <line class="gridline" x1="64" x2="744" y1="109.5" y2="109.5"/>
+          <line class="gridline" x1="64" x2="744" y1="156.5" y2="156.5"/>
+          <line class="gridline" x1="64" x2="744" y1="202.5" y2="202.5"/>
+          <line class="gridline" x1="64" x2="744" y1="249.5" y2="249.5"/>
+          <line class="axis" x1="64" x2="744" y1="296.5" y2="296.5"/>
+          <text class="end" x="56" y="20">1,000,000</text>
+          <text class="end" x="56" y="66">100,000</text>
+          <text class="end" x="56" y="113">10,000</text>
+          <text class="end" x="56" y="160">1,000</text>
+          <text class="end" x="56" y="206">100</text>
+          <text class="end" x="56" y="253">10</text>
+          <text class="end" x="56" y="300">1</text>
+          <text class="mid" x="64" y="316">10</text>
+          <text class="mid" x="200" y="316">100</text>
+          <text class="mid" x="336" y="316">1,000</text>
+          <text class="mid" x="472" y="316">10,000</text>
+          <text class="mid" x="608" y="316">100,000</text>
+          <text class="mid" x="744" y="316">1,000,000</text>
+          <text class="mid" x="404" y="336">Variables n (log scale)</text>
+          <text x="72" y="32">Digits in the step count (log scale)</text>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M64 273.7 L744 40.3"/>
+          <path class="line" pathLength="1" style="--fill:var(--c2)" d="M64 292.9 L744 59.6"/>
+            <path class="line" pathLength="1" style="--fill:var(--c3)" d="M64.0 282.1 L91.2 274.6 L118.4 266.9 L145.6 258.9 L172.8 250.7 L200.0 242.5 L227.2 234.1 L254.4 225.7 L281.6 217.1 L308.8 208.6 L336.0 199.9 L363.2 191.2 L390.4 182.5 L417.6 173.8 L444.8 165.0 L472.0 156.2 L499.2 147.3 L526.4 138.5 L553.6 129.6 L580.8 120.7 L608.0 111.8 L635.2 102.8 L662.4 93.9 L689.6 84.9 L716.8 75.9 L744.0 66.9"/>
+            <rect class="dot" style="--fill:var(--c1)" x="740" y="36" width="8" height="8" data-tip="Brute force" data-tip-value="301,030 digits" data-tip-note="at a million variables"/>
+            <rect class="dot" style="--fill:var(--c2)" x="740" y="56" width="8" height="8" data-tip="Best known before" data-tip-value="116,276 digits" data-tip-note="at a million variables"/>
+            <rect class="dot" style="--fill:var(--c3)" x="740" y="63" width="8" height="8" data-tip="Claimed, sparse formulas" data-tip-value="80,989 digits" data-tip-note="at a million variables"/>
+            <text class="series" x="756" y="40">Brute force</text>
+            <text class="series" x="756" y="58">Best known before</text>
+            <text class="series" x="756" y="76">Claimed bound</text>
+            <rect class="dot" style="--fill:var(--text)" x="320" y="200" width="8" height="8" data-tip="Crossover" data-tip-value="n of about 800" data-tip-note="with every constant set to 1"/>
+            <text class="series" x="336" y="228">Crossover at about n = 800</text>
+        </svg>
+        </div>
+        <div data-tab-panel="general" hidden>
+        <svg class="chart" viewBox="0 0 894 340" role="img" aria-label="Digits in the step count against the number of variables, both on log scales, for brute force, the best earlier algorithm, and the claimed bound.">
+          <line class="gridline" x1="64" x2="744" y1="16.5" y2="16.5"/>
+          <line class="gridline" x1="64" x2="744" y1="62.5" y2="62.5"/>
+          <line class="gridline" x1="64" x2="744" y1="109.5" y2="109.5"/>
+          <line class="gridline" x1="64" x2="744" y1="156.5" y2="156.5"/>
+          <line class="gridline" x1="64" x2="744" y1="202.5" y2="202.5"/>
+          <line class="gridline" x1="64" x2="744" y1="249.5" y2="249.5"/>
+          <line class="axis" x1="64" x2="744" y1="296.5" y2="296.5"/>
+          <text class="end" x="56" y="20">1,000,000</text>
+          <text class="end" x="56" y="66">100,000</text>
+          <text class="end" x="56" y="113">10,000</text>
+          <text class="end" x="56" y="160">1,000</text>
+          <text class="end" x="56" y="206">100</text>
+          <text class="end" x="56" y="253">10</text>
+          <text class="end" x="56" y="300">1</text>
+          <text class="mid" x="64" y="316">10</text>
+          <text class="mid" x="200" y="316">100</text>
+          <text class="mid" x="336" y="316">1,000</text>
+          <text class="mid" x="472" y="316">10,000</text>
+          <text class="mid" x="608" y="316">100,000</text>
+          <text class="mid" x="744" y="316">1,000,000</text>
+          <text class="mid" x="404" y="336">Variables n (log scale)</text>
+          <text x="72" y="32">Digits in the step count (log scale)</text>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M64 273.7 L744 40.3"/>
+          <path class="line" pathLength="1" style="--fill:var(--c2)" d="M64 292.9 L744 59.6"/>
+            <path class="line" pathLength="1" style="--fill:var(--c3)" d="M64.0 285.8 L91.2 274.3 L118.4 263.7 L145.6 253.5 L172.8 243.6 L200.0 233.9 L227.2 224.3 L254.4 214.8 L281.6 205.3 L308.8 195.9 L336.0 186.6 L363.2 177.2 L390.4 167.9 L417.6 158.6 L444.8 149.3 L472.0 140.0 L499.2 130.7 L526.4 121.4 L553.6 112.2 L580.8 102.9 L608.0 93.7 L635.2 84.4 L662.4 75.1 L689.6 65.9 L716.8 56.6 L744.0 47.4"/>
+            <rect class="dot" style="--fill:var(--c1)" x="740" y="36" width="8" height="8" data-tip="Brute force" data-tip-value="301,030 digits" data-tip-note="at a million variables"/>
+            <rect class="dot" style="--fill:var(--c3)" x="740" y="43" width="8" height="8" data-tip="Claimed, general bound" data-tip-value="212,660 digits" data-tip-note="at a million variables"/>
+            <rect class="dot" style="--fill:var(--c2)" x="740" y="56" width="8" height="8" data-tip="Best known before" data-tip-value="116,276 digits" data-tip-note="at a million variables"/>
+            <text class="series" x="756" y="34">Brute force</text>
+            <text class="series" x="756" y="52">Claimed bound</text>
+            <text class="series" x="756" y="70">Best known before</text>
+            <text class="series end" x="736" y="282">The crossover is far off the chart, to the right</text>
+        </svg>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Brute force, <code class="math">2<sup>n</sup></code></span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c2)"></span>Best known before, <code class="math">1.307<sup>n</sup></code></span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c3)"></span>Claimed bound, constants set to 1</span>
+        </div>
+        <figcaption>The vertical axis counts the digits in the step count. Both axes are logarithmic. “Sparse” means at most a constant number of clauses per variable; the general bound has an extra <code class="math">log log n</code> factor in the exponent, which moves the crossover to about <code class="math">n = 10<sup>79</sup></code>. The paper gives no concrete constants.</figcaption>
+      </div>
+    </figure>
+  </section>
+
+  <!-- ── 7 ── -->
+  <section id="fallout" class="flow">
+    <p class="eyebrow">Chapter 7 / 9</p>
+    <h2>If it holds: what falls, what stands</h2>
+    <p>Back to the foundation. Suppose review confirms the claim. What happens to everything that rested on ETH and SETH?</p>
+
+    <aside class="callout note quiz" data-quiz data-check="k-06">
+      <div class="callout-head">Predict</div>
+      <div class="callout-body">
+        <p>The famous result that edit distance (a close relative of what diff computes) can't be done much faster than quadratic time assumes SETH, not ETH. If OpenAI's claim holds, what happens to that result?</p>
+        <div class="row options" role="group" aria-label="Your prediction">
+          <button type="button" class="button">Untouched: only ETH was refuted</button>
+          <button type="button" class="button" data-correct>It loses its basis: SETH falls too</button>
+          <button type="button" class="button">Edit distance now has a fast algorithm</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>It loses its basis. SETH is the stronger assumption, and SETH implies ETH, so if ETH is false, SETH is false too. The paper says it refutes SETH directly.</p>
+          <p>Yet the quadratic bound itself still stands. Backurs and Indyk's proof actually starts from the <mark>Orthogonal Vectors Conjecture (OVC)</mark>, a weaker assumption that this claim doesn't touch, so the bound keeps a footing on OVC. The same holds for longest common subsequence and regex matching.</p>
+          <p>And losing a basis would never have meant “edit distance is now fast”: no faster algorithm comes with the claim.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Foundation, two states. The second tab unlocks with the question above. -->
+    <figure class="panel">
+      <div class="panel-head">The foundation
+        <span class="tabs">
+          <button class="tab" type="button" data-tab="before" aria-pressed="true">Before the claim</button>
+          <button class="tab" type="button" data-tab="after" aria-pressed="false" disabled data-gate-enable="k-06" data-gate-press="k-06">If the claim holds</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <div class="found" style="--cols:14" data-tab-panel="before">
+          <div style="grid-column:1 / 4; grid-row:1 / 3"><p>Graph colouring: no <code class="math">2<sup>o(n)</sup></code> algorithm</p><p class="note">unless ETH fails</p></div>
+          <div style="grid-column:4 / 7; grid-row:1 / 3"><p>Hamiltonian cycle, vertex cover: no <code class="math">2<sup>o(n)</sup></code> algorithm</p><p class="note">unless ETH fails</p></div>
+          <div style="grid-column:7 / 10; grid-row:1 / 3"><p>k-Clique: no <code class="math">n<sup>o(k)</sup></code> algorithm, so brute-force search is essentially optimal</p><p class="note">unless ETH fails</p></div>
+          <div style="grid-column:10 / 13; grid-row:1"><p>Edit distance (a close relative of <code>diff</code>): no <code class="math">O(n<sup>2−δ</sup>)</code> algorithm</p><p class="note">unless SETH fails</p></div>
+          <div style="grid-column:13 / 15; grid-row:1 / 3"><p class="faint">… and many more</p></div>
+          <div class="slab" style="grid-column:10 / 13; grid-row:2"><strong>SETH</strong><span class="note">bolder · SETH implies ETH</span></div>
+          <div class="slab" style="grid-column:1 / 15; grid-row:3"><strong>ETH</strong><span class="note">the Exponential Time Hypothesis</span></div>
+        </div>
+        <div class="found" style="--cols:14" data-tab-panel="after" hidden>
+          <div style="grid-column:1 / 4; grid-row:1 / 3"><p>Graph colouring: no <code class="math">2<sup>o(n)</sup></code> algorithm</p><p class="note">unless ETH fails</p><p><span class="tag bad">Claimed false</span></p><p class="note">The paper also claims a <code class="math">2<sup>o(n)</sup></code> colouring algorithm of its own.</p></div>
+          <div style="grid-column:4 / 7; grid-row:1 / 3"><p>Hamiltonian cycle, vertex cover: no <code class="math">2<sup>o(n)</sup></code> algorithm</p><p class="note">unless ETH fails</p><p><span class="tag warn">Unproven again</span></p><p class="note">Not disproved.</p></div>
+          <div style="grid-column:7 / 10; grid-row:1 / 3"><p>k-Clique: no <code class="math">n<sup>o(k)</sup></code> algorithm, so brute-force search is essentially optimal</p><p class="note">unless ETH fails</p><p><span class="tag warn">Unproven again</span></p><p class="note">Not disproved.</p></div>
+          <div style="grid-column:10 / 13; grid-row:1"><p>Edit distance (a close relative of <code>diff</code>): no <code class="math">O(n<sup>2−δ</sup>)</code> algorithm</p><p class="note">unless SETH fails, and unless OVC fails</p><p><span class="tag good">Still stands</span></p><p class="note">SETH basis lost; it stands on OVC.</p></div>
+          <div style="grid-column:13 / 15; grid-row:1"><p>Longest common subsequence, regex matching: lower bounds</p><p class="note">unless OVC fails</p><p><span class="tag good">Still stands</span></p></div>
+          <div class="slab fallen" style="grid-column:10 / 12; grid-row:2"><strong>SETH</strong><p><span class="tag bad">Refuted</span></p><p class="note">as claimed</p></div>
+          <div class="slab fallen" style="grid-column:1 / 12; grid-row:3"><strong>ETH</strong><span class="note">the Exponential Time Hypothesis</span><p><span class="tag bad">Refuted</span></p><p class="note">as claimed</p></div>
+          <div class="slab" style="grid-column:12 / 15; grid-row:2 / 4"><strong>OVC</strong><p class="note">Orthogonal Vectors Conjecture</p><p><span class="tag good">Not refuted</span></p></div>
+        </div>
+        <figcaption>A theorem of the form “no fast algorithm, unless ETH fails” stays true when ETH fails. It just stops telling us anything about hardness. Many more results rest on ETH than the ones shown.</figcaption>
+      </div>
+    </figure>
+
+    <p class="note" data-gate-hide="k-06">The diagram updates once you've answered.</p>
+    <div class="flow" data-gate="k-06" hidden>
+      <p>The theorem blocks keep their statements; what they lose is their footing. Each link of the form “a faster algorithm here would break ETH” still holds, but with ETH gone it no longer shows that the problem is hard.</p>
+      <p>One exception: for graph colouring the paper goes further and claims a subexponential colouring algorithm of its own. It can, because colouring also rewrites the other way, <strong>into</strong> a SAT formula with short rules and only a few switches per dot. So a fast SAT algorithm becomes a fast colouring algorithm.</p>
+      <p>For Hamiltonian cycle, vertex cover and k-Clique it claims nothing of the kind, so they are only unproven again. A few bounds, edit distance among them, keep a footing because they also follow from OVC.</p>
+    </div>
+
+    <h3 id="myths">Three tempting conclusions</h3>
+    <section class="panel">
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th>Tempting conclusion</th><th class="fit">Follows?</th><th>Why not</th></tr></thead>
+          <tbody>
+            <tr><td><strong>“So P = NP?”</strong></td><td class="fit"><span class="tag bad">No</span></td><td>The claimed running time, roughly <code class="math">2<sup>n/√log n</sup></code>, is still far above any polynomial, and ETH failing says nothing either way about P vs NP. The paper itself notes that its result doesn't imply subexponential algorithms for general NP problems, because the usual translations between problems can blow up the input size.</td></tr>
+            <tr><td><strong>“So crypto is broken?”</strong></td><td class="fit"><span class="tag bad">No</span></td><td>RSA and AES never rested on ETH. And “subexponential” can still mean astronomically slow: factoring, the problem behind RSA, has had a subexponential algorithm, the general number field sieve (GNFS), for decades, and properly sized RSA keys are still secure.</td></tr>
+            <tr><td><strong>“So Hamiltonian cycle and the rest are fast now?”</strong></td><td class="fit"><span class="tag bad">No</span></td><td>Losing the proof that a problem is hard is not the same as finding a fast algorithm for it. A bound whose condition fails is unproven, not reversed. Any faster algorithm for a particular problem still has to be found and proved on its own.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- ── 8 ── -->
+  <section id="verified" class="flow">
+    <p class="eyebrow">Chapter 8 / 9</p>
+    <h2>Is it true? What “verified” does and doesn't mean</h2>
+    <p>“Verified in Lean” is strong evidence. It is also narrower than it sounds.</p>
+    <p>Lean is a proof assistant: you state a theorem in its formal language, supply a proof, and its small trusted core, the kernel, checks every step. OpenAI's repository includes the formal statement as a challenge file and invites anyone to re-run the check with a tool called <mark>Comparator</mark>. Here is what that check does and doesn't settle.</p>
+
+    <section class="panel">
+      <div class="panel-head">What the check settles</div>
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th class="fit"></th><th>Lean's checker guarantees</th><th>Humans still have to confirm</th></tr></thead>
+          <tbody>
+            <tr><td class="fit dim">Statement</td><td>The proof proves exactly the stated formal theorem.</td><td>The formal definitions mean what the paper says: the model of a computer (a Turing-machine model defined in the challenge file), how a formula is encoded, what counts as a step.</td></tr>
+            <tr><td class="fit dim">Strength</td><td>It uses only the three standard axioms the check permits.</td><td>The paper's sharper headline bound holds. The bound that was formalised is slightly weaker (though still enough to refute ETH).</td></tr>
+            <tr><td class="fit dim">Scope</td><td>Lean's kernel accepts every step of the formal proof.</td><td>The informal parts of the manuscript are right. The repository's own README warns that some unformalised results could have issues.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <details class="more">
+      <summary><span class="tag">More</span>The exact formal bound</summary>
+      <p>The Lean theorem proves a running time of <code class="math">2<sup>A · n (log log n)<sup>2</sup> / √log n</sup></code> times a polynomial, with polynomial memory, for the machine model defined in the challenge file. That's slightly weaker than the paper's headline bound, but it still grows more slowly than any <code class="math">c<sup>n</sup></code>, so it is still enough to refute ETH.</p>
+    </details>
+
+    <p>The gap in the right-hand column isn't hypothetical. When OpenAI announced an earlier Lean-verified result, on the Navier–Stokes equations, readers raised the concern that Lean had verified a weaker assertion than the headline (as reported by <a href="https://gizmodo.com/openai-trumpets-3-more-math-and-science-results-along-with-a-new-plan-for-publishing-them-2000830956">Gizmodo</a>). No such problem has been reported for the ETH formalisation.</p>
+
+    <div class="grid">
+      <figure class="panel span-6">
+        <div class="panel-head">How the claim surfaced</div>
+        <div class="panel-body">
+          <ol class="timeline">
+            <li><span class="timeline-when">16 Oct</span><div><strong>Model produces the claimed disproof</strong><br><span class="dim">As reported.</span></div></li>
+            <li><span class="timeline-when">17 Oct</span><div><strong>Formalised in Lean</strong><br><span class="dim">As reported.</span></div></li>
+            <li><span class="timeline-when">25 Oct</span><div><strong>Date on the manuscript</strong></div></li>
+            <li><span class="timeline-when">26 Oct</span><div><strong>Made public</strong><br><span class="dim">Review group announced.</span></div></li>
+          </ol>
+          <figcaption>The first two dates come from press accounts of OpenAI's announcement (<a href="https://www.unite.ai/openai-says-its-models-produced-three-proofs-in-math-cs-and-physics/">Unite.AI</a>, The Next Web), not from the repository.</figcaption>
+        </div>
+      </figure>
+      <section class="panel span-6">
+        <div class="panel-head">Review status</div>
+        <div class="panel-body">
+          <p class="label"><strong>Working group:</strong> Russell Impagliazzo and Ramamohan Paturi, who proposed ETH, and Ryan Williams.</p>
+          <blockquote>
+            <p>Our involvement should not be taken as certification of the claim.</p>
+            <cite>The group's open letter, as reported by <a href="https://thenextweb.com/news/openai-exponential-time-hypothesis-false-kakeya-yang-mills">The Next Web</a></cite>
+          </blockquote>
+        </div>
+      </section>
+    </div>
+
+    <aside class="callout note quiz" data-check="k-07">
+      <div class="callout-head">Explain · think, then reveal</div>
+      <div class="callout-body">
+        <p>Lean's checker accepted the proof. Name one way the result could still turn out to be wrong, or weaker than advertised.</p>
+        <div class="row"><button type="button" class="button reveal">Show a model answer</button></div>
+        <div class="feedback" hidden aria-live="polite">
+          <p>Lean only confirms that the formal theorem follows. Humans still have to confirm that the formal definitions (the machine model, how a formula is encoded, what “time” counts) mean what the paper says. A faithful-looking but subtly off definition could make the checked theorem say less than the headline. (Separately, the checked bound is already slightly weaker than the paper's headline bound, though still enough to refute ETH.)</p>
+          <p>ETH's own inventors are among those reviewing it, and they say their involvement isn't a certification.</p>
+        </div>
+      </div>
+    </aside>
+
+    <h3 id="watch">What to watch for</h3>
+    <ul>
+      <li>The working group's write-up of the proof.</li>
+      <li>Whether experts judge the Lean definitions, the machine model and the formula encoding, to be faithful.</li>
+      <li>Independent re-checks and re-implementations of the argument.</li>
+      <li>Whether the paper's sharper bound, the one that wasn't formalised, holds up.</li>
+    </ul>
+    <p>One more piece of context, about the source rather than this result: on 7 October 2026 the same repository withdrew three unrelated manuscripts after a sign error was found. That says nothing about the ETH proof. It is a reminder that these manuscripts are, in the README's words, “best understood as a form of raw research data”.</p>
+  </section>
+
+  <!-- ── 9 ── -->
+  <section id="recap" class="flow">
+    <p class="eyebrow">Chapter 9 / 9</p>
+    <h2>The whole story in five statements</h2>
+    <aside class="callout note quiz">
+      <div class="callout-head">Sort · one statement at a time</div>
+      <div class="callout-body">
+        <p>Suppose the claim survives review. For each statement, does it follow?</p>
+        <div class="sort-item" data-quiz>
+          <p><strong>a.</strong> P = NP.</p>
+          <div class="row options" role="group" aria-label="Statement a"><button type="button" class="button">Follows</button><button type="button" class="button" data-correct>Doesn't follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Doesn't follow: the claimed bound is still far above any polynomial. See <a href="#bet">The bet</a>.</p></div>
+        </div>
+        <div class="sort-item" data-quiz>
+          <p><strong>b.</strong> 3-SAT can be solved in <code class="math">2<sup>o(n)</sup></code> time.</p>
+          <div class="row options" role="group" aria-label="Statement b"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Doesn't follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Follows: that's the claim itself. See <a href="#claim">The claim</a>.</p></div>
+        </div>
+        <div class="sort-item" data-quiz>
+          <p><strong>c.</strong> RSA encryption is broken.</p>
+          <div class="row options" role="group" aria-label="Statement c"><button type="button" class="button">Follows</button><button type="button" class="button" data-correct>Doesn't follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Doesn't follow: RSA never rested on ETH, and “subexponential” can still be astronomically slow. See <a href="#fallout">What falls, what stands</a>.</p></div>
+        </div>
+        <div class="sort-item" data-quiz>
+          <p><strong>d.</strong> Most hardness results proved “unless ETH fails” become unproven, not false.</p>
+          <div class="row options" role="group" aria-label="Statement d"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Doesn't follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Follows: the link still holds, but it no longer shows hardness. Graph colouring is the exception, because there the paper also claims a fast algorithm outright. See <a href="#built">What was built on the bet</a> and <a href="#fallout">What falls, what stands</a>.</p></div>
+        </div>
+        <div class="sort-item" data-quiz>
+          <p><strong>e.</strong> SETH is false too.</p>
+          <div class="row options" role="group" aria-label="Statement e"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Doesn't follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Follows: SETH implies ETH, so if ETH falls, SETH falls with it. See <a href="#seth">A bolder bet: SETH</a> in chapter 5, and <a href="#fallout">What falls, what stands</a> in chapter 7.</p></div>
+        </div>
+      </div>
+    </aside>
+
+    <h3 id="recap-lines">Recap</h3>
+    <ul>
+      <li>3-SAT is the switches puzzle, and it stands for a whole family of problems that rewrite into one another. Brute force doubles its work with each switch.</li>
+      <li>ETH bet that every 3-SAT algorithm pays a fixed multiplier per extra switch; SETH bet that for wide rules that multiplier is ×2. Both were always assumptions, never theorems.</li>
+      <li>Many hardness results were built on those bets: colouring and its relatives on ETH, edit distance on SETH.</li>
+      <li>OpenAI claims an algorithm just under the wall. If review confirms it, SETH falls too, and most ETH-based results become unproven again. For colouring, the paper also claims a fast algorithm outright.</li>
+      <li>Some bounds, edit distance's among them, still stand on a weaker assumption (OVC). P vs NP and today's cryptography are untouched.</li>
+    </ul>
+
+    <h3>Further reading</h3>
+    <ul>
+      <li><a href="https://github.com/openai/math">OpenAI's math repository</a>: the manuscript, the Lean files and the release history.</li>
+      <li><a href="https://en.wikipedia.org/wiki/Exponential_time_hypothesis">Wikipedia, “Exponential time hypothesis”</a>: ETH, SETH and their consequences.</li>
+    </ul>
+  </section>
+
+  <hr>
+  <p class="note">Text and figures from <a href="https://gravitypersists.github.io/explainer-eth-disproved/">the original explainer</a>, written by Claude Opus 5.5 with <a href="https://github.com/gravitypersists/didactician">the didactician skill</a>. Restyled here.</p>
+
+</main>
+
+<script>
+/* Page behaviour: the switchboard, the sweep, quizzes with their gates, and
+   steppers. style.js handles tooltips, plain tabs and reveal on scroll. */
+(() => {
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // The four rules of the puzzle, over { x, y, z } booleans.
+  const RULES = [
+    (s) => s.x || s.y || s.z,
+    (s) => !s.x || s.y,
+    (s) => !s.y || s.z,
+    (s) => !s.z || !s.x,
+  ];
+
+  function setTag(tag, kind, text) {
+    tag.className = kind ? "tag " + kind : "tag";
+    tag.textContent = text;
+  }
+
+  // ── Switchboard ──
+  const state = { x: true, y: false, z: false };
+  function drawBoard() {
+    let lit = 0;
+    RULES.forEach((rule, i) => {
+      const on = rule(state);
+      if (on) lit++;
+      setTag($(`#switchboard [data-rule="${i + 1}"] .tag`), on ? "good" : "", on ? "Lit" : "Off");
+    });
+    $("#sb-count").textContent = lit + " of 4";
+  }
+
+  // ── Sweep ──
+  let sweeping = false;
+  function checkRow(row) {
+    const [x, y, z] = [...row.dataset.set].map((c) => c === "T");
+    const off = RULES.map((rule, i) => (rule({ x, y, z }) ? 0 : i + 1)).filter(Boolean);
+    const cell = row.lastElementChild;
+    const tag = document.createElement("span");
+    setTag(tag, off.length ? "bad" : "good", off.length ? (off.length > 1 ? "Rules " : "Rule ") + off.join(", ") + " off" : "All four lit");
+    cell.className = "";
+    cell.replaceChildren(tag);
+    return !off.length;
+  }
+  function sweep() {
+    if (sweeping) return;
+    sweeping = true;
+    const rows = $$("#sweep tbody tr");
+    const go = $("#sweep-go");
+    go.disabled = true;
+    for (const row of rows) {
+      row.lastElementChild.className = "faint";
+      row.lastElementChild.textContent = "Not checked yet";
+    }
+    let done = 0;
+    let good = 0;
+    const step = () => {
+      if (checkRow(rows[done])) good++;
+      done++;
+      $("#sweep-count").textContent = done + " of 8 checked";
+      if (done < rows.length) return calm ? step() : setTimeout(step, 240);
+      $("#sweep-out").textContent = good + " of 8 settings light all four rules.";
+      go.textContent = "Replay";
+      go.disabled = false;
+      sweeping = false;
+    };
+    step();
+  }
+
+  // ── Gates: answering a quiz reveals, hides, enables or presses other parts. ──
+  function openGate(id) {
+    if (!id) return;
+    for (const el of $$(`[data-gate="${id}"]`)) el.hidden = false;
+    for (const el of $$(`[data-gate-hide="${id}"]`)) el.hidden = true;
+    for (const el of $$(`[data-gate-enable="${id}"]`)) el.disabled = false;
+    for (const el of $$(`[data-gate-press="${id}"]`)) el.click();
+  }
+
+  function answer(option) {
+    const quiz = option.closest("[data-quiz]");
+    const right = option.hasAttribute("data-correct");
+    for (const button of $$(".options > .button", quiz)) {
+      button.disabled = true;
+      if (button.hasAttribute("data-correct")) button.classList.add("is-right");
+      else if (button === option) button.classList.add("is-wrong");
+    }
+    $(".verdict", quiz).textContent = "Your answer: " + option.textContent + ". " + (right ? "Correct." : "Not quite.");
+    $(".feedback", quiz).hidden = false;
+    openGate(quiz.dataset.check);
+  }
+
+  document.addEventListener("click", (e) => {
+    const flip = e.target.closest(".tab[data-var]");
+    if (flip) {
+      state[flip.dataset.var] = flip.dataset.val === "T";
+      for (const tab of $$(".tab", flip.parentNode)) tab.setAttribute("aria-pressed", tab === flip ? "true" : "false");
+      return drawBoard();
+    }
+    const go = e.target.closest(".tab[data-go]");
+    if (go) {
+      go.closest("[data-step]").dataset.step = go.dataset.go;
+      for (const tab of $$(".tab", go.parentNode)) tab.setAttribute("aria-pressed", tab === go ? "true" : "false");
+      return;
+    }
+    const option = e.target.closest("[data-quiz] .options > .button");
+    if (option) return answer(option);
+    const reveal = e.target.closest(".button.reveal");
+    if (reveal) {
+      const box = reveal.closest(".quiz");
+      reveal.disabled = true;
+      $(".feedback", box).hidden = false;
+      return openGate(box.dataset.check);
+    }
+    if (e.target.closest("#sweep-go")) sweep();
+  });
+
+  drawBoard();
+})();
+</script>
+<!-- Font trial. A test tool, not part of the page: delete from here to the
+     closing comment to remove it. Web fonts load from Google Fonts on demand. -->
+<style>
+.font-trial {
+  position: fixed; right: var(--s4); bottom: var(--s4); z-index: 10; width: 224px;
+  /* The panel keeps the stock face and weights, so it does not reflow with each choice. */
+  --font: "Expressway", "Overpass", sans-serif; --w-text: 400; --w-bold: 800;
+  font-family: var(--font);
+}
+.font-trial .panel-body { display: grid; gap: var(--s2); }
+/* style.css writes its weights as literals: 400 for text and 800 for
+   headings and emphasis. A trial font may use others, so these two rules
+   repeat the stylesheet's weight selectors with variables. */
+html[data-font-trial] :is(body, .panel-head > :is(.tag, .tabs), .table th, .tab, .button, .input) { font-weight: var(--w-text); }
+html[data-font-trial] :is(h1, .title, h2, .heading, h3, .subheading, strong, b, .panel-head, .stat-value, .table tfoot td, .hero-number, blockquote)::before,
+html[data-font-trial] :is(h1, .title, h2, .heading, h3, .subheading, strong, b, .panel-head, .stat-value, .table tfoot td, .hero-number) { font-weight: var(--w-bold); }
+
+/* Two-face trial. Expressway keeps the outlined text (titles, headings, panel
+   titles, stat and meter text) at its stock weights; the chosen face sets the
+   rest. "labels" also hands Expressway the uppercase note-size labels. */
+html[data-head-trial] { --font-head: "Expressway", "Overpass", sans-serif; }
+html[data-head-trial] :is(h1, .title, h2, .heading, h3, .subheading, .stat-value, .panel-head) { font-family: var(--font-head); font-weight: 800; }
+html[data-head-trial] :is(.stat-label, .stat-foot > .delta, .meter-label, .meter-value) { font-family: var(--font-head); font-weight: 700; }
+html[data-head-trial] blockquote::before { font-family: var(--font-head); font-weight: 800; }
+html[data-head-trial] :is(h1, .title, h2, .heading, h3, .subheading, .panel-head) code.math { font-family: var(--font-head), var(--font-mono); }
+/* A chip on a panel's border is a label, not a title. */
+html[data-head-trial="outlined"] .panel-head > :is(.tag, .tabs) { font-family: var(--font); }
+html[data-head-trial="labels"] :is(.eyebrow, .tag, .tab, .table th, .callout-head, .panel-head > :is(.tag, .tabs)) { font-family: var(--font-head); font-weight: 400; }
+
+/* Softer dark trial. One step past the stylesheet's palette: text and
+   surfaces move closer again, and each data colour mixes 24% gray into its
+   pure hue where the stylesheet mixes 12%. Ink stays black. */
+html[data-soft-trial] {
+  --sunken: #262626; --page: #2b2b2b; --inset: #303030; --panel: #383838; --raised: #444444;
+  --text: #cecece; --text-prose: #b0b0b0; --text-dim: #9e9e9e; --text-faint: #878787;
+  --soften: 76%;
+  --accent: color-mix(in oklab, #c69b6d var(--soften), #707070);
+  --gold: color-mix(in oklab, #cfb53b var(--soften), #707070);
+  --silver: color-mix(in oklab, #c9cdd2 var(--soften), #707070);
+  --copper: color-mix(in oklab, #db7c3d var(--soften), #707070);
+  --azure: color-mix(in oklab, #5fa5de var(--soften), #707070);
+  --amethyst: color-mix(in oklab, #9964c4 var(--soften), #707070);
+  --rose: color-mix(in oklab, #df8db5 var(--soften), #707070);
+  --red: color-mix(in oklab, #e24130 var(--soften), #707070);
+  --green: color-mix(in oklab, #81c043 var(--soften), #707070);
+  --yellow: color-mix(in oklab, #ffeb4e var(--soften), #707070);
+}
+
+/* Light trial. The style is dark only; this exists to test whether dark text
+   on a light page renders crisper. The grays keep their order (well, page,
+   inset, panel, raised), flipped to the light end. */
+html[data-light-trial] {
+  color-scheme: light;
+  --sunken: #d0d0d0; --page: #e2e2e2; --inset: #e8e8e8; --panel: #f2f2f2; --raised: #fafafa;
+  --text: #0a0a0a; --text-prose: #2e2e2e; --text-dim: #4a4a4a; --text-faint: #767676;
+  /* Tan and the code metals are too pale on a light page, so each drops to a darker step. */
+  --accent: #8a5a24;
+  --code-string: #7a6400; --code-number: #a04a12; --code-constant: #a04a12; --code-function: #3d4852; --code-type: #3d4852;
+}
+/* Outlined text keeps a white fill: its ink outline is what lets it read
+   across a border, and black on black would lose it. */
+html[data-light-trial] :is(h1, .title, h2, .heading, h3, .subheading, .stat-value, .panel-head, .stat-label, .meter-label, .meter-value, blockquote)::before,
+html[data-light-trial] :is(h1, .title, h2, .heading, h3, .subheading, .stat-value, .panel-head, .stat-label, .meter-label, .meter-value) { color: #ffffff; }
+/* A tag or tab row on the border is a chip with plain text, not outlined text. */
+html[data-light-trial] .panel-head > :is(.tag, .tabs) { color: var(--text); }
+</style>
+<aside class="panel font-trial" aria-label="Font trial">
+  <div class="panel-head">Font trial</div>
+  <div class="panel-body">
+    <label class="field">Page<select class="input" id="ft-theme">
+      <option value="dark">Dark (stock)</option><option value="softer">Dark, softer</option><option value="light">Light</option>
+    </select></label>
+    <label class="field">Font<select class="input" id="ft-font"></select></label>
+    <label class="field">Headings<select class="input" id="ft-head">
+      <option value="outlined">Expressway</option><option value="labels">Expressway, labels too</option><option value="text">Same as text</option>
+    </select></label>
+    <label class="field">Text weight<select class="input" id="ft-weight"></select></label>
+    <label class="field">Prose tracking<select class="input" id="ft-track">
+      <option value="0px">None</option><option value="0.5px">0.5px</option><option value="1px">1px</option>
+    </select></label>
+    <p class="note" id="ft-status" aria-live="polite"></p>
+  </div>
+</aside>
+<script>
+(() => {
+  const STOCK = "Expressway";
+  // weights: what Google Fonts serves. The stock entry is Expressway Regular
+  // text; the next one is the old look, with text in the Bold cut. family is
+  // the CSS family when it differs from the name, and local skips the download.
+  const FONTS = [
+    { name: STOCK },
+    { name: "Expressway, bold text", family: STOCK, local: true, weights: [700], bold: 800 },
+    { name: "Overpass", weights: [400, 500, 600, 700, 800] },
+    { name: "Barlow", weights: [400, 500, 600, 700, 800] },
+    { name: "Barlow Semi Condensed", weights: [400, 500, 600, 700, 800] },
+    { name: "Saira Semi Condensed", weights: [400, 500, 600, 700, 800] },
+    { name: "PT Sans", weights: [400, 700] },
+    { name: "PT Sans Narrow", weights: [400, 700] },
+    { name: "Roboto", weights: [400, 500, 600, 700, 800] },
+    { name: "Roboto Condensed", weights: [400, 500, 600, 700, 800] },
+    { name: "Inter", weights: [400, 500, 600, 700, 800] },
+    { name: "IBM Plex Sans", weights: [400, 500, 600, 700] },
+    { name: "Source Sans 3", weights: [400, 500, 600, 700, 800] },
+    { name: "Noto Sans", weights: [400, 500, 600, 700, 800] },
+  ];
+  const HINT = "Keys [ and ] step through fonts.";
+  // A new key drops choices saved while the stock font and tracking differed.
+  const KEY = "font-trial-3";
+  const root = document.documentElement;
+  const fontSel = document.getElementById("ft-font");
+  const weightSel = document.getElementById("ft-weight");
+  const trackSel = document.getElementById("ft-track");
+  const status = document.getElementById("ft-status");
+  const themeSel = document.getElementById("ft-theme");
+  const headSel = document.getElementById("ft-head");
+  const loaded = new Set();
+
+  const nearest = (list, want) => list.reduce((a, b) => (Math.abs(b - want) < Math.abs(a - want) ? b : a));
+
+  // Storage can throw in a private window; the trial works without it.
+  function save(state) { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function restore() {
+    const q = new URLSearchParams(location.search);
+    if (q.has("font") || q.has("theme")) return { font: q.get("font") || STOCK, weight: Number(q.get("weight")) || 0, track: q.get("track"), theme: q.get("theme"), head: q.get("head") };
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
+  }
+
+  function load(font) {
+    if (loaded.has(font.name)) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://fonts.googleapis.com/css2?family=" + font.name.replace(/ /g, "+") +
+        ":wght@" + font.weights.join(";") + "&display=swap";
+      link.onload = () => { loaded.add(font.name); resolve(); };
+      link.onerror = () => { link.remove(); reject(); };
+      document.head.append(link);
+    });
+  }
+
+  function apply(wantWeight, wantTrack) {
+    const font = FONTS.find((f) => f.name === fontSel.value) || FONTS[0];
+    const stock = font.name === STOCK;
+    weightSel.replaceChildren();
+    weightSel.disabled = stock;
+    headSel.disabled = stock;
+    if (stock || headSel.value === "text") delete root.dataset.headTrial; else root.dataset.headTrial = headSel.value;
+    if (stock) {
+      weightSel.add(new Option("Regular", ""));
+      delete root.dataset.fontTrial;
+      for (const prop of ["--font", "--w-text", "--w-bold"]) root.style.removeProperty(prop);
+    } else {
+      for (const w of font.weights) weightSel.add(new Option(w, w));
+      // Regular rendered crispest in every family measured, and sits furthest from the headings.
+      const text = nearest(font.weights, wantWeight || 400);
+      weightSel.value = text;
+      // Emphasis sits two or three steps above the text weight, where the family has one.
+      const bold = font.bold || nearest(font.weights, text >= 600 ? 800 : 700);
+      root.dataset.fontTrial = "";
+      root.style.setProperty("--font", `"${font.family || font.name}", sans-serif`);
+      root.style.setProperty("--w-text", text);
+      root.style.setProperty("--w-bold", bold);
+      status.textContent = font.local ? HINT : "Loading " + font.name + "…";
+      if (!font.local) load(font)
+        .then(() => document.fonts.load(`${text} 16px "${font.name}"`))
+        .then(() => { if (fontSel.value === font.name) status.textContent = HINT; })
+        .catch(() => { if (fontSel.value === font.name) status.textContent = font.name + " did not load. Showing a fallback."; });
+    }
+    if (stock) status.textContent = HINT;
+    trackSel.value = wantTrack || font.track || "0px";
+    if (!trackSel.value) trackSel.value = "0px";
+    root.style.setProperty("--track-prose", trackSel.value);
+    if (themeSel.value === "light") root.dataset.lightTrial = ""; else delete root.dataset.lightTrial;
+    if (themeSel.value.startsWith("soft")) root.dataset.softTrial = themeSel.value; else delete root.dataset.softTrial;
+    save({ font: font.name, weight: Number(weightSel.value) || 0, track: trackSel.value, theme: themeSel.value, head: headSel.value });
+  }
+
+  for (const f of FONTS) fontSel.add(new Option(f.name, f.name));
+  const start = restore();
+  if (FONTS.some((f) => f.name === start.font)) fontSel.value = start.font;
+  if ([...themeSel.options].some((o) => o.value === start.theme)) themeSel.value = start.theme;
+  if ([...headSel.options].some((o) => o.value === start.head)) headSel.value = start.head;
+  apply(start.weight, start.track);
+  themeSel.addEventListener("change", () => apply(Number(weightSel.value), trackSel.value));
+  headSel.addEventListener("change", () => apply(Number(weightSel.value), trackSel.value));
+
+  // A new font starts at its own default tracking; weight carries over.
+  fontSel.addEventListener("change", () => apply(Number(weightSel.value)));
+  weightSel.addEventListener("change", () => apply(Number(weightSel.value), trackSel.value));
+  trackSel.addEventListener("change", () => apply(Number(weightSel.value), trackSel.value));
+  document.addEventListener("keydown", (e) => {
+    if ((e.key !== "[" && e.key !== "]") || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.target instanceof Element && e.target.matches("input, textarea")) return;
+    const step = e.key === "]" ? 1 : -1;
+    fontSel.selectedIndex = (fontSel.selectedIndex + step + FONTS.length) % FONTS.length;
+    apply(Number(weightSel.value));
+  });
+})();
+</script>
+<!-- End of font trial. -->
+</body>
+</html>

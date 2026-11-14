@@ -9,7 +9,7 @@
    element with the same key the class is-hot, so a slice and its legend row
    light up together. style.css dims the siblings.
 
-   Inside .anim, entry animations wait until their panel scrolls into view:
+   Inside .anim, data animations wait until their panel scrolls into view:
    this script holds them paused (html.js-reveal) and adds in-view to each
    panel, slide, or figure the first time a fifth of it is visible. Without
    the script everything plays on load.
@@ -19,7 +19,7 @@
 
    scripts/build.py inlines this file. */
 (() => {
-  const ANIMATED = ".enter, .bar-fill, .col-fill, .line, .dot, .pie-slice";
+  const ANIMATED = ".bar-fill, .col-fill, .line, .dot, .pie-slice";
   if ("IntersectionObserver" in window) {
     document.documentElement.classList.add("js-reveal");
     const seen = new IntersectionObserver((entries) => {

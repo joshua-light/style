@@ -27,11 +27,11 @@ The style is dark only. Never add a light theme.
 | Token | Value | Use |
 | --- | --- | --- |
 | `--ink` | `#000000` | Every border, every outline. The only black. |
-| `--sunken` | `#1a1a1a` | Table heads (`--head`), bar tracks, code, wells. |
-| `--page` | `#1e1e1e` | The page. |
-| `--inset` | `#222222` | A box inside a box: nested panels, table rows. |
-| `--panel` | `#2e2e2e` | Top-level boxes: panels, callouts, slides. |
-| `--raised` | `#3a3a3a` | Neutral tags. |
+| `--sunken` | `#212121` | Table heads (`--head`), bar tracks, code, wells. |
+| `--page` | `#262626` | The page. |
+| `--inset` | `#2b2b2b` | A box inside a box: nested panels, table rows. |
+| `--panel` | `#333333` | Top-level boxes: panels, callouts, slides. |
+| `--raised` | `#3f3f3f` | Neutral tags. |
 
 - Every container edge is `1px solid #000`.
 - Nothing is rounded: no `border-radius`, no round markers. The pie chart is the one round shape.
@@ -44,26 +44,41 @@ The style is dark only. Never add a light theme.
 
 Melli is a status-bar texture: a vertical luminance curve that multiplies the colour under it.
 
-- Melli goes on colour fills only: bars, columns, stacked segments, pies, swatches, coloured tags.
-- Gray surfaces stay flat: the page, panel bodies, every head, neutral tags.
+- Melli goes on data marks only: bars, columns, stacked segments, pies, swatches.
+- Tags and callout kinds are flat, coloured or not: Melli muddied the colour behind the word.
+- Gray surfaces stay flat: the page, panel bodies, every head.
 - In CSS: `background: var(--melli), <colour>`.
 - Melli always runs top to bottom, on columns too. Never rotate it.
 - Outside CSS, multiply the colour by this curve, top to bottom: 0.69 at 0%, 0.83 at 40%, 0.97 at 73%, 1.0 from 84% to 90%, 0.76 at 100%.
 
 ## Text
 
-Expressway sets everything except code. The regular weight is already bold; extra-bold marks headings and emphasis. Nothing is italic.
+Expressway sets everything except code, in three cuts. Nothing is italic.
 
-Each size has one meaning. Pick the size by meaning, never by looks, and never use a size off the scale.
+| Weight | Cut | Use |
+| --- | --- | --- |
+| 400 | Regular | Everything plain: prose, cells, tags, captions, controls, chart text. |
+| 700 | Bold | Small outlined text: stat labels, deltas, meter names and values. |
+| 800 | Extra-bold | Headings, panel titles, hero numbers, `<strong>`, table totals. |
+
+- Outlined text is never Regular: the stroke eats into thin stems.
+- Regular is licensed for desktop use only. Never convert it, embed it, or copy it into `assets/fonts/`: the stylesheet reads it from the machine's installed fonts.
+- Where Regular is not installed, plain text falls back to Bold and the page looks heavier. That is why emphasis is Extra-bold: a Bold word would vanish in Bold text. When a page is meant for other readers, say that they will see the Bold fallback.
+
+- One face only. Roboto for text under Expressway headings was tried and dropped.
+- Prose is never tracked: no `letter-spacing` on body text, lists, or callouts. Extra tracking belongs only to uppercase labels and outlined text.
+
+Each size has one meaning. Pick the size by meaning, never by looks, and never use a size off the scale. Line heights are even whole pixels, because text on a border is offset by half a line. A scale a tenth larger was tried while text was Bold and dropped once text became Regular.
 
 | Token | Size / line | Meaning |
 | --- | --- | --- |
 | `--fs-title` | 40 / 48 | The name of the whole piece. Once per page or slide. |
 | `--fs-heading` | 28 / 36 | Section heads and hero numbers. |
 | `--fs-subheading` | 20 / 28 | Subsection heads and the lead sentence. |
-| `--fs-body` | 16 / 24 | Prose read in sentences. |
+| `--fs-prose` | 18 / 30 | Long prose: paragraphs and lists in the page's flow, outside any box. |
+| `--fs-body` | 16 / 24 | Sentences inside a box or a column: panel text, quotes, slides. |
 | `--fs-label` | 14 / 20 | Anything scanned: table cells, meter labels, legends, callouts, panel heads. |
-| `--fs-note` | 12 / 16 | Captions, axis ticks, units, eyebrows, table heads. |
+| `--fs-note` | 12 / 16 | Captions, axis ticks, units, eyebrows, tags. |
 
 - Headings and titles wear the black outline: title, heading, subheading, hero numbers (`.stat-value`), the titles of boxes (panel heads, stat labels), and text that sits on a border (stat deltas, meter names and values). Everything else stays plain: prose, table cells, legends, chart text.
 - The outline scales with the text: 7% of the font size, between 1.25px and 2px. That gives 1.25px on small titles, 1.4px at 20px, and 2px from 28px.
@@ -72,17 +87,21 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - Plain text keeps the browser's default rendering. Never set `-webkit-font-smoothing`, `text-rendering`, `paint-order`, or a text stroke (even `0px`) on it: together they made body text look soft in Chrome. Only headings and titles get the stroke.
 - Never clip outlined text at the glyph edge. A box with `overflow: hidden` needs padding as wide as the outline around its text.
 - Without an outline, text needs a surface it reads on. White text sits only on gray surfaces. Text on a colour fill (coloured tags, callout kinds, stacked-bar segments) is ink black. Plain text never sits on a bar: it would cross from fill to track. A meter's name and value are outlined and sit on the bar's top edge.
-- Text has three colours: `--text` `#f2f2f2` for content, `--text-dim` `#b8b8b8` for labels and captions, `--text-faint` `#8f8f8f` for markers and disabled items.
+- Text has four colours: `--text` `#d9d9d9` for content, `--text-prose` `#bcbcbc` for long prose, `--text-dim` `#a3a3a3` for labels and captions, `--text-faint` `#888888` for markers and disabled items.
+- Prose is a plain `<p>`, `<ul>`, or `<ol>` placed straight in `.page` or `.flow`. The stylesheet sets it a size above body text and a shade dimmer, so `<strong>` stands out in `--text`. Give it no class, and never set these by hand.
+- Contrast is soft on purpose. Text is never pure white and no surface is darker than `--sunken`: near-white on near-black glared in the bold face. Never raise the contrast to make text stand out; use size or `<strong>`.
 - Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline.
   - Mark names only. Never mark a number, a verdict, or a whole phrase, and never give a mark a state colour.
   - Mark running text only: body, leads, list items. Titles and headings stay white.
   - Keep it sparse: most sentences have no mark. When highlighting starts to compete with the content, remove marks.
-- Other coloured text: links and eyebrows (accent) and deltas (green up, crimson down). Text never wears a series colour.
-- Uppercase with extra tracking appears only at note size: eyebrows, table heads, tags, stat labels.
-- Prose lines stop at 640px (`--measure`).
+- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour.
+- Uppercase with extra tracking appears only at note size: eyebrows, tags, stat labels.
+- Table heads are uppercase too, at 11px on a 16px line. That is the one size below the scale: a row of capitals at note size read larger than the cells under it. Nothing else uses it.
+- Prose lines stop at 560px (`--measure`), about 65 characters. A list's indent sits inside that width.
 - Bulleted lists use square markers at every level and nest three levels at most. Numbered lists switch to letters one level down. Numbers are `--text-dim`; bullets are `--text-faint`.
 - A quote is its own box with a large outlined opening mark in the accent colour on its top border, and the source in a `<cite>` at note size. The mark is an ornament and the only glyph off the type scale. Never mark a quote with only a side rule or dim text: it does not read as a quote.
-- Expressway has no arrows, triangles, or `≈ ≤ ≥`. Use `.delta` for up and down; write "to" and "about".
+- Expressway has no arrows or triangles. Use `.delta` for up and down, and write "to".
+- Only the Regular cut has `≈ ≤ ≥ ≠ √`. Use them inside maths only, never in a heading, `<strong>`, or outlined text; elsewhere write "about" or "at most".
 
 ## On the border
 
@@ -123,7 +142,7 @@ Every gap is one of seven steps. Each has one meaning.
 
 ## Colour
 
-The accent is `--accent` `#c69b6d`, the Warrior class colour. It dresses text only: links and eyebrows.
+The accent is `--accent` `#bb966e`: the Warrior class colour (`#c69b6d`), softened like the data colours. It dresses text only: links and eyebrows.
 
 - Charts never use the accent. No bar, column, line, swatch, or tag is filled with `--accent`, and no series colour is defined from it. Changing the accent must not recolour any data.
 - The accent is not a replacement for other colours. States keep their usual colours: green for good, red for bad. A gain, a kill, or a tip is green, never the accent.
@@ -132,20 +151,21 @@ Data and state colours are three metals and six enamels:
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--azure` | `#5fa5de` | Series. Also neutral notes. |
-| `--gold` | `#cfb53b` | Series. |
-| `--amethyst` | `#9964c4` | Series. |
-| `--copper` | `#db7c3d` | Series. |
-| `--silver` | `#c9cdd2` | Series. |
-| `--rose` | `#df8db5` | Series. |
-| `--green` | `#5bc663` | Positive state. Never a series. A plain light green: never teal, mint, or blue-green. |
-| `--yellow` | `#ffeb4e` | Warning, needs attention. Never a series. Never orange. |
-| `--crimson` | `#e13c5b` | Negative state, danger. Never a series. |
+| `--azure` | `#639fd0` | Series. Also neutral notes. |
+| `--gold` | `#c3ad48` | Series. |
+| `--amethyst` | `#9466ba` | Series. |
+| `--copper` | `#ce7b47` | Series. |
+| `--silver` | `#bec1c6` | Series. |
+| `--rose` | `#d28aac` | Series. |
+| `--green` | `#7fb64d` | Positive state. Never a series. A warm green that leans yellow: never teal, mint, or blue-green. |
+| `--yellow` | `#eddc59` | Warning, needs attention. Never a series. Never orange. |
+| `--red` | `#d64c3b` | Negative state, danger. Never a series. A warm red that leans yellow: never crimson or pink. |
 
-State tokens: `--good` green, `--warn` yellow, `--bad` crimson, `--info` azure.
+State tokens: `--good` green, `--warn` yellow, `--bad` red, `--info` azure.
 
 Series colours, assigned in this order: `--c1` azure, `--c2` gold, `--c3` amethyst, `--c4` copper, `--c5` silver, `--c6` rose. `--c-other` `#7a7a7a` holds everything past six. A mark with no `--fill` takes `--c1`.
 
+- Every colour here is a pure hue mixed 12% toward mid gray (`#707070`, in OKLab), so fills sit with the softened text. Soften a new colour by the same share; never paste in a pure hue.
 - Never add an amber, lime, or second yellow. None separates from gold, least of all for colour-blind readers. `--yellow` separates only because it is much lighter: never darken it.
 - Set a fill with `style="--fill: var(--c2)"`.
 - A colour follows its entity across every chart on the page, whatever its rank.
@@ -162,7 +182,7 @@ Markup for each is in `assets/showcase.html`.
 - **Stat** (`.panel.stat`): note-size label on the top border at the left, `.stat-foot` with one `.delta` or `.tag` on the same border at the right, heading-size value inside, then an optional `.stat-note` caption at the bottom left saying what the delta compares against ("vs last week"), thin bar, or sparkline. A delta never appears without its comparison.
 - **Bar** (`.bar`): the signature mark, a Melli fill in a sunken track. It carries no plain text. `.bar.thin` is the small one. `.bar.stack` splits one bar into `.bar-seg` parts, which may hold an ink label.
 - **Meter** (`.meter`): a ranked list of `.meter-row`s, each a label, a bar, and a value. The name sits on the bar's top edge at the left and the value on the same edge at the right, as a unit frame names a health bar. This is the horizontal bar chart.
-- **Table** (`.table`): note-size uppercase heads, label-size cells, numbers right-aligned with `.num`.
+- **Table** (`.table`): 11px uppercase heads, label-size cells, numbers right-aligned with `.num`.
 - **Pie** (`.pie`): an SVG of `.pie-slice` circles and `.pie-cut` lines. Each slice sets `--v`, its share in percent, and `--at`, the sum of the shares before it. No arc geometry is needed.
 - **Tag** (`.tag`): a short state word.
 - **Icon**: see Icons below.
@@ -171,6 +191,16 @@ Markup for each is in `assets/showcase.html`.
 - **Empty state** (`.empty`): one dim centred line, with an optional glyph, in a panel that has nothing to show. Say what would fill it.
 - **Figure frame** (`figure.frame`): an image, SVG, or video in a 1px ink frame, caption below.
 - **Slide**: see Slides and decks below.
+
+## Maths
+
+Maths is not code: it takes the text face and no chip.
+
+- Inline maths is `<code class="math">`. It never wraps.
+- Exponents and indices are real `<sup>` and `<sub>`. Never type `^` or `_`.
+- A formula on its own line is `<p class="formula" role="math" aria-label="…">`, at heading size in a `--sunken` box. Each term is a `<span>`. Say the formula in words in the `aria-label`.
+- A fraction in an exponent is stacked: `<sup class="frac">` holding one `<span>` for the numerator and one for the denominator. Never write nested exponents on one line with a slash: three levels ran together.
+- A sign the text face lacks falls back to the monospace face.
 
 ## Code
 
@@ -216,7 +246,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - Parts of each column: stack several `.col-fill` in one `.col`, top part first, one colour per series, with a legend.
 - Two series per category: put the fills side by side in `.col-bars`. Two series at most; values go in tooltips.
 - A value against a goal: add `<span class="bar-mark" style="--at:80">` inside the `.bar`. It is a white tick with an ink ring. Say what it marks in a caption or legend.
-- Gains and losses: `.bar.diverge`. The fill grows right from the middle for a gain and left (`.bar-fill.neg`) for a loss; `--v` is a share of one half. Gains are green, losses crimson, and the signed value sits beside each bar.
+- Gains and losses: `.bar.diverge`. The fill grows right from the middle for a gain and left (`.bar-fill.neg`) for a loss; `--v` is a share of one half. Gains are green, losses red, and the signed value sits beside each bar.
 - Two dimensions, such as day by hour: `.heat`. Each `.heat-cell` takes `--v` from 0 to 100. One hue only, set with `--fill`; never a rainbow. Put a `.heat-scale` key under it, and give every cell a tooltip.
 - Parts of a whole: `.bar.stack` with a legend, or a `.pie`.
 - A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line, and Melli runs top to bottom over the whole disc. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
@@ -273,15 +303,15 @@ A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one su
 | Token | Value | Meaning |
 | --- | --- | --- |
 | `--t-fast` | 120ms | A state changes: hover, press. |
-| `--t-base` | 240ms | An element enters. |
 | `--t-slow` | 480ms | Data draws: bars fill, columns rise, lines trace. |
 | `--t-step` | 40ms | Delay between staggered siblings. |
 
-- Add `.anim` to a container to turn motion on. Bars, columns, lines, and pies inside it animate on their own.
-- `.enter` fades an element in over an 8px rise. `.stagger` on a parent delays each child by one step. Put `.enter` on every chart panel.
+- Motion is for data marks only: bars fill, columns rise, lines trace, pies sweep. Add `.anim` to a container to turn it on.
+- Panels, text, and boxes never animate in. A fade and rise held text between pixels, so it looked blurred until it settled.
+- `.stagger` on a parent delays each child's mark by one step.
 - With `style.js` loaded, each panel plays when a fifth of it scrolls into view, not on page load. Its marks start together.
 - A line needs `pathLength="1"` to trace. A pie slice needs `pathLength="100"`.
-- Everything plays once. Nothing replays on scrolling back, loops, bounces, or moves more than 8px.
+- Everything plays once. Nothing replays on scrolling back, loops, or bounces.
 - The stylesheet already honours reduced-motion settings.
 
 ## Hover
