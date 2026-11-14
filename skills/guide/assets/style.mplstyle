@@ -1,0 +1,68 @@
+# The style for matplotlib. Load it through scripts/mpl_style.py:
+#
+#   import mpl_style
+#   mpl_style.use()        # this file, plus the Expressway font
+#   ...draw...
+#   mpl_style.finish(fig)  # Melli shading, ink edges, outlined title
+#
+# Sizes are points at 100 dpi, so 0.72pt is one pixel: 8.64pt is the 12px note
+# size, 10.08pt the 14px label, 14.4pt the 20px subheading.
+
+figure.dpi: 100
+figure.facecolor: 2e2e2e
+figure.edgecolor: 000000
+savefig.facecolor: 2e2e2e
+savefig.dpi: 200
+savefig.bbox: tight
+savefig.pad_inches: 0.16
+
+# The plot sits straight on the panel gray. Only the baseline is drawn, in ink.
+axes.facecolor: 2e2e2e
+axes.edgecolor: 000000
+axes.linewidth: 0.72
+axes.spines.top: False
+axes.spines.right: False
+axes.spines.left: False
+axes.axisbelow: True
+axes.grid: True
+axes.grid.axis: y
+grid.color: 1a1a1a
+grid.linewidth: 0.72
+
+# Series colours, in order: azure, gold, amethyst, copper, silver, rose.
+axes.prop_cycle: cycler('color', ['5fa5de', 'cfb53b', '9964c4', 'db7c3d', 'c9cdd2', 'df8db5'])
+
+font.size: 8.64
+text.color: f2f2f2
+axes.labelcolor: b8b8b8
+axes.labelsize: 8.64
+axes.titlesize: 14.4
+axes.titleweight: bold
+axes.titlelocation: left
+axes.titlepad: 12
+xtick.color: b8b8b8
+ytick.color: b8b8b8
+xtick.labelsize: 8.64
+ytick.labelsize: 8.64
+xtick.major.size: 0
+ytick.major.size: 0
+xtick.major.pad: 6
+ytick.major.pad: 6
+
+# Every mark has a 1px ink edge. Lines are 2px with mitered joins; markers are 8px squares.
+patch.edgecolor: 000000
+patch.linewidth: 0.72
+patch.force_edgecolor: True
+lines.linewidth: 1.44
+lines.solid_joinstyle: miter
+lines.solid_capstyle: butt
+lines.markersize: 5.76
+lines.markeredgecolor: 000000
+lines.markeredgewidth: 0.72
+scatter.marker: s
+
+legend.frameon: False
+legend.fontsize: 10.08
+legend.labelcolor: b8b8b8
+legend.handlelength: 0.9
+legend.handleheight: 0.9

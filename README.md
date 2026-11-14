@@ -12,6 +12,7 @@ The style builds on work by others:
 - [EllesmereUI](https://www.curseforge.com/wow/addons/ellesmereui) by Ellesmere. Its overall polish is the starting point.
 - **Melli**, the status-bar texture shipped with ElvUI. `style.css` reproduces its luminance curve as a CSS gradient; the texture file is not included.
 - [Expressway](https://typodermicfonts.com/) by Ray Larabie, Typodermic Fonts. The typeface both interfaces use.
+- [Remix Icon](https://remixicon.com) by Remix Design. Its fill set supplies the symbol icons.
 
 ## Fonts
 
@@ -30,8 +31,14 @@ Without them, pages fall back to Overpass. Embedding the font in pages you publi
 | --- | --- |
 | `skills/guide/SKILL.md` | The rules. Both tools load it. |
 | `skills/guide/assets/style.css` | Tokens and components. |
+| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, deck keys. |
+| `skills/guide/assets/style.mplstyle` | The same look for matplotlib charts. |
 | `skills/guide/assets/showcase.html` | Reference markup for every component. |
-| `skills/guide/scripts/build.py` | Inlines the stylesheet and fonts into a page. |
+| `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
+| `skills/guide/scripts/build.py` | Inlines the stylesheet, script, and fonts into a page. |
+| `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
+| `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup. Needs Pygments. |
+| `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: Melli shading, ink edges, outlined title. |
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests. |
 | `.codex-plugin/plugin.json` | Codex plugin manifest. |
 | `.agents/plugins/marketplace.json` | Codex marketplace manifest. |
@@ -66,3 +73,5 @@ codex plugin add style@j-light-style
 ## License
 
 MIT for the code and rules in this repo. Expressway, ElvUI, and EllesmereUI belong to their authors.
+
+The icons in `skills/guide/assets/icons/` are Remix Icon 4.8.0, published under Apache 2.0; the licence text sits beside them. Remix Icon releases from January 2026 use the Remix Icon License v1.0 instead, which also allows icons inside a design system but not resale as an icon pack. Read it before updating the set.

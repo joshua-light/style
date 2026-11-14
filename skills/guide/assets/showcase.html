@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Style Showcase</title>
 <link rel="stylesheet" href="style.css">
+<script src="style.js" defer></script>
 </head>
 <body>
 <!-- Reference markup for every component. Copy structure from here.
-     .anim on the page opts every bar, column and line into its entry animation. -->
+     .anim on the page opts every bar, column, line and pie into its entry animation, and .enter fades a panel in.
+     With style.js loaded, each plays when its panel scrolls into view. -->
 <main class="page anim">
 
   <!-- ── Text ── -->
@@ -18,7 +20,8 @@
 
   <h2>Text</h2>
   <p>Body text runs at 16px on a 24px line and never wider than 640px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Extra-bold marks emphasis</strong>; nothing is italic.</p>
-  <p>A second paragraph sits 16px below the first. Blocks of other kinds sit 24px apart.</p>
+  <!-- mark: the name of a thing inside a sentence. Names only, never numbers; running text only, never titles. -->
+  <p>A highlight colours the name of a thing: <mark>Tukz</mark> topped the meter, and 24 pulls went into <mark>Dimensius</mark>.</p>
 
   <h3>Lists</h3>
   <!-- Lists nest up to three levels. Numbered lists switch to letters one level down. -->
@@ -61,6 +64,36 @@
   </blockquote>
   <p>Inline <code>code</code> and blocks use a monospace face:</p>
 <pre><code>python3 scripts/build.py report.html</code></pre>
+  <!-- Highlighted code: paste the output of scripts/highlight.py LANG FILE. The stylesheet colours the token classes:
+       tan keywords, gold strings, copper numbers and constants, silver functions and types, gray comments. -->
+<pre><code class="language-lua"><span class="c1">-- Skin a status bar the ElvUI way.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">BORDER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">}</span>
+
+<span class="kr">function</span><span class="w"> </span><span class="nc">E</span><span class="p">:</span><span class="nf">SkinBar</span><span class="p">(</span><span class="nv">bar</span><span class="p">,</span><span class="w"> </span><span class="nv">texture</span><span class="p">)</span>
+<span class="w">  </span><span class="nv">bar</span><span class="p">:</span><span class="nf">SetStatusBarTexture</span><span class="p">(</span><span class="nv">texture</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s2">"Melli"</span><span class="p">)</span>
+<span class="w">  </span><span class="nv">bar</span><span class="p">.</span><span class="py">backdrop</span><span class="p">:</span><span class="nf">SetBackdropBorderColor</span><span class="p">(</span><span class="nf">unpack</span><span class="p">(</span><span class="nv">BORDER</span><span class="p">))</span>
+<span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">bar</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="nv">bar</span><span class="p">.</span><span class="py">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">bar</span><span class="p">:</span><span class="nf">CreateFontString</span><span class="p">(</span><span class="kc">nil</span><span class="p">,</span><span class="w"> </span><span class="s2">"OVERLAY"</span><span class="p">)</span>
+<span class="w">    </span><span class="nv">bar</span><span class="p">.</span><span class="py">text</span><span class="p">:</span><span class="nf">SetFont</span><span class="p">(</span><span class="s2">"Expressway"</span><span class="p">,</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w"> </span><span class="s2">"OUTLINE"</span><span class="p">)</span>
+<span class="w">  </span><span class="kr">end</span>
+<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="nv">bar</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span>
+<span class="kr">end</span></code></pre>
+
+  <h3>Icons</h3>
+  <!-- Glyph: a symbol from Remix Icon's fill set, with no background. Get the markup from scripts/icon.py NAME.
+       .with-icon attaches it to its text: the glyph takes that text's colour and the height of one line.
+       Tile (scripts/icon.py --tile --fill c1 NAME) is the exception, for an icon that stands as its own mark.
+       A picture icon is <span class="icon"><img src="…" alt=""></span>; put one first in a .meter-row to stand it left of the bar. -->
+  <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><span>Beside an eyebrow</span></p>
+  <h3 class="with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.005 2.003a8 8 0 0 1 3.292 15.293A8 8 0 1 1 6.711 6.71a8 8 0 0 1 7.294-4.707m-3 7h-2v1a2.5 2.5 0 0 0-.164 4.995l.164.005h2l.09.008a.5.5 0 0 1 0 .984l-.09.008h-4v2h2v1h2v-1a2.5 2.5 0 0 0 .164-4.995l-.164-.005h-2l-.09-.008a.5.5 0 0 1 0-.984l.09-.008h4v-2h-2zm3-5A6 6 0 0 0 9.52 6.016a8 8 0 0 1 8.47 8.471a6 6 0 0 0-3.986-10.484"/></svg></span><span>Beside a subheading</span></h3>
+  <p class="with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m1-10V7h-2v7h6v-2z"/></svg></span><span>Beside body text, a glyph is white and 24px tall.</span></p>
+  <p class="note with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12.866 3l9.526 16.5a1 1 0 0 1-.866 1.5H2.474a1 1 0 0 1-.866-1.5L11.134 3a1 1 0 0 1 1.732 0M11 16v2h2v-2zm0-7v5h2V9z"/></svg></span><span>Beside a caption it is dim and 16px tall.</span></p>
+  <div class="row">
+    <span class="icon" style="--fill:var(--c1)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span>
+    <span class="icon" style="--fill:var(--c2)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12.005 1a5 5 0 0 1 5 5v2h3a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1h3V6a5 5 0 0 1 5-5m5 10h-2v1a1 1 0 0 0 1.993.116l.007-.116zm-8 0h-2v1a1 1 0 0 0 1.993.116L9.005 12zm3-8A3 3 0 0 0 9.01 5.823L9.005 6v2h6V6a3 3 0 0 0-2.824-2.995z"/></svg></span>
+    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18 18v3a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1v-3H3a1 1 0 0 1-1-1v-5C2 6.477 6.477 2 12 2s10 4.477 10 10v5a1 1 0 0 1-1 1zM7.5 14a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m9 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3"/></svg></span>
+    <span class="label dim">Tiles: only where an icon stands as a mark of its own.</span>
+  </div>
 
   <!-- ── Callouts ── -->
   <h2>Callouts</h2>
@@ -151,7 +184,7 @@
   <h2>Charts</h2>
   <div class="grid">
     <!-- Columns: values labelled directly, so there is no y-axis. --max sets the scale. -->
-    <figure class="panel span-6">
+    <figure class="panel span-6 enter">
       <div class="panel-head">Pulls per night</div>
       <div class="panel-body">
         <div class="cols stagger" style="--max:30">
@@ -169,7 +202,7 @@
 
     <!-- Line chart: inline SVG on a 440×200 viewBox. Plot area x 32–428, y 8–168.
          Each line carries pathLength="1" so .anim can trace it. Series are labelled at the line end. -->
-    <figure class="panel span-6">
+    <figure class="panel span-6 enter">
       <div class="panel-head">Raid DPS by pull</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull for two nights">
@@ -203,7 +236,7 @@
     </figure>
 
     <!-- Stacked bar: parts of one whole. Use it where a pie would go. -->
-    <figure class="panel span-12">
+    <figure class="panel span-12 enter">
       <div class="panel-head">Damage by school</div>
       <div class="panel-body">
         <div class="bar stack">
@@ -211,7 +244,7 @@
           <span class="bar-seg" style="--v:27; --fill:var(--c2)">Frost 27%</span>
           <span class="bar-seg" style="--v:19; --fill:var(--c3)">Holy 19%</span>
           <span class="bar-seg" style="--v:11; --fill:var(--c4)">Arcane 11%</span>
-          <span class="bar-seg" style="--v:5; --fill:var(--c-other)" title="Other 5%"></span>
+          <span class="bar-seg" style="--v:5; --fill:var(--c-other)" data-tip="Other" data-tip-value="5%" data-tip-note="Fire, Shadow, Physical" aria-label="Other 5%"></span>
         </div>
         <div class="legend">
           <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Nature</span>
@@ -225,18 +258,20 @@
 
     <!-- Pie: parts of one whole, five slices at most. Each slice is a circle with r="50" and pathLength="100":
          --v is its share in percent, --at the sum of the shares before it. One .pie-cut per slice, at the same --at.
-         Largest slice first, "other" last. The legend carries the names and values. -->
-    <figure class="panel span-8">
+         Largest slice first, "other" last. The legend carries the names and values and fills the width the pie leaves.
+         data-tip, data-tip-value and data-tip-note feed the hover tooltip; data-key links a slice to its legend row.
+         .rows-2 lets this panel stand beside two short ones. -->
+    <figure class="panel span-6 rows-2 enter">
       <div class="panel-head">Interrupts by player</div>
       <div class="panel-body">
         <div class="chart-row">
           <div class="pie" role="img" aria-label="Interrupts by player: Ellesmere 34%, Tukz 26%, Melli 18%, Elv 14%, other 8%">
             <svg viewBox="-100 -100 200 200">
-              <circle class="pie-slice" r="50" pathLength="100" style="--v:34; --at:0; --fill:var(--c1)"/>
-              <circle class="pie-slice" r="50" pathLength="100" style="--v:26; --at:34; --fill:var(--c2)"/>
-              <circle class="pie-slice" r="50" pathLength="100" style="--v:18; --at:60; --fill:var(--c3)"/>
-              <circle class="pie-slice" r="50" pathLength="100" style="--v:14; --at:78; --fill:var(--c4)"/>
-              <circle class="pie-slice" r="50" pathLength="100" style="--v:8; --at:92; --fill:var(--c-other)"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:34; --at:0; --fill:var(--c1)" data-key="ellesmere" data-tip="Ellesmere" data-tip-value="34%" data-tip-note="41 of 120 interrupts"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:26; --at:34; --fill:var(--c2)" data-key="tukz" data-tip="Tukz" data-tip-value="26%" data-tip-note="31 of 120 interrupts"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:18; --at:60; --fill:var(--c3)" data-key="melli" data-tip="Melli" data-tip-value="18%" data-tip-note="22 of 120 interrupts"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:14; --at:78; --fill:var(--c4)" data-key="elv" data-tip="Elv" data-tip-value="14%" data-tip-note="17 of 120 interrupts"/>
+              <circle class="pie-slice" r="50" pathLength="100" style="--v:8; --at:92; --fill:var(--c-other)" data-key="other" data-tip="Other" data-tip-value="8%" data-tip-note="9 of 120 interrupts, 4 players"/>
               <line class="pie-cut" x2="100" style="--at:0"/>
               <line class="pie-cut" x2="100" style="--at:34"/>
               <line class="pie-cut" x2="100" style="--at:60"/>
@@ -245,25 +280,25 @@
             </svg>
           </div>
           <div class="legend list">
-            <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Ellesmere<span class="legend-value">34%</span></span>
-            <span class="legend-item"><span class="swatch" style="--fill:var(--c2)"></span>Tukz<span class="legend-value">26%</span></span>
-            <span class="legend-item"><span class="swatch" style="--fill:var(--c3)"></span>Melli<span class="legend-value">18%</span></span>
-            <span class="legend-item"><span class="swatch" style="--fill:var(--c4)"></span>Elv<span class="legend-value">14%</span></span>
-            <span class="legend-item"><span class="swatch" style="--fill:var(--c-other)"></span>Other<span class="legend-value">8%</span></span>
+            <span class="legend-item" data-key="ellesmere"><span class="swatch" style="--fill:var(--c1)"></span>Ellesmere<span class="legend-value">34%</span></span>
+            <span class="legend-item" data-key="tukz"><span class="swatch" style="--fill:var(--c2)"></span>Tukz<span class="legend-value">26%</span></span>
+            <span class="legend-item" data-key="melli"><span class="swatch" style="--fill:var(--c3)"></span>Melli<span class="legend-value">18%</span></span>
+            <span class="legend-item" data-key="elv"><span class="swatch" style="--fill:var(--c4)"></span>Elv<span class="legend-value">14%</span></span>
+            <span class="legend-item" data-key="other"><span class="swatch" style="--fill:var(--c-other)"></span>Other<span class="legend-value">8%</span></span>
           </div>
         </div>
       </div>
     </figure>
 
-    <!-- Sparkline: a trend with no axes, inside a stat. viewBox is the data's own box. -->
-    <div class="panel stat span-4">
+    <!-- Sparkline: a trend with no axes, inside a stat. viewBox is the data's own box. It stretches to fill the card. -->
+    <div class="panel stat span-6 enter">
       <div class="stat-label">Wipes per night</div>
       <div class="stat-value">6</div>
       <svg class="spark" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true">
         <path class="line" pathLength="1" style="--fill:var(--c5)" d="M0 4 L10 8 L20 6 L30 14 L40 12 L50 22 L60 26"/>
       </svg>
     </div>
-    <div class="panel span-12">
+    <div class="panel span-6 enter">
       <div class="panel-head">Series colours</div>
       <div class="panel-body">
         <div class="row">
@@ -280,15 +315,390 @@
     </div>
   </div>
 
+  <!-- ── More charts ── -->
+  <h2>More charts</h2>
+  <div class="grid">
+    <!-- Stacked columns: several .col-fill in one .col, top part first. One colour per series, with a legend. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">Damage by night</div>
+      <div class="panel-body">
+        <div class="cols stagger" style="--max:60">
+          <div class="col"><span class="col-value">31</span><span class="col-fill" style="--v:9; --fill:var(--c2)" data-tip="Trash" data-tip-value="9M"></span><span class="col-fill" style="--v:22; --fill:var(--c1)" data-tip="Bosses" data-tip-value="22M"></span><span class="col-label">Mon</span></div>
+          <div class="col"><span class="col-value">44</span><span class="col-fill" style="--v:12; --fill:var(--c2)" data-tip="Trash" data-tip-value="12M"></span><span class="col-fill" style="--v:32; --fill:var(--c1)" data-tip="Bosses" data-tip-value="32M"></span><span class="col-label">Tue</span></div>
+          <div class="col"><span class="col-value">27</span><span class="col-fill" style="--v:10; --fill:var(--c2)" data-tip="Trash" data-tip-value="10M"></span><span class="col-fill" style="--v:17; --fill:var(--c1)" data-tip="Bosses" data-tip-value="17M"></span><span class="col-label">Wed</span></div>
+          <div class="col"><span class="col-value">56</span><span class="col-fill" style="--v:14; --fill:var(--c2)" data-tip="Trash" data-tip-value="14M"></span><span class="col-fill" style="--v:42; --fill:var(--c1)" data-tip="Bosses" data-tip-value="42M"></span><span class="col-label">Thu</span></div>
+          <div class="col"><span class="col-value">48</span><span class="col-fill" style="--v:11; --fill:var(--c2)" data-tip="Trash" data-tip-value="11M"></span><span class="col-fill" style="--v:37; --fill:var(--c1)" data-tip="Bosses" data-tip-value="37M"></span><span class="col-label">Fri</span></div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Bosses</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c2)"></span>Trash</span>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Grouped columns: the fills of one group sit side by side in .col-bars. Values go in tooltips. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">Pulls by night</div>
+      <div class="panel-body">
+        <div class="cols stagger" style="--max:30; --h:184px">
+          <div class="col"><span class="col-bars"><span class="col-fill" style="--v:12; --fill:var(--c1)" data-tip="This week" data-tip-value="12"></span><span class="col-fill" style="--v:16; --fill:var(--c5)" data-tip="Last week" data-tip-value="16"></span></span><span class="col-label">Mon</span></div>
+          <div class="col"><span class="col-bars"><span class="col-fill" style="--v:18; --fill:var(--c1)" data-tip="This week" data-tip-value="18"></span><span class="col-fill" style="--v:21; --fill:var(--c5)" data-tip="Last week" data-tip-value="21"></span></span><span class="col-label">Tue</span></div>
+          <div class="col"><span class="col-bars"><span class="col-fill" style="--v:9; --fill:var(--c1)" data-tip="This week" data-tip-value="9"></span><span class="col-fill" style="--v:14; --fill:var(--c5)" data-tip="Last week" data-tip-value="14"></span></span><span class="col-label">Wed</span></div>
+          <div class="col"><span class="col-bars"><span class="col-fill" style="--v:27; --fill:var(--c1)" data-tip="This week" data-tip-value="27"></span><span class="col-fill" style="--v:19; --fill:var(--c5)" data-tip="Last week" data-tip-value="19"></span></span><span class="col-label">Thu</span></div>
+          <div class="col"><span class="col-bars"><span class="col-fill" style="--v:21; --fill:var(--c1)" data-tip="This week" data-tip-value="21"></span><span class="col-fill" style="--v:24; --fill:var(--c5)" data-tip="Last week" data-tip-value="24"></span></span><span class="col-label">Fri</span></div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>This week</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c5)"></span>Last week</span>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Heatmap: --cols columns after the row label. Each cell's --v, 0 to 100, shades it. One hue; a key underneath. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">Wipes by hour</div>
+      <div class="panel-body">
+        <div class="heat" style="--cols:7; --cell:32px" role="img" aria-label="Wipes by hour and night; most on Thursday at 21:00">
+          <span class="heat-x"></span><span class="heat-x">Mon</span><span class="heat-x">Tue</span><span class="heat-x">Wed</span><span class="heat-x">Thu</span><span class="heat-x">Fri</span><span class="heat-x">Sat</span><span class="heat-x">Sun</span>
+          <span class="heat-y">19:00</span><span class="heat-cell" style="--v:12" data-tip="Mon, 19:00" data-tip-value="1 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Tue, 19:00" data-tip-value="2 wipes"></span><span class="heat-cell" style="--v:0" data-tip="Wed, 19:00" data-tip-value="0 wipes"></span><span class="heat-cell" style="--v:38" data-tip="Thu, 19:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Fri, 19:00" data-tip-value="2 wipes"></span><span class="heat-cell" style="--v:12" data-tip="Sat, 19:00" data-tip-value="1 wipes"></span><span class="heat-cell" style="--v:0" data-tip="Sun, 19:00" data-tip-value="0 wipes"></span>
+          <span class="heat-y">20:00</span><span class="heat-cell" style="--v:38" data-tip="Mon, 20:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:50" data-tip="Tue, 20:00" data-tip-value="4 wipes"></span><span class="heat-cell" style="--v:12" data-tip="Wed, 20:00" data-tip-value="1 wipes"></span><span class="heat-cell" style="--v:75" data-tip="Thu, 20:00" data-tip-value="6 wipes"></span><span class="heat-cell" style="--v:50" data-tip="Fri, 20:00" data-tip-value="4 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Sat, 20:00" data-tip-value="2 wipes"></span><span class="heat-cell" style="--v:12" data-tip="Sun, 20:00" data-tip-value="1 wipes"></span>
+          <span class="heat-y">21:00</span><span class="heat-cell" style="--v:50" data-tip="Mon, 21:00" data-tip-value="4 wipes"></span><span class="heat-cell" style="--v:62" data-tip="Tue, 21:00" data-tip-value="5 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Wed, 21:00" data-tip-value="2 wipes"></span><span class="heat-cell" style="--v:100" data-tip="Thu, 21:00" data-tip-value="8 wipes"></span><span class="heat-cell" style="--v:75" data-tip="Fri, 21:00" data-tip-value="6 wipes"></span><span class="heat-cell" style="--v:38" data-tip="Sat, 21:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:12" data-tip="Sun, 21:00" data-tip-value="1 wipes"></span>
+          <span class="heat-y">22:00</span><span class="heat-cell" style="--v:25" data-tip="Mon, 22:00" data-tip-value="2 wipes"></span><span class="heat-cell" style="--v:50" data-tip="Tue, 22:00" data-tip-value="4 wipes"></span><span class="heat-cell" style="--v:38" data-tip="Wed, 22:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:88" data-tip="Thu, 22:00" data-tip-value="7 wipes"></span><span class="heat-cell" style="--v:62" data-tip="Fri, 22:00" data-tip-value="5 wipes"></span><span class="heat-cell" style="--v:50" data-tip="Sat, 22:00" data-tip-value="4 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Sun, 22:00" data-tip-value="2 wipes"></span>
+          <span class="heat-y">23:00</span><span class="heat-cell" style="--v:0" data-tip="Mon, 23:00" data-tip-value="0 wipes"></span><span class="heat-cell" style="--v:12" data-tip="Tue, 23:00" data-tip-value="1 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Wed, 23:00" data-tip-value="2 wipes"></span><span class="heat-cell" style="--v:38" data-tip="Thu, 23:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:38" data-tip="Fri, 23:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:38" data-tip="Sat, 23:00" data-tip-value="3 wipes"></span><span class="heat-cell" style="--v:25" data-tip="Sun, 23:00" data-tip-value="2 wipes"></span>
+        </div>
+        <div class="legend">
+          <span class="heat-scale">0<span class="heat-cell" style="--v:0"></span><span class="heat-cell" style="--v:25"></span><span class="heat-cell" style="--v:50"></span><span class="heat-cell" style="--v:75"></span><span class="heat-cell" style="--v:100"></span><span>8 wipes</span></span>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Area: the line chart with a filled .area under the line and a second copy, .area-melli, for the texture.
+         The <defs> gradient is Melli for SVG; copy it with the chart. One series only: areas hide each other. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">Raid DPS, Thursday</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull on Thursday, rising from 9M to 24M">
+          <defs><linearGradient id="melli" x1="0" y1="0" x2="0" y2="1"><stop offset="0.008" stop-color="#000" stop-opacity="0.314"/><stop offset="0.164" stop-color="#000" stop-opacity="0.271"/><stop offset="0.398" stop-color="#000" stop-opacity="0.165"/><stop offset="0.586" stop-color="#000" stop-opacity="0.075"/><stop offset="0.727" stop-color="#000" stop-opacity="0.027"/><stop offset="0.836" stop-color="#000" stop-opacity="0.004"/><stop offset="0.898" stop-color="#000" stop-opacity="0.004"/><stop offset="0.914" stop-color="#000" stop-opacity="0.027"/><stop offset="0.93" stop-color="#000" stop-opacity="0.063"/><stop offset="0.977" stop-color="#000" stop-opacity="0.2"/><stop offset="0.992" stop-color="#000" stop-opacity="0.239"/></linearGradient></defs>
+          <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
+          <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
+          <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
+          <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
+          <path class="area" style="--fill:var(--c1)" d="M32 132 L65 124 L98 128 L131 108 L164 112 L197 96 L230 100 L263 84 L296 88 L329 76 L362 80 L395 68 L428 72 L428 168 L32 168 Z"/>
+          <path class="area-melli" d="M32 132 L65 124 L98 128 L131 108 L164 112 L197 96 L230 100 L263 84 L296 88 L329 76 L362 80 L395 68 L428 72 L428 168 L32 168 Z"/>
+          <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
+          <text class="end" x="24" y="12">40M</text>
+          <text class="end" x="24" y="52">30M</text>
+          <text class="end" x="24" y="92">20M</text>
+          <text class="end" x="24" y="132">10M</text>
+          <text class="end" x="24" y="172">0</text>
+          <text class="mid" x="32" y="188">1</text>
+          <text class="mid" x="131" y="188">4</text>
+          <text class="mid" x="230" y="188">7</text>
+          <text class="mid" x="329" y="188">10</text>
+          <text class="mid" x="428" y="188">13</text>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M32 132 L65 124 L98 128 L131 108 L164 112 L197 96 L230 100 L263 84 L296 88 L329 76 L362 80 L395 68 L428 72"/>
+          <rect class="dot" style="--fill:var(--c1)" x="424" y="68" width="8" height="8" data-tip="Pull 13" data-tip-value="24.0M"/>
+        </svg>
+      </div>
+    </figure>
+
+    <!-- Target: a .bar-mark at --at percent marks a goal or last week's value. Say what it marks in a legend. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">Damage against target</div>
+      <div class="panel-body">
+        <div class="meter stagger">
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:92; --fill:var(--c1)"><span class="bar-fill"></span><span class="bar-mark" style="--at:80" data-tip="Target" data-tip-value="4.30M"></span></div><span class="meter-value">4.92M</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:84; --fill:var(--c2)"><span class="bar-fill"></span><span class="bar-mark" style="--at:80" data-tip="Target" data-tip-value="4.30M"></span></div><span class="meter-value">4.48M</span></div>
+          <div class="meter-row"><span class="meter-label">Elv</span><div class="bar" style="--v:66; --fill:var(--c4)"><span class="bar-fill"></span><span class="bar-mark" style="--at:80" data-tip="Target" data-tip-value="4.30M"></span></div><span class="meter-value">3.54M</span></div>
+          <div class="meter-row"><span class="meter-label">Azilroka</span><div class="bar" style="--v:38; --fill:var(--c6)"><span class="bar-fill"></span><span class="bar-mark" style="--at:80" data-tip="Target" data-tip-value="4.30M"></span></div><span class="meter-value">2.02M</span></div>
+        </div>
+        <p class="note">The white tick marks the 4.30M target.</p>
+      </div>
+    </figure>
+
+    <!-- Diverging: .bar.diverge grows from the middle. --v is a share of one half; .neg grows left.
+         Gains are green and losses crimson, always with the signed value beside them. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">Change since last week</div>
+      <div class="panel-body">
+        <div class="meter stagger">
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar diverge"><span class="bar-fill" style="--v:72"></span></div><span class="meter-value">+0.61M</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar diverge"><span class="bar-fill" style="--v:31"></span></div><span class="meter-value">+0.26M</span></div>
+          <div class="meter-row"><span class="meter-label">Elv</span><div class="bar diverge"><span class="bar-fill neg" style="--v:44"></span></div><span class="meter-value">-0.37M</span></div>
+          <div class="meter-row"><span class="meter-label">Azilroka</span><div class="bar diverge"><span class="bar-fill neg" style="--v:86"></span></div><span class="meter-value">-0.73M</span></div>
+        </div>
+        <p class="note">Right of the middle is a gain, left a loss.</p>
+      </div>
+    </figure>
+  </div>
+
+  <!-- ── Explainers ── -->
+  <h2>Explainers</h2>
+  <div class="grid">
+    <!-- Diagram: a chain of .node boxes joined by .link arrows. .diagram.down runs it top to bottom. -->
+    <figure class="panel span-12 enter">
+      <div class="panel-head">How a pull runs</div>
+      <div class="panel-body">
+        <div class="diagram">
+          <div class="node"><strong>Ready check</strong><span>Everyone confirms</span></div>
+          <span class="link"></span>
+          <div class="node"><strong>Pull</strong><span>Tank opens</span></div>
+          <span class="link"></span>
+          <div class="node"><strong>Phase one</strong><span>To 60% health</span></div>
+          <span class="link"></span>
+          <div class="node"><strong>Phase two</strong><span>Burn before enrage</span></div>
+          <span class="link"></span>
+          <div class="node"><strong>Loot</strong><span>Or wipe and reset</span></div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- A diagram that branches is an SVG: .box rectangles, .wire paths and .arrow heads, drawn at the width it renders.
+         Label a branch beside its wire. -->
+    <figure class="panel span-6 enter">
+      <div class="panel-head">What ends a pull</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 176" role="img" aria-label="A pull ends in a kill if the boss dies before the enrage timer, and in a wipe if not">
+          <path class="wire" d="M104 88 H156"/>
+          <polygon class="arrow" points="156,84 164,88 156,92"/>
+          <path class="wire" d="M276 88 H300 V40 H328"/>
+          <polygon class="arrow" points="328,36 336,40 328,44"/>
+          <path class="wire" d="M276 88 H300 V136 H328"/>
+          <polygon class="arrow" points="328,132 336,136 328,140"/>
+          <rect class="box" x="8.5" y="64.5" width="96" height="48"/>
+          <rect class="box" x="164.5" y="64.5" width="112" height="48"/>
+          <rect class="box" x="336.5" y="16.5" width="96" height="48"/>
+          <rect class="box" x="336.5" y="112.5" width="96" height="48"/>
+          <text class="name mid" x="56" y="93">Pull</text>
+          <text class="name mid" x="220" y="93">Dead by enrage?</text>
+          <text class="name mid" x="384" y="45">Kill</text>
+          <text class="name mid" x="384" y="141">Wipe</text>
+          <text x="306" y="30">yes</text>
+          <text x="306" y="154">no</text>
+        </svg>
+      </div>
+    </figure>
+
+    <!-- Timeline: one <li> per event, with its date in .timeline-when. Set --fill on an <li> to colour its marker. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Progress</div>
+      <div class="panel-body">
+        <ol class="timeline">
+          <li><span class="timeline-when">Week 9</span><div><strong>Plexus Sentinel dies</strong><br><span class="dim">First night, one pull.</span></div></li>
+          <li><span class="timeline-when">Week 10</span><div><strong>Loom'ithar dies</strong><br><span class="dim">Three pulls.</span></div></li>
+          <li style="--fill:var(--warn)"><span class="timeline-when">Week 11</span><div><strong>Stuck on Forgeweaver Araz</strong><br><span class="dim">Eleven pulls, best 18%.</span></div></li>
+          <li style="--fill:var(--good)"><span class="timeline-when">Week 12</span><div><strong>Eight of eight</strong><br><span class="dim">With a night to spare.</span></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Steps: an ordered list with its numbers in squares. .steps.across sets them side by side, for three to five short steps. -->
+    <section class="panel span-12 enter">
+      <div class="panel-head">Before the pull</div>
+      <div class="panel-body">
+        <ol class="steps across">
+          <li><strong>Repair</strong><br><span class="dim label">Gear above half durability.</span></li>
+          <li><strong>Eat and flask</strong><br><span class="dim label">Buffs last the whole night.</span></li>
+          <li><strong>Assign interrupts</strong><br><span class="dim label">Two players per cast.</span></li>
+          <li><strong>Ready check</strong><br><span class="dim label">Pull on the count of five.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Key-value list: <dl class="kv">, label then value. For a handful of facts about one thing. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Dimensius</div>
+      <div class="panel-body">
+        <dl class="kv">
+          <dt>Health</dt><dd>1.84B</dd>
+          <dt>Enrage</dt><dd>9 min 30 s</dd>
+          <dt>Phases</dt><dd>3</dd>
+          <dt>Best pull</dt><dd>61% left</dd>
+          <dt>Pulls so far</dt><dd>24</dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Icon list: a .icon-list item is a glyph and its text. Use it where each line is a different kind of thing. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">For next week</div>
+      <div class="panel-body">
+        <ul class="icon-list">
+          <li><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><span>Swap one healer for a third <mark>Mage</mark>.</span></li>
+          <li><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m1-10V7h-2v7h6v-2z"/></svg></span><span>Start at 19:30 to fit two more pulls.</span></li>
+          <li><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.783 2.826L12 1l8.217 1.826a1 1 0 0 1 .783.976v9.987a6 6 0 0 1-2.672 4.992L12 23l-6.328-4.219A6 6 0 0 1 3 13.79V3.802a1 1 0 0 1 .783-.976"/></svg></span><span>Tanks trade at three stacks, not four.</span></li>
+          <li><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12.866 3l9.526 16.5a1 1 0 0 1-.866 1.5H2.474a1 1 0 0 1-.866-1.5L11.134 3a1 1 0 0 1 1.732 0M11 16v2h2v-2zm0-7v5h2V9z"/></svg></span><span>Nobody stands in the fire.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Before and after: .compare holds two boxes and a .link between them. Tag each box on its top border. -->
+    <div class="compare span-12 enter">
+      <section class="panel">
+        <div class="panel-head">Two healers <span class="tag">Before</span></div>
+        <div class="panel-body"><p class="label">37 deaths a night, and the enrage hit on every Dimensius pull.</p></div>
+      </section>
+      <span class="link"></span>
+      <section class="panel">
+        <div class="panel-head">Three healers <span class="tag good">After</span></div>
+        <div class="panel-body"><p class="label">21 deaths a night. Damage fell 4%, and the boss still died.</p></div>
+      </section>
+    </div>
+
+    <!-- Figure frame: <figure class="frame"> puts an ink border on an image, an SVG or a video, with the caption below. -->
+    <figure class="frame span-6 enter">
+      <svg viewBox="0 0 440 160" role="img" aria-label="A unit frame: a health bar over a power bar">
+        <rect x="24.5" y="40.5" width="56" height="56" fill="var(--panel)" stroke="var(--ink)"/>
+        <rect x="88.5" y="40.5" width="328" height="36" fill="var(--good)" stroke="var(--ink)"/>
+        <rect x="88.5" y="40.5" width="328" height="36" fill="url(#melli)"/>
+        <rect x="88.5" y="80.5" width="236" height="16" fill="var(--azure)" stroke="var(--ink)"/>
+        <rect x="88.5" y="80.5" width="236" height="16" fill="url(#melli)"/>
+        <rect x="324.5" y="80.5" width="92" height="16" fill="var(--sunken)" stroke="var(--ink)"/>
+      </svg>
+      <figcaption>A unit frame: portrait, health bar, power bar. The frame around a picture is the same 1px ink.</figcaption>
+    </figure>
+
+    <!-- Empty state: one dim line in the middle of a panel that has nothing to show. Say what would fill it. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Loot this week</div>
+      <div class="panel-body"><div class="empty"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 3h16l2 4v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.004zm9 11v-4h-2v4H8l4 4l4-4zm6.764-7l-1-2H5.237l-1 2z"/></svg></span><span>No drops yet. Loot appears after the first kill.</span></div></div>
+    </section>
+  </div>
+
+  <!-- ── Controls ── -->
+  <h2>Controls</h2>
+  <div class="grid">
+    <!-- Tabs: a row of .tab buttons in .tabs; data-tab names the [data-tab-panel] to show. In a panel head they sit on the border.
+         Mark the first tab aria-pressed="true" and hide the other panels, so the page is right before the script runs. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Meter
+        <span class="tabs">
+          <button class="tab" type="button" data-tab="damage" aria-pressed="true">Damage</button>
+          <button class="tab" type="button" data-tab="healing" aria-pressed="false">Healing</button>
+          <button class="tab" type="button" data-tab="deaths" aria-pressed="false">Deaths</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <div class="meter" data-tab-panel="damage">
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">4.92M</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:91; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">4.48M</span></div>
+          <div class="meter-row"><span class="meter-label">Melli</span><div class="bar" style="--v:84; --fill:var(--c3)"><span class="bar-fill"></span></div><span class="meter-value">4.13M</span></div>
+        </div>
+        <div class="meter" data-tab-panel="healing" hidden>
+          <div class="meter-row"><span class="meter-label">Simpy</span><div class="bar" style="--v:100; --fill:var(--c5)"><span class="bar-fill"></span></div><span class="meter-value">2.31M</span></div>
+          <div class="meter-row"><span class="meter-label">Azilroka</span><div class="bar" style="--v:78; --fill:var(--c6)"><span class="bar-fill"></span></div><span class="meter-value">1.80M</span></div>
+          <div class="meter-row"><span class="meter-label">Melli</span><div class="bar" style="--v:12; --fill:var(--c3)"><span class="bar-fill"></span></div><span class="meter-value">0.28M</span></div>
+        </div>
+        <div class="meter" data-tab-panel="deaths" hidden>
+          <div class="meter-row"><span class="meter-label">Elv</span><div class="bar" style="--v:100; --fill:var(--c4)"><span class="bar-fill"></span></div><span class="meter-value">9</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:67; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">6</span></div>
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:44; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">4</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form controls: .field labels a control; .input for text and selects; .check for a checkbox; .button, with one .primary. -->
+    <section class="panel span-6 enter">
+      <div class="panel-head">Filter</div>
+      <div class="panel-body">
+        <div class="row">
+          <label class="field">Player<input class="input" type="text" placeholder="Any" size="12"></label>
+          <label class="field">Difficulty<select class="input"><option>Mythic</option><option>Heroic</option><option>Normal</option></select></label>
+        </div>
+        <label class="with-icon label"><input class="check" type="checkbox" checked><span>Kills only</span></label>
+        <div class="row">
+          <button class="button primary" type="button">Apply</button>
+          <button class="button" type="button">Reset</button>
+          <button class="button" type="button" disabled>Export</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Table extras: class="sortable" sorts on a click of a head (aria-sort shows the way). A <th> row inside a <tbody> heads a group;
+         each group is its own <tbody> so it sorts within itself. <tfoot> holds the totals. -->
+    <section class="panel span-12 enter">
+      <div class="panel-head">Roster</div>
+      <div class="panel-body flush">
+        <table class="table sortable">
+          <thead><tr><th>Player</th><th>Class</th><th class="num" aria-sort="descending">Damage</th><th class="num">Deaths</th></tr></thead>
+          <tbody>
+            <tr><th colspan="4">Damage dealers</th></tr>
+            <tr><td>Ellesmere</td><td>Mage</td><td class="num">4.92M</td><td class="num">4</td></tr>
+            <tr><td>Tukz</td><td>Warrior</td><td class="num">4.48M</td><td class="num">6</td></tr>
+            <tr><td>Melli</td><td>Warlock</td><td class="num">4.13M</td><td class="num">3</td></tr>
+          </tbody>
+          <tbody>
+            <tr><th colspan="4">Tanks and healers</th></tr>
+            <tr><td>Elv</td><td>Paladin</td><td class="num">3.54M</td><td class="num">9</td></tr>
+            <tr><td>Simpy</td><td>Priest</td><td class="num">0.92M</td><td class="num">2</td></tr>
+          </tbody>
+          <tfoot><tr><td>Total</td><td></td><td class="num">17.99M</td><td class="num">24</td></tr></tfoot>
+        </table>
+      </div>
+    </section>
+  </div>
+
   <!-- ── Slide ── -->
-  <h2>Slide</h2>
-  <section class="slide">
+  <h2>Slides</h2>
+  <section class="slide enter">
+    <span class="tag slide-no">1 / 5</span>
     <p class="eyebrow">Week 12 · Mythic</p>
     <h1>Eight of eight, with a night to spare</h1>
-    <p class="lead">One title, one supporting line, one figure. A slide is a 16:9 panel with section-sized padding.</p>
-    <div class="meter" style="max-width: var(--measure)">
-      <div class="meter-row"><span class="meter-label">Progress</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">8 / 8</span></div>
+    <p class="lead">One title, one supporting line, one figure in an inner panel. A slide is a 16:9 panel with section-sized padding.</p>
+    <!-- The figure sits in an inner panel: a box inside a box is dark. -->
+    <div class="panel">
+      <div class="panel-body">
+        <div class="meter">
+          <div class="meter-row"><span class="meter-label">Progress</span><div class="bar" style="--v:100"><span class="bar-fill"></span></div><span class="meter-value">8 / 8</span></div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- More slide layouts. A deck is <main class="page deck anim"> holding only slides: .deck turns on arrow-key stepping
+       and one slide per printed page. .slide-no is the slide's number, a tag on its top border. -->
+  <!-- Split: the claim at the left, its figure at the right. For a figure that would not fill the slide's width. -->
+  <section class="slide split enter">
+    <span class="tag slide-no">2 / 5</span>
+    <div class="flow">
+      <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><span>Damage</span></p>
+      <h1>Three players do half the damage</h1>
+      <p class="lead"><mark>Ellesmere</mark>, <mark>Tukz</mark> and <mark>Melli</mark> lead every night.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-body">
+        <div class="meter">
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">4.92M</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:91; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">4.48M</span></div>
+          <div class="meter-row"><span class="meter-label">Melli</span><div class="bar" style="--v:84; --fill:var(--c3)"><span class="bar-fill"></span></div><span class="meter-value">4.13M</span></div>
+          <div class="meter-row"><span class="meter-label">Everyone else</span><div class="bar" style="--v:60; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">2.96M</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Divider: opens a section. The eyebrow counts the section; the title names it. -->
+  <section class="slide divider enter">
+    <span class="tag slide-no">3 / 5</span>
+    <p class="eyebrow">Part two</p>
+    <h1>What went wrong on Dimensius</h1>
+  </section>
+
+  <!-- Big number: one figure in .hero-number, with a line saying what it counts. The only text above title size. -->
+  <section class="slide enter">
+    <span class="tag slide-no">4 / 5</span>
+    <p class="eyebrow">Dimensius</p>
+    <p class="hero-number">24 pulls</p>
+    <p class="lead">More than the other seven bosses together.</p>
+  </section>
+
+  <!-- Quote: a slide that holds one quote, at lead size. -->
+  <section class="slide quote enter">
+    <span class="tag slide-no">5 / 5</span>
+    <blockquote>
+      <p>Wipe it. We go again with three healers, and this time nobody stands in the fire.</p>
+      <cite>Tukz, raid lead</cite>
+    </blockquote>
   </section>
 
 </main>

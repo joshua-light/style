@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Make an HTML page self-contained: inline style.css and embed the fonts.
+"""Make an HTML page self-contained: inline style.css and style.js, embed the fonts.
 
 Usage: build.py PAGE.html [-o OUT.html]
 
 Replaces the page's <link rel="stylesheet" href="…style.css"> (or the
 <style data-style> block left by an earlier run) with the stylesheet, fonts
-embedded as data URIs. Without -o the page is rewritten in place.
+embedded as data URIs. Replaces <script src="…style.js"> (or an earlier
+<script data-style> block) with the script; a page without it is left
+without. Without -o the page is rewritten in place.
 
 Expressway is not redistributable, so its files may be absent. The page then
 falls back to Overpass from Google Fonts and this script says so on stderr.
@@ -25,6 +27,8 @@ FORMATS = {".woff2": ("font/woff2", "woff2"), ".ttf": ("font/ttf", "truetype"), 
 
 LINK = re.compile(r"<link\b[^>]*href=[\"'][^\"']*style\.css[\"'][^>]*>", re.I)
 BLOCK = re.compile(r"<style data-style>.*?</style>", re.S)
+SCRIPT = re.compile(r"<script\b[^>]*src=[\"'][^\"']*style\.js[\"'][^>]*>\s*</script>", re.I)
+SCRIPT_BLOCK = re.compile(r"<script data-style>.*?</script>", re.S)
 FALLBACK = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@600;800&display=swap">'
 
 
@@ -75,6 +79,16 @@ def main():
         html = LINK.sub(lambda _: block, html, count=1)
     else:
         sys.exit('build.py: no <link rel="stylesheet" href="style.css"> found in the page')
+
+    # The script is optional: only pages with tooltips or scroll reveal load it.
+    # It moves to the end of the body, where a src script with defer would run.
+    if SCRIPT.search(html) or SCRIPT_BLOCK.search(html):
+        js = (ASSETS / "style.js").read_text(encoding="utf-8")
+        html = SCRIPT_BLOCK.sub("", SCRIPT.sub("", html))
+        tag = f"<script data-style>\n{js}</script>\n"
+        if "</body>" not in html:
+            sys.exit("build.py: no </body> to put the script before")
+        html = html.replace("</body>", tag + "</body>", 1)
 
     out = args.out or args.page
     out.write_text(html, encoding="utf-8")

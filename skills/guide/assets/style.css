@@ -1,6 +1,7 @@
 /* style — dark gray, black ink, Warrior-tan accent, Melli data fills, outlined Expressway.
    Rules live in ../SKILL.md; markup for every component in showcase.html.
-   scripts/build.py inlines this file and embeds the fonts as data URIs. */
+   style.js adds hover tooltips and linked highlighting.
+   scripts/build.py inlines both files and embeds the fonts as data URIs. */
 
 @font-face {
   font-family: "Expressway";
@@ -19,10 +20,11 @@
   /* Gray surfaces, darkest to lightest. Ink is the only black. */
   --ink: #000000;
   --sunken: #1a1a1a;   /* bar tracks, code, wells */
-  --page: #242424;
-  --panel: #2e2e2e;
-  --raised: #3a3a3a;   /* neutral tags, hover */
-  --head: var(--sunken);  /* table heads: flat and much darker than the body */
+  --page: #1e1e1e;
+  --inset: #222222;    /* a box inside a box: nested panels, table rows */
+  --panel: #2e2e2e;    /* top-level boxes: panels, slides, callouts */
+  --raised: #3a3a3a;   /* neutral tags */
+  --head: var(--sunken);  /* table heads: flat, one step darker than the rows */
 
   --text: #f2f2f2;
   --text-dim: #b8b8b8;
@@ -33,9 +35,8 @@
      recolours data. */
   --accent: #c69b6d;
 
-  /* Data and state colours: three metals and five enamels. There is no yellow,
-     amber, or lime: none separates from gold, least of all for colour-blind
-     readers. */
+  /* Data and state colours: three metals and six enamels. There is no amber or
+     lime: neither separates from gold, least of all for colour-blind readers. */
   --gold: #cfb53b;
   --silver: #c9cdd2;
   --copper: #db7c3d;
@@ -47,9 +48,12 @@
      close to gold for red-green colour-blind readers, so it always comes with a
      word or a delta triangle. */
   --green: #5bc663;
+  /* Warning yellow, by request. Much lighter than gold so the two stay apart;
+     darkening it merges them. */
+  --yellow: #ffeb4e;
 
-  --good: var(--green);  /* green and crimson mark state only; never a series */
-  --warn: var(--copper);
+  --good: var(--green);  /* green, yellow and crimson mark state only; never a series */
+  --warn: var(--yellow);
   --bad: var(--crimson);
   --info: var(--azure);
 
@@ -106,7 +110,19 @@
   --s6: 32px;  /* subsection: above a subheading */
   --s7: 48px;  /* section: above a heading; page margin */
 
+  /* Code colours, the "Metals" scheme: warm and restrained, so code sits in
+     the page's own tan-and-gold family and never out-shouts a chart. */
+  --code-comment: var(--text-faint);
+  --code-keyword: var(--accent);
+  --code-string: var(--gold);
+  --code-number: var(--copper);
+  --code-constant: var(--copper);
+  --code-function: var(--silver);
+  --code-type: var(--silver);
+  --code-punct: var(--text-dim);
+
   --border: 1px solid var(--ink);
+  --icon: 24px;  /* picture icons: one size everywhere */
   --page-width: 960px;
   --measure: 640px;      /* widest a line of prose may run */
   --head-height: 28px;   /* table heads */
@@ -138,6 +154,8 @@ body {
 
 h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre, table { margin: 0; }
 img, svg { display: block; max-width: 100%; }
+/* A component's own display would otherwise beat the hidden attribute. */
+[hidden] { display: none !important; }
 
 /* ── Layout ───────────────────────────────────────────────────────────── */
 
@@ -174,15 +192,29 @@ img, svg { display: block; max-width: 100%; }
 .grid > .span-6 { grid-column: span 6; }
 .grid > .span-8 { grid-column: span 8; }
 .grid > .span-9 { grid-column: span 9; }
+/* A tall panel beside two short ones stacked in the next column. */
+.grid > .rows-2 { grid-row: span 2; }
 
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); }
 
-@media (max-width: 760px) {
+/* Screen only: a printed page measures under 760px before @page applies, and
+   would otherwise print the phone layout. */
+@media screen and (max-width: 760px) {
   .page { padding: var(--s5) var(--s4) var(--s7); }
   .grid > .span-3 { grid-column: span 6; }
   .grid > .span-4, .grid > .span-6, .grid > .span-8, .grid > .span-9 { grid-column: span 12; }
+  .grid > .rows-2 { grid-row: auto; }
   /* A phone cannot hold 16:9 at a readable size; the slide becomes a tall panel. */
-  .slide { aspect-ratio: auto; padding: var(--s5); }
+  :root .slide { aspect-ratio: auto; padding: var(--s5); }
+  :root .slide.split { display: flex; }
+  :root .slide.split > * + * { margin-top: var(--s5); }
+  .diagram { flex-direction: column; align-items: stretch; }
+  .diagram > .node { flex: none; }
+  .compare { grid-template-columns: minmax(0, 1fr); }
+  .diagram > .link, .compare > .link { align-self: center; justify-self: center; margin: var(--s3) 0; transform: rotate(90deg); }
+  .steps.across { grid-auto-flow: row; }
+  .steps.across > li { padding: 0 0 0 calc(var(--icon) + var(--s3)); }
+  .steps.across > li::after { display: none; }
 }
 
 /* ── Text ─────────────────────────────────────────────────────────────── */
@@ -229,6 +261,9 @@ p, li, blockquote, .lead { max-width: var(--measure); }
 .dim { color: var(--text-dim); }
 .faint { color: var(--text-faint); }
 strong, b { font-weight: 700; }
+/* A highlight colours the name of a thing inside a sentence, as game text
+   colours an item's name. Names only, and colour only: no background. */
+mark { background: none; color: var(--accent); }
 
 /* A border, not text-decoration: a heading's outline would stroke an underline too. */
 a {
@@ -277,6 +312,89 @@ blockquote cite {
   color: var(--text-dim);
 }
 
+/* A list led by glyphs instead of bullets: each item is a glyph and its text. */
+.icon-list { display: grid; gap: var(--s3); padding: 0; list-style: none; }
+.icon-list > li { display: flex; align-items: flex-start; gap: var(--s2); margin: 0; }
+
+/* Numbered steps: each number sits in a square the size of an icon. */
+.steps { display: grid; gap: var(--s4); padding: 0; list-style: none; counter-reset: step; }
+.steps > li {
+  position: relative;
+  min-height: var(--icon);
+  margin: 0;
+  padding-left: calc(var(--icon) + var(--s3));
+  counter-increment: step;
+}
+.steps > li::before {
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: var(--icon);
+  height: var(--icon);
+  background: var(--raised);
+  border: var(--border);
+  font-size: var(--fs-label);
+  line-height: 1;
+}
+/* Across: the steps stand side by side, joined by a rule through their numbers. */
+.steps.across { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+.steps.across > li { padding: calc(var(--icon) + var(--s2)) 0 0; }
+.steps.across > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: calc(var(--icon) / 2 - 1px);
+  left: var(--icon);
+  right: calc(-1 * var(--s4));
+  height: 2px;
+  background: var(--ink);
+}
+
+/* A timeline: dates at the left, events at the right, and between them an ink
+   rule with a square marker for each event. */
+.timeline { --when: 72px; display: grid; gap: var(--s4); padding: 0; list-style: none; font-size: var(--fs-label); line-height: var(--lh-label); }
+.timeline > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--when) minmax(0, 1fr);
+  column-gap: var(--s5);
+  max-width: none;
+  margin: 0;
+}
+.timeline-when { padding-top: 2px; text-align: right; font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.timeline > li::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: 6px;
+  left: calc(var(--when) + var(--s5) / 2 - 4px);
+  width: 8px;
+  height: 8px;
+  background: var(--melli), var(--fill, var(--c1));
+  border: var(--border);
+}
+.timeline > li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  bottom: calc(-1 * var(--s4) - 6px);
+  left: calc(var(--when) + var(--s5) / 2 - 1px);
+  width: 2px;
+  background: var(--ink);
+}
+
+/* Label and value pairs, ruled like a legend list. */
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); font-size: var(--fs-label); line-height: var(--lh-label); }
+.kv > dt, .kv > dd { margin: 0; padding: var(--s1) 0; border-bottom: var(--border); }
+.kv > dt { padding-right: var(--s4); color: var(--text-dim); }
+.kv > dd { text-align: right; }
+.kv > :nth-last-child(-n + 2) { border-bottom: 0; }
+
+/* A picture or screenshot in an ink frame, with its caption below. */
+.frame > :is(img, svg, video) { width: 100%; background: var(--sunken); border: var(--border); }
+
 hr { height: 1px; margin: 0; border: 0; background: var(--ink); }
 
 code, kbd, pre {
@@ -299,6 +417,19 @@ pre {
 }
 pre code { padding: 0; background: none; border: 0; }
 
+/* Syntax colours. scripts/highlight.py emits Pygments' token classes; these
+   rules fold them into eight roles. Names keep the text colour. */
+:is(pre, code) :is(.c, .c1, .cm, .ch, .cs, .cp, .cpf, .sd) { color: var(--code-comment); }
+:is(pre, code) :is(.k, .kd, .kn, .kr, .kp, .ow, .nt) { color: var(--code-keyword); }
+:is(pre, code) :is(.s, .s1, .s2, .sb, .sc, .sa, .sh, .sx, .sr, .ss, .dl) { color: var(--code-string); }
+:is(pre, code) :is(.m, .mi, .mf, .mh, .mo, .mb, .il) { color: var(--code-number); }
+:is(pre, code) :is(.kc, .no, .bp, .se, .si) { color: var(--code-constant); }
+:is(pre, code) :is(.nf, .fm, .nd, .na) { color: var(--code-function); }
+:is(pre, code) :is(.nc, .kt, .nn, .nb) { color: var(--code-type); }
+:is(pre, code) :is(.o, .p) { color: var(--code-punct); }
+/* Code keeps one weight and never slants, whatever the highlighter suggests. */
+:is(pre, code) span { font-style: normal; font-weight: inherit; }
+
 figure > * + figcaption { margin-top: var(--s2); }
 
 /* ── Panels and callouts ──────────────────────────────────────────────── */
@@ -308,6 +439,13 @@ figure > * + figcaption { margin-top: var(--s2); }
   border: var(--border);
 }
 .panel, .callout { position: relative; }
+/* A box inside a box is dark, so it reads as set into the lighter one: a stat
+   or a chart panel on a slide, a panel in a panel. */
+:is(.panel, .slide, .callout) :is(.panel, .callout, blockquote, .node) { background: var(--inset); }
+/* Panels in one grid row share a height. A panel is a column so its body can
+   take the spare height and fill it, never leave it empty at the bottom. */
+.panel { display: flex; flex-direction: column; }
+.panel-body { flex: 1; }
 /* A panel's title sits across its top border, not in a bar: outlined text
    that looks laid on top of the frame. A tag in the head lands on the same
    border at the right. The offset is half the line height in whole pixels; a
@@ -328,7 +466,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   white-space: nowrap;
 }
 /* A tag is a solid chip, so it drops the title's outline and weight. */
-.panel-head > .tag {
+.panel-head > :is(.tag, .tabs) {
   font-weight: 400;
   -webkit-text-stroke: 0;
   paint-order: normal;
@@ -361,7 +499,11 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* A table may run edge to edge inside a panel. Under a title it starts below
    the title. The strip above it takes the table head's colour, and the head
    keeps its own black line on top, so it still reads as a bordered row. */
-.panel-body.flush { padding: 0; overflow-x: auto; }
+.panel-body.flush { display: flex; flex-direction: column; padding: 0; overflow-x: auto; }
+/* The table takes the spare height and shares it among its rows. */
+.panel-body.flush > .table { flex: 1; }
+/* A chart row sits in the middle of whatever height its panel has. */
+.panel-body:has(> .chart-row) { display: flex; flex-direction: column; justify-content: center; }
 .panel-head + .panel-body.flush { padding-top: 0; border-top: var(--s4) solid var(--head); }
 .panel-head + .panel-body.flush > .table { border-top: var(--border); }
 
@@ -395,6 +537,55 @@ figure > * + figcaption { margin-top: var(--s2); }
   background: var(--melli), var(--fill);
   color: var(--ink);
 }
+
+/* ── Icons ────────────────────────────────────────────────────────────── */
+
+/* A glyph is a symbol from Remix Icon's fill set (scripts/icon.py prints the
+   markup). It has no background. It belongs to the text beside it: the same
+   colour, and as tall as one line of that text, so it sits on the first line
+   whatever the size. It wears the ink outline of a heading: a stroke painted
+   under the fill, in screen pixels whatever the viewBox. --outline reads the
+   font size, so the glyph's size sets the outline's weight. */
+.glyph {
+  display: block;
+  flex: none;
+  width: 1lh;
+  height: 1lh;
+  font-size: 1lh;
+  color: inherit;
+}
+.glyph > svg, .icon > svg { display: block; width: 100%; height: 100%; overflow: visible; }
+:is(.glyph, .icon) > svg * {
+  stroke: var(--ink);
+  stroke-width: calc(2 * var(--outline));
+  stroke-linejoin: miter;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+/* A picture icon (a game item, a spell, an avatar): a square with an ink
+   border. The image is drawn 20% larger than the box and cropped, which trims
+   the bevelled frame game icons carry, as ElvUI crops its icon textures.
+   Sized by width and margin, not a transform, so it lands on whole pixels. */
+.icon {
+  display: block;
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  overflow: hidden;
+  background: var(--sunken);
+  border: var(--border);
+}
+.icon > img { display: block; width: 120%; height: 120%; margin: -10%; max-width: none; object-fit: cover; }
+/* A tile: a glyph inside the same bordered square, on the sunken gray or, with
+   --fill set, on a colour under Melli. The exception, for an icon that must
+   stand as a mark of its own: beside a meter bar, or carrying a colour. The
+   glyph is 18px and stays outlined white, as a bar's name does on its bar. */
+.icon:has(> svg) { display: grid; place-items: center; font-size: 18px; color: var(--text); }
+.icon:has(> svg)[style*="--fill"] { background: var(--melli), var(--fill); }
+.icon > svg { width: 18px; height: 18px; }
+/* An icon beside its name, in a table cell or a line of text. */
+.with-icon { display: flex; align-items: center; gap: var(--s2); }
 
 /* ── Stats ────────────────────────────────────────────────────────────── */
 
@@ -439,6 +630,8 @@ figure > * + figcaption { margin-top: var(--s2); }
   color: var(--text-dim);
 }
 .stat > .bar, .stat > .spark { margin-top: var(--s3); }
+/* The sparkline takes any spare height in the card. */
+.stat > .spark { flex: 1 1 32px; min-height: 32px; }
 
 /* Expressway has no arrow glyphs, so deltas draw their own triangle. */
 .delta { display: inline-flex; align-items: center; gap: var(--s1); }
@@ -478,11 +671,43 @@ figure > * + figcaption { margin-top: var(--s2); }
   color: var(--text-dim);
 }
 .table tbody tr:last-child td { border-bottom: 0; }
-.table tbody tr { transition: background-color var(--t-fast) var(--ease); }
-.table tbody tr:hover { background: var(--raised); }
+/* Rows are an inset in their panel: one step above the head, far darker than the panel. */
+.table tbody tr { background: var(--inset); transition: background-color var(--t-fast) var(--ease); }
+.table tbody tr:hover { background: var(--panel); }
 .table .num { text-align: right; }
 .table td.fit, .table th.fit { width: 1%; white-space: nowrap; }
 .table .bar { min-width: 64px; }
+/* Totals: a foot as dark as the head, in extra-bold. */
+.table tfoot td { background: var(--head); border-top: var(--border); border-bottom: 0; font-weight: 700; }
+/* A group heading is a <th> row inside the body; it takes the head's look. */
+.table tbody th { border-top: var(--border); }
+.table tbody tr:first-child th { border-top: 0; }
+/* Sortable (needs style.js): the sorted column's head lights up and shows which way. */
+.table.sortable thead th { cursor: pointer; user-select: none; }
+.table.sortable thead th:hover, .table th[aria-sort] { color: var(--text); }
+.table th[aria-sort]::after {
+  content: "";
+  display: inline-block;
+  margin-left: var(--s1);
+  border: 4px solid transparent;
+  vertical-align: middle;
+}
+.table th[aria-sort="ascending"]::after { border-top-width: 0; border-bottom: 6px solid currentColor; }
+.table th[aria-sort="descending"]::after { border-bottom-width: 0; border-top: 6px solid currentColor; }
+
+/* What a panel shows when it has no data: one dim line, centred. */
+.empty {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--s2);
+  min-height: 96px;
+  height: 100%;
+  color: var(--text-faint);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  text-align: center;
+}
 
 /* ── Bars: the Melli status bar ───────────────────────────────────────── */
 
@@ -504,6 +729,24 @@ figure > * + figcaption { margin-top: var(--s2); }
   box-shadow: 1px 0 0 var(--ink);
 }
 .bar.thin { height: 8px; }
+/* A target or reference value: a white tick with an ink ring, so it reads on
+   the fill and on the track alike. --at is its position in percent. */
+.bar-mark {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--at, 0) * 1%);
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+/* Diverging: the fill grows from the middle, right for a gain and left (.neg)
+   for a loss. --v is a share of one half. Gains are green and losses crimson. */
+.bar.diverge .bar-fill { inset: 0 auto 0 50%; width: calc(var(--v, 0) * 0.5%); background: var(--melli), var(--good); }
+.bar.diverge .bar-fill.neg { inset: 0 50% 0 auto; background: var(--melli), var(--bad); box-shadow: -1px 0 0 var(--ink); }
+.bar.diverge::after { content: ""; position: absolute; inset: 0 auto 0 50%; width: 1px; background: var(--ink); }
 
 /* Stacked: segments share one bar and split it by weight. A segment is all
    fill, so it may hold an ink label. */
@@ -538,6 +781,11 @@ figure > * + figcaption { margin-top: var(--s2); }
 .meter-label, .meter-value { position: absolute; z-index: 1; top: 0; white-space: nowrap; }
 .meter-label { left: var(--s2); }
 .meter-value { right: var(--s2); }
+/* An icon stands left of its bar, centred on it, one touch gap away: a unit
+   frame's portrait. The name starts over the bar, not over the icon. */
+.meter-row:has(> .icon) { padding-left: calc(var(--icon) + var(--s1)); }
+.meter-row > .icon { position: absolute; left: 0; top: calc(var(--lh-label) / 2 + (20px - var(--icon)) / 2); }
+.meter-row:has(> .icon) > .meter-label { left: calc(var(--icon) + var(--s1) + var(--s2)); }
 
 /* ── Columns ──────────────────────────────────────────────────────────── */
 
@@ -574,6 +822,40 @@ figure > * + figcaption { margin-top: var(--s2); }
   white-space: nowrap;
 }
 .col-fill + .col-label { margin-top: -1px; }
+/* Stacked: several fills in one column share an ink line. */
+.col > .col-fill + .col-fill { margin-top: -1px; }
+/* Grouped: fills stand side by side in .col-bars, one per series. */
+.col-bars { display: flex; align-items: flex-end; }
+.col-bars > .col-fill { flex: 1; }
+.col-bars > .col-fill + .col-fill { margin-left: -1px; }
+.col-bars + .col-label { margin-top: -1px; }
+
+/* ── Heatmap ──────────────────────────────────────────────────────────── */
+
+/* A grid of cells shaded by value: --v from 0 to 100 mixes the cell from the
+   sunken gray up to --fill. One hue only. --cols is the number of columns;
+   the first column holds the row labels. */
+.heat {
+  --cols: 7;
+  --cell: 24px;
+  display: grid;
+  grid-template-columns: auto repeat(var(--cols), minmax(0, 1fr));
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  color: var(--text-dim);
+}
+.heat-x { padding-bottom: var(--s1); text-align: center; }
+.heat-y { align-self: center; padding-right: var(--s2); text-align: right; white-space: nowrap; }
+.heat-cell {
+  height: var(--cell);
+  margin: 0 -1px -1px 0;
+  background: var(--melli), color-mix(in oklab, var(--fill, var(--c1)) calc(var(--v, 0) * 1%), var(--sunken));
+  border: var(--border);
+}
+/* The key: five cells from low to high, between the words for each end. */
+.heat-scale { display: inline-flex; align-items: center; gap: var(--s2); }
+.heat-scale > .heat-cell { width: 12px; height: 12px; margin: 0 calc(-1 * var(--s2) - 1px) 0 0; }
+.heat-scale > .heat-cell + :not(.heat-cell) { margin-left: var(--s2); }
 
 /* ── SVG charts: lines, sparklines ────────────────────────────────────── */
 
@@ -601,6 +883,16 @@ figure > * + figcaption { margin-top: var(--s2); }
   stroke: var(--ink);
   stroke-width: 1px;
 }
+/* Area: a flat fill under a line. A second copy of the path with .area-melli
+   lays the texture over it; it needs the #melli gradient from the showcase. */
+.chart .area { fill: var(--fill, var(--c1)); }
+.chart .area-melli { fill: url(#melli); pointer-events: none; }
+/* Diagram shapes for an SVG: an inset box with an ink edge, and a light wire
+   with an ink ring that ends in an arrowhead. */
+.chart .box { fill: var(--inset); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+.chart .wire { fill: none; stroke: var(--text-dim); stroke-width: 2px; stroke-linejoin: miter; filter: var(--ink-ring); }
+.chart .arrow { fill: var(--text-dim); filter: var(--ink-ring); }
+.chart text.name { fill: var(--text); font-size: var(--fs-label); }
 
 .spark { width: 100%; height: 32px; overflow: visible; filter: var(--ink-ring); }
 /* The sparkline stretches to fit, so its ring sits on the svg, in CSS pixels. */
@@ -615,10 +907,50 @@ figure > * + figcaption { margin-top: var(--s2); }
   color: var(--text-dim);
 }
 .legend-item { display: inline-flex; align-items: center; gap: var(--s2); }
-/* A legend as a column, one series per row, with room for a value at the right. */
-.legend.list { display: grid; gap: var(--s2); min-width: 160px; }
-.legend.list .legend-item { display: flex; }
+/* A legend as a small table: one series per row, value at the right edge,
+   ruled between rows. It takes the width its chart leaves over. */
+.legend.list { display: grid; flex: 1; gap: 0; min-width: 160px; }
+.legend.list .legend-item { display: flex; padding: var(--s1) 0; border-bottom: var(--border); }
+.legend.list .legend-item:last-child { border-bottom: 0; }
 .legend-value { margin-left: auto; padding-left: var(--s4); color: var(--text); }
+
+/* ── Hover: highlight and tooltip (needs style.js) ────────────────────── */
+
+/* Hovering a mark darkens its siblings. Nothing turns transparent. */
+.pie-slice, .bar-seg, .legend-item, .legend-value {
+  transition: filter var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.pie:has(.is-hot) .pie-slice:not(.is-hot),
+.bar.stack:has(.is-hot) .bar-seg:not(.is-hot) { filter: brightness(0.45); }
+.legend:has(.is-hot) .legend-item:not(.is-hot),
+.legend:has(.is-hot) .legend-item:not(.is-hot) .legend-value { color: var(--text-faint); }
+.legend-item.is-hot { color: var(--text); }
+
+/* The tooltip is a sunken box: darker than any panel, black border, no shadow. */
+.tooltip {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  min-width: 128px;
+  max-width: 280px;
+  padding: var(--s2) var(--s3);
+  background: var(--sunken);
+  border: var(--border);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  pointer-events: none;
+}
+.tooltip[hidden] { display: none; }
+.tooltip-head { display: flex; align-items: center; gap: var(--s2); }
+.tooltip-value { margin-left: auto; padding-left: var(--s4); }
+.tooltip-note {
+  display: block;
+  margin-top: var(--s1);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  color: var(--text-dim);
+}
 .swatch {
   flex: none;
   width: 12px;
@@ -633,7 +965,7 @@ figure > * + figcaption { margin-top: var(--s2); }
    draws the wedge, so no arc geometry is needed: --v is the slice's share in
    percent and --at the sum of the shares before it. A .pie-cut line at each
    --at inks the boundary. Slices start at 12 o'clock and run clockwise. */
-.chart-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s5); }
+.chart-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--s5); }
 .pie { position: relative; flex: none; width: 160px; aspect-ratio: 1; }
 .pie > svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 .pie-slice {
@@ -649,11 +981,13 @@ figure > * + figcaption { margin-top: var(--s2); }
   vector-effect: non-scaling-stroke;
   transform: rotate(calc(var(--at, 0) * 3.6deg));
 }
-/* Melli and the ink rim sit over the whole disc. */
+/* Melli and the ink rim sit over the whole disc, and let the pointer through
+   to the slices. */
 .pie::after {
   content: "";
   position: absolute;
   inset: 0;
+  pointer-events: none;
   background: var(--melli);
   border: var(--border);
   border-radius: 50%;
@@ -670,13 +1004,138 @@ figure > * + figcaption { margin-top: var(--s2); }
   background: var(--panel);
   border: var(--border);
 }
+.slide { position: relative; }
 .slide > * + * { margin-top: var(--s5); }
 .slide > .eyebrow + * { margin-top: var(--s1); }
 .slide > h1 + .lead, .slide > h2 + .lead { margin-top: var(--s2); }
+/* The slide's number: a tag on the top border at the right, as on a panel. */
+.slide-no { position: absolute; top: -10px; right: var(--s3); }
+.slide > .slide-no + * { margin-top: 0; }
+/* Split: the claim at the left, its figure at the right. A full-width figure
+   left half the slide empty for a pie or a short bar list. */
+.slide.split { display: grid; grid-template-columns: 5fr 7fr; column-gap: var(--s7); align-items: center; }
+.slide.split > * + * { margin-top: 0; }
+/* Divider: a section's name alone, at the foot of the slide under a rule. */
+.slide.divider { justify-content: flex-end; }
+.slide.divider > :is(h1, h2) { padding-top: var(--s4); border-top: var(--border); }
+/* Big number: one figure on a slide of its own, the only text above title
+   size. The outline keeps the title's weight: a twentieth of the size. */
+.hero-number {
+  font-size: 80px;
+  line-height: 88px;
+  font-weight: 700;
+  -webkit-text-stroke: 8px var(--ink);
+  paint-order: stroke fill;
+}
+.slide > .hero-number + * { margin-top: var(--s2); }
+/* Quote: the quote runs at lead size across the slide. */
+.slide blockquote { max-width: none; }
+.slide.quote blockquote p { max-width: none; font-size: var(--fs-subheading); line-height: var(--lh-subheading); }
+
+/* ── Diagrams ─────────────────────────────────────────────────────────── */
+
+/* A chain of boxes joined by arrows. For anything that branches, draw an SVG
+   with .box, .wire and .arrow instead. */
+.diagram { display: flex; align-items: center; font-size: var(--fs-label); line-height: var(--lh-label); }
+.node { flex: 1 1 0; min-width: 0; padding: var(--s2) var(--s3); background: var(--panel); border: var(--border); }
+.node > strong { display: block; }
+.node > span { display: block; font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+/* The arrow: a light line with an ink ring, like a chart line. Expressway has
+   no arrow glyphs, so the head is drawn from borders. */
+.link { position: relative; flex: none; width: var(--s6); height: 8px; filter: var(--ink-ring); }
+.link::before { content: ""; position: absolute; top: 3px; left: 0; right: 6px; height: 2px; background: var(--text-dim); }
+.link::after { content: ""; position: absolute; top: 0; right: 0; border: 4px solid transparent; border-right-width: 0; border-left: 6px solid var(--text-dim); }
+/* Down: the chain runs top to bottom. The arrow turns; its layout box does not,
+   so margins hold the room it needs. */
+.diagram.down { flex-direction: column; align-items: stretch; }
+.diagram.down > .node { flex: none; }
+.diagram.down > .link, .compare.down > .link { align-self: center; justify-self: center; margin: var(--s3) 0; transform: rotate(90deg); }
+/* Before and after: two boxes with an arrow between them. */
+.compare { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s3); }
+
+/* ── Controls ─────────────────────────────────────────────────────────── */
+
+/* Tabs are a row of joined tags; the pressed one is lit. In a panel head they
+   sit on the top border at the right. style.js shows the matching panel. */
+.tabs { display: inline-flex; }
+.tab {
+  height: 20px;
+  padding: 0 var(--s2);
+  background: var(--sunken);
+  border: var(--border);
+  color: var(--text-dim);
+  font: 400 var(--fs-note) / var(--lh-note) var(--font);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+}
+.tab + .tab { margin-left: -1px; }
+.tab:hover { color: var(--text); }
+.tab[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  height: var(--head-height);
+  padding: 0 var(--s3);
+  background: var(--raised);
+  border: var(--border);
+  color: var(--text);
+  font: 400 var(--fs-label) / var(--lh-label) var(--font);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: filter var(--t-fast) var(--ease);
+}
+.button:hover { filter: brightness(1.15); }
+.button:active { filter: brightness(0.9); }
+/* The one action that matters: a colour fill with ink text, like a coloured tag. */
+.button.primary { background: var(--melli), var(--fill, var(--c1)); color: var(--ink); }
+.button:disabled { color: var(--text-faint); filter: none; cursor: default; }
+
+.input {
+  height: var(--head-height);
+  min-width: 0;
+  padding: 0 var(--s2);
+  background: var(--sunken);
+  border: var(--border);
+  color: var(--text);
+  font: 400 var(--fs-label) / var(--lh-label) var(--font);
+}
+.input::placeholder { color: var(--text-faint); }
+/* A select draws its own triangle; the font has none. */
+select.input {
+  appearance: none;
+  padding-right: var(--s5);
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: right 12px center, right 8px center;
+  background-size: 4px 4px;
+  background-repeat: no-repeat;
+}
+/* A checkbox is a sunken square; checked, it holds a smaller filled square. */
+.check {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  background: var(--sunken);
+  border: var(--border);
+  cursor: pointer;
+}
+.check:checked::before { content: ""; width: 8px; height: 8px; background: var(--melli), var(--fill, var(--c1)); box-shadow: 0 0 0 1px var(--ink); }
+/* A field: a note-size label above its control. */
+.field { display: grid; gap: var(--s1); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+:is(.tab, .button, .input, .check):focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
 
 /* ── Motion ───────────────────────────────────────────────────────────── */
 
-/* Opt in with .anim on a container. Everything plays once, on entry. */
+/* Opt in with .anim on a container. Everything plays once: when its panel
+   scrolls into view if style.js is loaded, on page load if not. */
 .stagger > :nth-child(2) { --i: 1; }
 .stagger > :nth-child(3) { --i: 2; }
 .stagger > :nth-child(4) { --i: 3; }
@@ -718,8 +1177,32 @@ figure > * + figcaption { margin-top: var(--s2); }
   }
 }
 
+/* style.js sets js-reveal and holds each animation at its first frame until
+   the panel around it gets in-view. */
+.js-reveal .anim :is(.enter, .bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: paused; }
+.js-reveal .anim .in-view:is(.enter, .bar-fill, .col-fill, .line, .dot, .pie-slice),
+.js-reveal .anim .in-view :is(.enter, .bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: running; }
+
 @keyframes enter { from { opacity: 0; transform: translateY(8px); } }
 @keyframes fill-x { from { width: 0; } }
 @keyframes fill-y { from { height: 0; } }
 @keyframes pie { from { stroke-dasharray: 0 100; } }
 @keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+/* ── Print ────────────────────────────────────────────────────────────── */
+
+/* Paper keeps the dark surfaces. A deck (.deck on the page) prints one slide
+   to a page, edge to edge; open the print dialog and save as PDF. */
+@page { margin: 0; }
+@page slide { size: 960px 540px; margin: 0; }
+@media print {
+  :root { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tooltip { display: none !important; }
+  /* Reveal on scroll never fires on paper: show every mark finished. */
+  .anim * { animation: none !important; }
+  .panel, .callout, blockquote, pre, figure, .table tr { break-inside: avoid; }
+  h1, h2, h3 { break-after: avoid; }
+  .deck { max-width: none; padding: 0; }
+  .deck > .slide { page: slide; width: 100%; margin: 0 !important; border: 0; break-after: page; break-inside: avoid; }
+  .deck > .slide > .slide-no { top: var(--s3); }
+}
