@@ -50,17 +50,17 @@ Every fill is flat: one colour inside a 1px ink edge.
 
 ## Text
 
-Expressway sets everything except code, in three cuts. Nothing is italic.
+Expressway sets everything except code, in two cuts. Nothing is italic.
 
 | Weight | Cut | Use |
 | --- | --- | --- |
 | 400 | Regular | Everything plain: prose, cells, captions, buttons and inputs, chart text. |
-| 700 | Bold | Uppercase labels: eyebrows, tags, callout kinds, tabs, table heads. Small outlined text: stat labels, deltas, meter names and values. |
-| 800 | Extra-bold | Headings, panel titles, hero numbers, `<strong>`, table totals. |
+| 700 | Bold | Everything else. Headings, panel titles, hero numbers. Emphasis (`<strong>`) and table totals. Uppercase labels: eyebrows, tags, callout kinds, tabs, table heads. Small outlined text: stat labels, deltas, meter names and values. |
 
 - Outlined text is never Regular: the stroke eats into thin stems.
+- Nothing is Extra-bold. Headings and emphasis were once; Bold replaced it. Never set `font-weight: 800` on a page.
 - Regular is licensed for desktop use only. Never convert it, embed it, or copy it into `assets/fonts/`: the stylesheet reads it from the machine's installed fonts.
-- Where Regular is not installed, plain text falls back to Bold and the page looks heavier. That is why emphasis is Extra-bold: a Bold word would vanish in Bold text. When a page is meant for other readers, say that they will see the Bold fallback.
+- Where Regular is not installed, plain text falls back to Bold and the page looks heavier. A Bold word would vanish in Bold text, so `style.js` detects the fallback and sets `<strong>` in Extra-bold there. That is the cut's only use, and the script's alone. When a page is meant for other readers, say that they will see the Bold fallback.
 
 - One face only. Roboto for text under Expressway headings was tried and dropped.
 - Prose is never tracked: no `letter-spacing` on body text, lists, or callouts. Extra tracking belongs only to uppercase labels and outlined text.
@@ -104,7 +104,7 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 
 Titles and key values sit across a box's top border, not inside it. They look laid on top of the frame.
 
-- A panel's title is 20px extra-bold, 12px in from the left, centred on the top border. There is no head bar.
+- A panel's title is 20px bold, 12px in from the left, centred on the top border. There is no head bar.
 - A tag may sit on the same border at the right.
 - A callout names its kind in a coloured tag at the top left: the kind's glyph, then its name. The tag sets it apart from a panel.
 - A stat wears its label at the top left and its delta or tag at the top right.
@@ -184,7 +184,7 @@ Markup for each is in `assets/showcase.html`.
 - **Pie** (`.pie`): an SVG of `.pie-slice` circles and `.pie-cut` lines. Each slice sets `--v`, its share in percent, and `--at`, the sum of the shares before it. No arc geometry is needed.
 - **Tag** (`.tag`): a short state word, in bold.
 - **Icon**: see Icons below.
-- **Table extras**: `<tfoot>` holds totals, as dark as the head and extra-bold. A `<th colspan>` row inside a `<tbody>` heads a group; give each group its own `<tbody>`. `class="sortable"` sorts on a click of a head; mark the starting column with `aria-sort`.
+- **Table extras**: `<tfoot>` holds totals, as dark as the head and bold. A `<th colspan>` row inside a `<tbody>` heads a group; give each group its own `<tbody>`. `class="sortable"` sorts on a click of a head; mark the starting column with `aria-sort`.
 - **Key-value list** (`dl.kv`): label and value pairs, ruled, values at the right. For a handful of facts about one thing.
 - **Empty state** (`.empty`): one dim centred line, with an optional glyph, in a panel that has nothing to show. Say what would fill it.
 - **Figure frame** (`figure.frame`): an image, SVG, or video in a 1px ink frame, caption below.

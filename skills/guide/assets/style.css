@@ -3,12 +3,14 @@
    style.js adds hover tooltips and linked highlighting.
    scripts/build.py inlines both files and embeds the fonts as data URIs. */
 
-/* Three cuts: Regular 400, Bold 700, Extra-bold 800. Regular is licensed for
-   desktop use only: its file may not be converted or embedded, so it is read
-   from the reader's installed fonts. Where it is not installed, text falls
-   back to the Bold file, and the page looks as it did with two cuts. Chrome
-   does not try a sibling weight when a face fails, so the fallback has to be
-   a second source here.
+/* Two cuts set the page: Regular 400 for text, Bold 700 for headings, labels
+   and emphasis. Regular is licensed for desktop use only: its file may not be
+   converted or embedded, so it is read from the reader's installed fonts.
+   Where it is not installed, text falls back to the Bold file. Chrome does
+   not try a sibling weight when a face fails, so the fallback has to be a
+   second source here.
+   Extra-bold 800 is loaded for that fallback alone: it sets emphasis, which
+   would vanish in Bold text (see .no-regular).
    The TrueType file (version 6.000) names itself "ExpresswayRg-Regular" and
    comes first: it is hinted, so its letters keep one height at text sizes. The
    OpenType file (6.100, "Expressway Regular") carries the Extra-bold's
@@ -242,23 +244,23 @@ blockquote::before {
   letter-spacing: var(--fit);
 }
 /* Outlined text is never Regular: the stroke eats into thin stems. Small
-   outlined text takes Bold; headings take Extra-bold below. */
+   outlined text and headings both take Bold. */
 .stat-label, .stat-foot > .delta, .meter-label, .meter-value { font-weight: 700; }
 h1, .title {
   font-size: var(--fs-title);
   line-height: var(--lh-title);
-  font-weight: 800;
+  font-weight: 700;
 }
 h2, .heading {
   font-size: var(--fs-heading);
   line-height: var(--lh-heading);
-  font-weight: 800;
+  font-weight: 700;
 }
 h3, .subheading, .lead {
   font-size: var(--fs-subheading);
   line-height: var(--lh-subheading);
 }
-h3, .subheading { font-weight: 800; }
+h3, .subheading { font-weight: 700; }
 .lead { color: var(--text-dim); }
 .label { font-size: var(--fs-label); line-height: var(--lh-label); }
 /* :not(.callout) because .callout.note is a callout kind, not a caption. */
@@ -290,9 +292,11 @@ p, li, blockquote, .lead { max-width: var(--measure); }
 :is(ul, ol):not([class]) { max-width: var(--measure); }
 .dim { color: var(--text-dim); }
 .faint { color: var(--text-faint); }
-/* Emphasis is Extra-bold, not Bold: where Regular is not installed, text is
-   already Bold and a Bold word would vanish in it. */
-strong, b { font-weight: 800; }
+/* Emphasis is Bold. Where Regular is not installed, text is already Bold and
+   a Bold word would vanish in it: style.js sets .no-regular there, and
+   emphasis steps up to Extra-bold, the cut's only use. */
+strong, b { font-weight: 700; }
+.no-regular :is(strong, b) { font-weight: 800; }
 /* A highlight colours the name of a thing inside a sentence, as game text
    colours an item's name. Names only, and colour only: no background. */
 mark { background: none; color: var(--accent); }
@@ -333,7 +337,7 @@ blockquote::before {
   color: var(--accent);
   font-size: 80px;
   line-height: 1;
-  font-weight: 800;
+  font-weight: 700;
 }
 blockquote > * + * { margin-top: var(--s2); }
 blockquote cite {
@@ -563,7 +567,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   gap: var(--s3);
   font-size: var(--fs-subheading);
   line-height: var(--lh-subheading);
-  font-weight: 800;
+  font-weight: 700;
   white-space: nowrap;
 }
 /* A tag is a solid chip, so it drops the title's outline and takes a pill's weight. */
@@ -736,7 +740,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .stat-value {
   font-size: var(--fs-heading);
   line-height: var(--lh-heading);
-  font-weight: 800;
+  font-weight: 700;
 }
 /* Holds one delta or one tag. 20px tall, centred on the border. */
 .stat-foot {
@@ -808,8 +812,8 @@ figure > * + figcaption { margin-top: var(--s2); }
 .table .num { text-align: right; }
 .table td.fit, .table th.fit { width: 1%; white-space: nowrap; }
 .table .bar { min-width: 64px; }
-/* Totals: a foot as dark as the head, in extra-bold. */
-.table tfoot td { background: var(--head); border-top: var(--border); border-bottom: 0; font-weight: 800; }
+/* Totals: a foot as dark as the head, in bold. */
+.table tfoot td { background: var(--head); border-top: var(--border); border-bottom: 0; font-weight: 700; }
 /* A group heading is a <th> row inside the body; it takes the head's look. */
 .table tbody th { border-top: var(--border); }
 .table tbody tr:first-child th { border-top: 0; }
@@ -1153,7 +1157,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .hero-number {
   font-size: 80px;
   line-height: 88px;
-  font-weight: 800;
+  font-weight: 700;
   -webkit-text-stroke: 8px var(--ink);
   paint-order: stroke fill;
 }

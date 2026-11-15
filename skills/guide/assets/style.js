@@ -36,8 +36,21 @@
    .rail: the link to the chapter being read gets aria-current, and the bar
    inside it fills with the share of the page scrolled.
 
+   html gets the class no-regular where Expressway Regular is not installed;
+   style.css then sets emphasis in Extra-bold.
+
    scripts/build.py inlines this file. */
 (() => {
+  // Text falls back to Bold where Expressway Regular is not installed, and
+  // Bold emphasis would vanish in it. Probe with the names style.css tries, so
+  // both agree; on a miss style.css steps emphasis up to Extra-bold.
+  if ("FontFace" in window) {
+    const names = ["ExpresswayRg-Regular", "Expressway Regular", "Expressway-Regular"];
+    new FontFace("Expressway probe", names.map((name) => `local("${name}")`).join(", "))
+      .load()
+      .catch(() => document.documentElement.classList.add("no-regular"));
+  }
+
   const ANIMATED = ".bar-fill, .col-fill, .line, .dot, .pie-slice";
   if ("IntersectionObserver" in window) {
     document.documentElement.classList.add("js-reveal");
