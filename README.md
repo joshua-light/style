@@ -1,8 +1,15 @@
 # style
 
+![A raid report in the style: stat tiles, a damage meter, a table, and two charts](assets/screenshots/dashboard.png)
+
 My visual style, packaged as a plugin for Claude Code and Codex. It is listed in the [`joshua-light` marketplace](https://github.com/joshua-light/marketplace). It steers reports, explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings.
 
-Open `skills/guide/assets/showcase.html` in a browser to see every component. Open `examples/voyager-deck.html` to see a deck: step through it with the arrow keys or a click.
+<p>
+  <img src="assets/screenshots/deck.png" width="49%" alt="A deck slide: a line chart with two events and a dashed forecast">
+  <img src="assets/screenshots/explainer.png" width="49%" alt="Explainer components: a slider bound to bars, a tree, stacked layers, and a list of claims">
+</p>
+
+The screenshots come from the pages in `examples/`, set in Fira Sans, the face an install shows. Open `examples/showcase.html` in a browser to see every component. Open `examples/voyager-deck.html` to see a deck: step through it with the arrow keys or a click.
 
 ## Credits
 
@@ -44,17 +51,18 @@ Embedding Expressway in pages you publish may need a web licence from Typodermic
 | `skills/guide/assets/style.css` | Tokens and components. |
 | `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, steppers, quizzes, bound sliders, the contents rail, deck keys, builds, and popups. |
 | `skills/guide/assets/style.mplstyle` | The same look for matplotlib charts. |
-| `skills/guide/assets/showcase.html` | Reference markup for every component. |
 | `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
 | `skills/guide/assets/fonts/` | Fira Sans, the fallback face, and its licence. Your Expressway files go here too; git ignores them. |
 | `skills/guide/scripts/build.py` | Inlines the stylesheet, script, and fonts into a page. |
 | `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
 | `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup. Needs Pygments. |
 | `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: ink rings on lines, outlined title. |
+| `examples/showcase.html` | Reference markup for every component. The guide reads it before it builds a page. |
 | `examples/voyager-deck.html` | The reference deck: builds, growth, a popup, motion to scale, and a speed slider for review. |
 | `examples/eth-explainer.html` | A long explainer page: Michael Silveira's ETH explainer, restyled. Its licence sits beside it. |
 | `.claude-plugin/plugin.json` | Claude Code plugin manifest. |
 | `.codex-plugin/plugin.json` | Codex plugin manifest. |
+| `assets/screenshots/` | The README's screenshots. |
 | `assets/icon.svg` | Icon source. Re-render the PNG with `rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png`. |
 
 ## Install

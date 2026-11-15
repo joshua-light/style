@@ -1,5 +1,6 @@
 /* style — dark gray, black ink, Warrior-tan accent, flat data fills, outlined Expressway.
-   Rules live in ../SKILL.md; markup for every component in showcase.html.
+   Rules live in ../SKILL.md; markup for every component in
+   ../../../examples/showcase.html.
    style.js adds hover tooltips and linked highlighting.
    scripts/build.py inlines both files and embeds the fonts as data URIs.
    Fira Sans stands in where Expressway is absent. */

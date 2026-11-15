@@ -13,8 +13,8 @@ Apply these rules to every visual output. Where another design skill disagrees o
 
 Paths are relative to this skill's directory.
 
-1. Read `assets/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck.
-2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, the contents rail, and stepping through a deck, its builds, and its popups.
+1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck.
+2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, the contents rail, and stepping through a deck, its builds, and its popups.
 3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
 4. Open or screenshot the result and check it against the rules below.
 
@@ -203,7 +203,7 @@ Series colours, assigned in this order: `--c1` azure, `--c2` gold, `--c3` amethy
 
 ## Components
 
-Markup for each is in `assets/showcase.html`.
+Markup for each is in `../../examples/showcase.html`.
 
 - **Panel** (`.panel`): an optional `.panel-head` title on the top border, body padded 16px. A `.tag` inside the head lands on the border at the right. `.panel-foot` is a strip under the body for the figure's controls or its one-line takeaway. `.panel-body.flush` lets a table run edge to edge; under a title, the strip between the panel's top border and the table head is `--head` too, and the table head keeps a black line above and below it.
 - **Callout** (`.callout.note|tip|warn|bad`): the kind's glyph and name in a tag of the kind's colour, on the top border at the left. Each kind has one glyph: note `information`, tip `lightbulb`, warn `alert`, bad `skull-2`. Put it first in the `.callout-head`, before the word. A callout with a name of its own ("Theorem") takes a glyph that fits the name, or none. Keep to one or two per screen.
@@ -481,4 +481,4 @@ Motion is judged by eye, slowed down.
 
 ## Recording preferences
 
-When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `assets/showcase.html`, then the matching rule here. Write each rule as a concrete instruction.
+When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `../../examples/showcase.html`, then the matching rule here. Write each rule as a concrete instruction.
