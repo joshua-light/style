@@ -71,12 +71,12 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
 .rung-mult { grid-column: 2; font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
 .rung > .tag { justify-self: end; }
 .eth-line { grid-column: 1; display: flex; align-items: center; gap: var(--s3); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
-.eth-line::before, .eth-line::after { content: ""; height: 2px; background: var(--text-dim); filter: var(--ink-ring); }
+.eth-line::before, .eth-line::after { content: ""; height: 2px; background: var(--text-dim); filter: var(--ink-ring); } /* lint-ok: filter-ring (a horizontal rule) */
 .eth-line::before { width: var(--s3); }
 .eth-line::after { flex: 1; }
 .eth-line > strong { color: var(--text); }
 .bracket { position: relative; padding: var(--s1) 0 var(--s1) var(--s5); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
-.bracket::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--s2); border: 2px solid var(--text-dim); border-left: 0; filter: var(--ink-ring); }
+.bracket::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: var(--s2); border: 2px solid var(--text-dim); border-left: 0; filter: var(--ink-ring); } /* lint-ok: filter-ring (horizontal and vertical edges) */
 .bracket > strong { display: block; color: var(--text); }
 .bracket.eth { grid-column: 2; }
 .bracket.pnp { grid-column: 3; }

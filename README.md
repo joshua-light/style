@@ -55,6 +55,8 @@ Embedding Expressway in pages you publish may need a web licence from Typodermic
 | `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
 | `skills/guide/assets/fonts/` | Fira Sans, the fallback face, and its licence. Your Expressway files go here too; git ignores them. |
 | `skills/guide/scripts/build.py` | Inlines the stylesheet, script, and fonts into a page. |
+| `skills/guide/scripts/lint.py` | Checks a page's own CSS, markup, and text against the rules, and names each breach by line. |
+| `skills/guide/scripts/shot.py` | Screenshots a page, a part of it, or a deck's slides, every mark finished. Needs Chrome or Chromium. |
 | `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
 | `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup, with numbered or lit lines, or as a diff. Needs Pygments. |
 | `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: ink rings on lines, outlined title. |

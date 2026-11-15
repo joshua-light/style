@@ -9,7 +9,7 @@
 <style>
 /* Page CSS for the showcase alone. The light gray is not part of the style:
    it stands for a surface the style does not own, such as a chat or a README. */
-.elsewhere { padding: var(--s5); background: #f4f4f4; border: var(--border); }
+.elsewhere { padding: var(--s5); background: #f4f4f4; border: var(--border); } /* lint-ok: raw-colour */
 .export { padding: var(--s5); background: var(--page); border: var(--border); }
 .scroll-demo { max-height: calc(6 * var(--lh-label) + 2 * var(--s3)); overflow: auto; }
 </style>
@@ -1096,19 +1096,19 @@
           <tr><td>Small count</td><td>1,284</td><td class="dim">1284</td><td class="dim">Whole digits with a comma, up to 9,999.</td></tr>
           <tr><td>Large amount</td><td>41.8M</td><td class="dim">41,800,000</td><td class="dim">Three figures and K, M, or B from 10,000 up.</td></tr>
           <tr><td>Column of amounts</td><td>4.92M, 0.28M</td><td class="dim">4.92M, 280K</td><td class="dim">One unit and one precision down a column.</td></tr>
-          <tr><td>Percent</td><td>6.4%</td><td class="dim">6.4 %</td><td class="dim">No space before the sign. One decimal at most.</td></tr>
+          <tr><td>Percent</td><td>6.4%</td><td class="dim">6.4 %</td><td class="dim">No space before the sign. One decimal at most.</td></tr> <!-- lint-ok: number-form -->
           <tr><td>Unit</td><td>25.9B km</td><td class="dim">25.9Bkm</td><td class="dim">A space before a unit that is a word.</td></tr>
           <tr><td>Change</td><td>+6.4%, -3.1%</td><td class="dim">6.4%</td><td class="dim">A change always shows its sign.</td></tr>
           <tr><td>Change in a share</td><td>+4 pts</td><td class="dim">+4%</td><td class="dim">Points between two percentages.</td></tr>
           <tr><td>Range</td><td>12 to 31</td><td class="dim">12-31</td><td class="dim">"to": a dash reads as a minus.</td></tr>
           <tr><td>Ratio</td><td>8 / 8</td><td class="dim">8/8</td><td class="dim">A space each side of the slash.</td></tr>
-          <tr><td>Rough value</td><td>about 40</td><td class="dim">~40</td><td class="dim">A word, outside maths.</td></tr>
+          <tr><td>Rough value</td><td>about 40</td><td class="dim">~40</td><td class="dim">A word, outside maths.</td></tr> <!-- lint-ok: number-form -->
           <tr><td>Duration</td><td>2h 14m, 4m 05s</td><td class="dim">2:14:00</td><td class="dim">Two units at most, the larger first.</td></tr>
-          <tr><td>Date</td><td>15 Nov 2026</td><td class="dim">11/15/26</td><td class="dim">Day, short month, year. No year inside the current one.</td></tr>
-          <tr><td>Time of day</td><td>21:30</td><td class="dim">9:30 PM</td><td class="dim">The 24-hour clock.</td></tr>
+          <tr><td>Date</td><td>15 Nov 2026</td><td class="dim">11/15/26</td><td class="dim">Day, short month, year. No year inside the current one.</td></tr> <!-- lint-ok: number-form -->
+          <tr><td>Time of day</td><td>21:30</td><td class="dim">9:30 PM</td><td class="dim">The 24-hour clock.</td></tr> <!-- lint-ok: number-form -->
           <tr><td>Recent time</td><td>3h ago</td><td class="dim">180 minutes ago</td><td class="dim">For anything less than a day old.</td></tr>
           <tr><td>Date in data</td><td>2026-11-15</td><td class="dim">15.11.2026</td><td class="dim">Year first, in code and file names only.</td></tr>
-          <tr><td>No value</td><td><span class="faint">–</span></td><td class="dim">0, blank, N/A</td><td class="dim">A faint dash. Zero is a value: write 0.</td></tr>
+          <tr><td>No value</td><td><span class="faint">–</span></td><td class="dim">0, blank, N/A</td><td class="dim">A faint dash. Zero is a value: write 0.</td></tr> <!-- lint-ok: number-form -->
         </tbody>
       </table>
     </div>

@@ -180,7 +180,10 @@
      outline swallow the line between them. Outlined text opens each gap to 2px;
      0.06em is Expressway's own gap between straight stems. */
   --fit: max(0px, calc(2px - 0.06em));
-  /* The same 1px ink ring for non-text shapes: chart lines, markers, icons. */
+  /* The same 1px ink ring for non-text shapes, as a filter: four copies of
+     the shape in ink, each a pixel off. It is exact on horizontal and vertical
+     edges and steps along a slope, so a sloped line takes a real stroke
+     instead (see .ink). */
   --ink-ring:
     drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink))
     drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
@@ -208,6 +211,13 @@
   --code-function: var(--silver);
   --code-type: var(--silver);
   --code-punct: var(--text-dim);
+
+  /* A chart line and the ink ring round it. On a screen of one device pixel
+     per px a sloped line steps, whatever its weight: lines up to 3px and
+     rings up to 2px were tried and looked no smoother, and stepped lines were
+     tried and dropped. That is the screen, not the style: leave these be. */
+  --line: 2px;
+  --ring: 1px;
 
   --border: 1px solid var(--ink);
   --icon: 24px;  /* picture icons: one size everywhere */
@@ -1131,7 +1141,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .chart .line, .spark .line {
   fill: none;
   stroke: var(--fill, var(--c1));
-  stroke-width: 2px;
+  stroke-width: var(--line);
   stroke-linejoin: miter;
   stroke-linecap: butt;
   filter: var(--ink-ring);
@@ -1149,8 +1159,9 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* Diagram shapes for an SVG: an inset box with an ink edge, and a light wire
    with an ink ring that ends in an arrowhead. */
 .chart .box { fill: var(--inset); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
-.chart .wire { fill: none; stroke: var(--text-dim); stroke-width: 2px; stroke-linejoin: miter; filter: var(--ink-ring); }
-.chart .arrow { fill: var(--text-dim); filter: var(--ink-ring); }
+.chart .wire { fill: none; stroke: var(--text-dim); stroke-width: var(--line); stroke-linejoin: miter; filter: var(--ink-ring); }
+/* The head's ring is a stroke painted under its fill: its edges slope. */
+.chart .arrow { fill: var(--text-dim); stroke: var(--ink); stroke-width: calc(2 * var(--ring)); stroke-linejoin: miter; paint-order: stroke fill; }
 .chart text.name { fill: var(--text); font-size: var(--fs-label); }
 /* Dashed in a chart: a forecast continues its line in the series colour, a
    planned box has no fill, and a target is a thin gray rule, not data. A 2px
@@ -1161,6 +1172,20 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* A forecast's marker is hollow: a 6px circle (r="3") whose 2px edge in the
    series colour brings it to the size of a filled marker. */
 .chart .dot.ghost { fill: var(--surface); stroke: var(--fill, var(--c1)); stroke-width: 2px; filter: var(--ink-ring); }
+/* The ring round a line or a hollow marker is a second copy of it in ink, 2px
+   wider, laid under it by style.js: a real stroke, smooth at any slope. The
+   filter ring it replaces is cut from pixels and steps along a diagonal; it
+   stays as the look of a page whose script has not run. A dashed line's ink
+   dashes reach a pixel past each end of its dashes. A hollow marker's copy
+   carries the middle, so the marker itself has none. */
+.chart .inked, .spark.inked { filter: none; }
+.chart .ink, .spark .ink { stroke: var(--ink); stroke-width: calc(var(--line) + 2 * var(--ring)); filter: none; pointer-events: none; }
+.chart :is(.line, .wire).ghost.ink { stroke-dasharray: calc(6px + 2 * var(--ring)) calc(6px - 2 * var(--ring)); stroke-dashoffset: var(--ring); }
+.chart .dot.ghost.inked { fill: none; filter: none; }
+.chart .dot.ghost.ink { fill: var(--surface); stroke: var(--ink); stroke-width: calc(2px + 2 * var(--ring)); filter: none; }
+/* In a deck, the copy of a line that is a build piece itself waits with it. */
+.deck.is-live .ink:has(+ [data-build]:not(.is-built)) { visibility: hidden; animation-play-state: paused; }
+
 /* Notes on a chart. An event is a solid gray rule down the plot: it happened,
    so it is not dashed. A period is a band one step darker than any surface. A
    range (best to worst, a margin of error) is a flat dark tone of its series
@@ -2227,7 +2252,7 @@ a.fn { padding: 0 1px; border: 0; font-size: 0.75em; line-height: 0; vertical-al
   .deck { max-width: none; padding: 0; }
   .deck > .slide { page: slide; width: 100%; margin: 0 !important; border: 0; break-after: page; break-inside: avoid; filter: none !important; }
   /* Paper has no clicks: every slide prints lit, with every piece built. */
-  .deck [data-build] { visibility: visible !important; animation: none !important; }
+  .deck [data-build], .deck .ink { visibility: visible !important; animation: none !important; }
   /* A popup is a throwaway: it would print over its slide. */
   .deck .popup { display: none !important; }
   .deck > .slide > .slide-no { top: var(--s3); }

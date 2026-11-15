@@ -76,6 +76,25 @@
       () => root.classList.add("no-expressway"));
   }
 
+  // The ink ring round a chart line is a second copy of the line, in ink and
+  // 2px wider, laid under it: a real stroke, so it is smooth at any slope.
+  // style.css draws the ring with a filter where this has not run, and a
+  // filter's ring is cut from pixels: it steps along a diagonal. A hollow
+  // marker gets the same copy. The copy keeps the line's classes, so it traces
+  // and fades with it.
+  for (const mark of document.querySelectorAll(".chart .line, .chart .wire, .spark .line, .chart .dot.ghost")) {
+    const ink = mark.cloneNode(false);
+    for (const { name } of [...ink.attributes]) {
+      if (name === "id" || name.startsWith("data-") || name.startsWith("aria-")) ink.removeAttribute(name);
+    }
+    ink.classList.add("ink");
+    ink.setAttribute("aria-hidden", "true");
+    mark.before(ink);
+    mark.classList.add("inked");
+    const spark = mark.closest(".spark");
+    if (spark) spark.classList.add("inked");
+  }
+
   const ANIMATED = ".bar-fill, .col-fill, .line, .dot, .pie-slice";
   if ("IntersectionObserver" in window) {
     document.documentElement.classList.add("js-reveal");
@@ -628,6 +647,9 @@
         for (const node of [el, ...el.querySelectorAll(DRAWN)]) {
           if (node.matches(DRAWN) && node.closest("[data-build]") === el) marks.push(node);
         }
+        // A line that is a piece itself: its ink copy sits just before it.
+        const ink = el.previousElementSibling;
+        if (ink && ink.matches(".ink")) marks.push(ink);
       }
       if (!marks.length) return;
       for (const mark of marks) mark.style.animation = "none";

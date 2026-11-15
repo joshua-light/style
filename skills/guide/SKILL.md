@@ -16,9 +16,10 @@ Paths are relative to this skill's directory.
 1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck.
 2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups.
 3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
-4. Open or screenshot the result and check it against the rules below.
+4. Run `python3 scripts/lint.py page.html`. It reads the page's own CSS, markup, and text, and names each breach of these rules by line. Fix every error. A warning is a rule with exceptions: check each by eye.
+5. Run `python3 scripts/shot.py page.html` and read the images it writes. A page comes as screens 1500px tall and a deck as one image per slide, every mark finished as on paper. `--select CSS` shoots one part. Check them against the rules below: the linter reads the source, and only the picture shows spacing, overlap, and empty room.
 
-Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. Where Expressway's files are absent, `build.py` sets the page in Fira Sans, the bundled fallback, and says so. That is the intended look on such a machine.
+Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. Never silence the linter to pass. A `lint-ok: RULE` comment on a line exempts it, and is only for an exception this guide names: write the reason beside it. Where Expressway's files are absent, `build.py` sets the page in Fira Sans, the bundled fallback, and says so. That is the intended look on such a machine.
 
 ## Surfaces and ink
 
@@ -341,6 +342,8 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
 - A single trend where the amount matters: add an `.area` under the line. One series only: areas hide each other.
 - Change over time: an inline SVG `.chart`. Lines are 2px with mitered joins and a black ring; markers are 8px circles; gridlines are `--sunken`; the baseline is ink. Label each line at its end and keep the legend.
+- The ring round a line or a hollow marker is a second copy of it in ink, 2px wider, which `style.js` lays under it: a real stroke, smooth at any slope. Never draw that ring with a filter or a shadow on a page: it steps along a diagonal. A page whose script has not run shows the stylesheet's filter ring, the look this replaced.
+- A sloped line looks stepped on a screen of one device pixel per px. That is the screen, not the style. Heavier lines and rings were tried and looked no smoother; stepped lines, flat runs and risers only, were tried and dropped. Do not try to fix it again.
 - A trend inside a stat: `.spark`.
 - An SVG chart scales as a whole, text included. Draw its `viewBox` at the width it will render.
 - For matplotlib, use the ready theme: `plt.style.use("assets/style.mplstyle")`, then `from mpl_style import finish` (in `scripts/`) and call `finish(fig)` before saving. It adds the ink ring on lines and the outlined title.
@@ -541,9 +544,9 @@ Motion is judged by eye, slowed down.
 
 Some places take no stylesheet. The look travels as an image, or as a mapping onto what the place offers.
 
-- An image exported for a light place (a chat, a README, another tool's slides) keeps the page gray behind it, 24px of padding, and a 1px ink frame. Never export on a clear background.
+- An image exported for a light place (a chat, a README, another tool's slides) keeps the page gray behind it, 24px of padding, and a 1px ink frame. Never export on a clear background. `python3 scripts/shot.py page.html --select "#id" -o figure.png` exports a part this way.
 - A README or a chat message gets plain text and Markdown tables, and each figure as an exported image. Lead a chat message with the finding in a sentence.
-- Slides for another tool are exported whole, each at 1920 by 1080.
+- Slides for another tool are exported whole, each at 1920 by 1080: `python3 scripts/shot.py deck.html --scale 2 -o slide.png`.
 - A terminal's colours map to tokens: background `--sunken`, text and white `--text`, bright black `--text-faint`, red `--red`, green `--green`, yellow `--yellow`, blue `--azure`, magenta `--amethyst`, cyan `--silver`, cursor `--accent`. The palette has no cyan. Put a state word beside every state colour.
 - Mermaid: `assets/mermaid.json` is the theme. Pass it to `mermaid.initialize`, or to `mmdc` with `-c`. It gives inset boxes, sunken groups, ink edges, square corners, and solid replies. Edge labels sit on a panel-gray chip, which shows inside a group.
 - plotly: `import plotly_style; plotly_style.use()` (in `scripts/`) registers the template. plotly cannot draw the ink ring or an outlined title; a figure that needs them is an inline SVG.
@@ -585,4 +588,4 @@ Some places take no stylesheet. The look travels as an image, or as a mapping on
 
 ## Recording preferences
 
-When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `../../examples/showcase.html`, then the matching rule here. Write each rule as a concrete instruction.
+When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `../../examples/showcase.html`, then the matching rule here. Write each rule as a concrete instruction. Where a page's source can show a breach of the new rule, add the check to `scripts/lint.py`.
