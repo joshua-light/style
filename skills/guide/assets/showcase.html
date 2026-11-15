@@ -35,7 +35,7 @@
   </nav>
 
   <h2 id="text">Text</h2>
-  <p>Prose runs at 18px on a 30px line, a shade dimmer than headings, and never wider than 560px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Bold marks emphasis</strong>; nothing is italic.</p>
+  <p>Prose runs at 18px on a 30px line, a shade dimmer than headings, and never wider than 560px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Bold marks emphasis</strong>; nothing is italic. A struck value was replaced: <del>two</del> <ins>three</ins> healers.</p>
   <!-- mark: the name of a thing inside a sentence. Names only, never numbers; running text only, never titles. -->
   <p>A highlight colours the name of a thing: <mark>Tukz</mark> topped the meter, and 24 pulls went into <mark>Dimensius</mark>.</p>
 
@@ -453,6 +453,205 @@
   </div>
 
   <!-- ── Explainers ── -->
+  <h3>Not there yet</h3>
+  <p>A dashed line or a hatched fill marks what is not there yet: a forecast, a goal, a planned part. A word beside it says which.</p>
+  <div class="grid">
+    <!-- Forecast: a second path with .line.ghost continues the measured line in the same colour, with no pathLength.
+         It ends in a hollow marker: .dot.ghost, a 6px square. A target is a <line class="target">. Label both on the chart. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Raid DPS by week</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by week: 25M in week six, forecast to pass the 28M goal in week eight">
+          <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
+          <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
+          <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
+          <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
+          <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
+          <text class="end" x="24" y="12">40M</text>
+          <text class="end" x="24" y="52">30M</text>
+          <text class="end" x="24" y="92">20M</text>
+          <text class="end" x="24" y="132">10M</text>
+          <text class="end" x="24" y="172">0</text>
+          <text class="mid" x="32" y="188">W1</text>
+          <text class="mid" x="131" y="188">W3</text>
+          <text class="mid" x="230" y="188">W5</text>
+          <text class="mid" x="329" y="188">W7</text>
+          <text class="mid" x="428" y="188">W9</text>
+          <line class="target" x1="32" x2="428" y1="56" y2="56"/>
+          <text x="36" y="50">Goal 28M</text>
+          <path class="line ghost" style="--fill:var(--c1)" d="M280 68 L329 60 L379 50 L428 40"/>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M32 112 L82 104 L131 92 L181 84 L230 80 L280 68"/>
+          <rect class="dot" style="--fill:var(--c1)" x="276" y="64" width="8" height="8" data-tip="Week 6" data-tip-value="25.0M"/>
+          <text class="series mid" x="156" y="80">Measured</text>
+          <rect class="dot ghost" style="--fill:var(--c1)" x="425" y="37" width="6" height="6" data-tip="Week 9, forecast" data-tip-value="32.0M"/>
+          <text class="series end" x="416" y="30">Forecast</text>
+        </svg>
+      </div>
+    </figure>
+
+    <!-- Ghost: .ghost on a .node or .layer draws it dashed and empty; .link.ghost dashes the arrow into it.
+         In an SVG diagram, .box.ghost and .wire.ghost do the same. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Raid tiers</div>
+      <div class="panel-body">
+        <div class="diagram down">
+          <div class="node"><strong>Normal</strong><span>Cleared</span></div>
+          <span class="link"></span>
+          <div class="node"><strong>Heroic</strong><span>5 of 8 down</span></div>
+          <span class="link ghost"></span>
+          <div class="node ghost"><strong>Mythic</strong><span>Planned</span></div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Hatched: .ghost on a .col-fill, .bar-seg or .swatch lays ink hatching over its colour. Its edges stay solid. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Kills by week</div>
+      <div class="panel-body">
+        <div class="cols stagger" style="--max:30">
+          <div class="col"><span class="col-value">14</span><span class="col-fill" style="--v:14"></span><span class="col-label">W1</span></div>
+          <div class="col"><span class="col-value">16</span><span class="col-fill" style="--v:16"></span><span class="col-label">W2</span></div>
+          <div class="col"><span class="col-value">19</span><span class="col-fill" style="--v:19"></span><span class="col-label">W3</span></div>
+          <div class="col"><span class="col-value">21</span><span class="col-fill" style="--v:21"></span><span class="col-label">W4</span></div>
+          <div class="col"><span class="col-value">22</span><span class="col-fill" style="--v:22"></span><span class="col-label">W5</span></div>
+          <div class="col"><span class="col-value">25</span><span class="col-fill ghost" style="--v:25"></span><span class="col-label">W6</span></div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch"></span>Counted</span>
+          <span class="legend-item"><span class="swatch ghost"></span>Forecast</span>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Projection: a .bar-fill.ghost before the measured fill, with its own --v, shows where the value is heading. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Damage so far</div>
+      <div class="panel-body">
+        <div class="meter stagger">
+          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:74; --fill:var(--c1)"><span class="bar-fill ghost" style="--v:92"></span><span class="bar-fill"></span></div><span class="meter-value">3.94M</span></div>
+          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:62; --fill:var(--c2)"><span class="bar-fill ghost" style="--v:80"></span><span class="bar-fill"></span></div><span class="meter-value">3.31M</span></div>
+          <div class="meter-row"><span class="meter-label">Melli</span><div class="bar" style="--v:55; --fill:var(--c3)"><span class="bar-fill ghost" style="--v:70"></span><span class="bar-fill"></span></div><span class="meter-value">2.93M</span></div>
+          <div class="meter-row"><span class="meter-label">Elv</span><div class="bar" style="--v:41; --fill:var(--c4)"><span class="bar-fill ghost" style="--v:52"></span><span class="bar-fill"></span></div><span class="meter-value">2.18M</span></div>
+        </div>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--c-other)"></span>Done</span>
+          <span class="legend-item"><span class="swatch ghost" style="--fill:var(--c-other)"></span>On pace by Sunday</span>
+        </div>
+      </div>
+    </figure>
+  </div>
+
+  <h3>Context and notes</h3>
+  <p>Gray keeps a series as background. A rule marks a moment, a band a period, and a tone of the series colour a range.</p>
+  <div class="grid">
+    <!-- Context: the series the page is about keeps its colour; the rest take --c-other, drawn first, with dim labels. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Raid DPS by pull</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull on Thursday, against three earlier nights">
+          <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
+          <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
+          <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
+          <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
+          <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
+          <text class="end" x="24" y="12">40M</text>
+          <text class="end" x="24" y="52">30M</text>
+          <text class="end" x="24" y="92">20M</text>
+          <text class="end" x="24" y="132">10M</text>
+          <text class="end" x="24" y="172">0</text>
+          <text class="mid" x="32" y="188">1</text>
+          <text class="mid" x="119" y="188">4</text>
+          <text class="mid" x="206" y="188">7</text>
+          <text class="mid" x="293" y="188">10</text>
+          <text class="mid" x="380" y="188">13</text>
+          <path class="line" pathLength="1" style="--fill:var(--c-other)" d="M32 150 L61 148 L90 140 L119 142 L148 132 L177 128 L206 130 L235 120 L264 116 L293 118 L322 108 L351 110 L380 104"/>
+          <path class="line" pathLength="1" style="--fill:var(--c-other)" d="M32 140 L61 136 L90 130 L119 126 L148 118 L177 120 L206 110 L235 104 L264 106 L293 96 L322 92 L351 96 L380 88"/>
+          <path class="line" pathLength="1" style="--fill:var(--c-other)" d="M32 132 L61 124 L90 128 L119 108 L148 112 L177 96 L206 100 L235 84 L264 88 L293 76 L322 80 L351 68 L380 72"/>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M32 120 L61 100 L90 104 L119 80 L148 72 L177 76 L206 52 L235 56 L264 40 L293 44 L322 28 L351 32 L380 20"/>
+          <rect class="dot" style="--fill:var(--c1)" x="376" y="16" width="8" height="8" data-tip="Thursday, pull 13" data-tip-value="37.0M"/>
+          <text class="series end" x="366" y="16">Thursday</text>
+          <text x="392" y="76">Tuesday</text>
+          <text x="392" y="92">Sunday</text>
+          <text x="392" y="108">Monday</text>
+        </svg>
+      </div>
+    </figure>
+
+    <!-- Notes: <line class="event"> is a moment, <rect class="band"> a period, drawn first. Label both at the top of the plot. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Raid DPS by week</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by week, with a patch after week three and a holiday break in weeks six and seven">
+          <rect class="band" x="255" y="8" width="99" height="160"/>
+          <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
+          <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
+          <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
+          <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
+          <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
+          <text class="end" x="24" y="12">40M</text>
+          <text class="end" x="24" y="52">30M</text>
+          <text class="end" x="24" y="92">20M</text>
+          <text class="end" x="24" y="132">10M</text>
+          <text class="end" x="24" y="172">0</text>
+          <text class="mid" x="32" y="188">W1</text>
+          <text class="mid" x="131" y="188">W3</text>
+          <text class="mid" x="230" y="188">W5</text>
+          <text class="mid" x="329" y="188">W7</text>
+          <text class="mid" x="428" y="188">W9</text>
+          <line class="event" x1="156.5" x2="156.5" y1="8" y2="168"/>
+          <text x="162" y="20">Patch 11.2</text>
+          <text class="mid" x="304" y="20">Holiday break</text>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M32 112 L82 108 L131 104 L181 80 L230 76 L280 96 L329 100 L379 68 L428 60"/>
+          <rect class="dot" style="--fill:var(--c1)" x="424" y="56" width="8" height="8" data-tip="Week 9" data-tip-value="27.0M"/>
+        </svg>
+      </div>
+    </figure>
+
+    <!-- Range: a closed <path class="range"> under the line, in the line's --fill. Say what it spans on the chart. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Raid DPS, typical pull</div>
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Typical raid DPS by week, with the range from the worst pull to the best">
+          <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
+          <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
+          <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
+          <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
+          <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
+          <text class="end" x="24" y="12">40M</text>
+          <text class="end" x="24" y="52">30M</text>
+          <text class="end" x="24" y="92">20M</text>
+          <text class="end" x="24" y="132">10M</text>
+          <text class="end" x="24" y="172">0</text>
+          <text class="mid" x="32" y="188">W1</text>
+          <text class="mid" x="131" y="188">W3</text>
+          <text class="mid" x="230" y="188">W5</text>
+          <text class="mid" x="329" y="188">W7</text>
+          <text class="mid" x="428" y="188">W9</text>
+          <path class="range" style="--fill:var(--c1)" d="M32 98 L82 86 L131 80 L181 64 L230 66 L280 52 L329 38 L379 36 L428 22 L428 56 L379 70 L329 74 L280 84 L230 102 L181 96 L131 112 L82 118 L32 130 Z"/>
+          <path class="line" pathLength="1" style="--fill:var(--c1)" d="M32 112 L82 104 L131 92 L181 84 L230 80 L280 68 L329 60 L379 50 L428 40"/>
+          <rect class="dot" style="--fill:var(--c1)" x="424" y="36" width="8" height="8" data-tip="Week 9, typical pull" data-tip-value="32.0M"/>
+          <text x="300" y="112">Best to worst pull</text>
+        </svg>
+      </div>
+    </figure>
+
+    <!-- Replaced values: <del> the old value, then <ins> the new one. -->
+    <section class="panel span-6">
+      <div class="panel-head">With a third healer</div>
+      <div class="panel-body flush">
+        <table class="table">
+          <thead><tr><th>Measure</th><th class="num">Was, now</th></tr></thead>
+          <tbody>
+            <tr><td>Healers</td><td class="num"><del>2</del> <ins>3</ins></td></tr>
+            <tr><td>Deaths a night</td><td class="num"><del>37</del> <ins>21</ins></td></tr>
+            <tr><td>Enrage wipes</td><td class="num"><del>6</del> <ins>1</ins></td></tr>
+            <tr><td>Raid DPS</td><td class="num"><del>41.8M</del> <ins>40.1M</ins></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
   <h2 id="explainers">Explainers</h2>
   <div class="grid">
     <!-- Diagram: a chain of .node boxes joined by .link arrows. .diagram.down runs it top to bottom. -->

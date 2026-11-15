@@ -33,20 +33,44 @@ The style is dark only. Never add a light theme.
 | `--panel` | `#333333` | Top-level boxes: panels, callouts, slides. |
 | `--raised` | `#3f3f3f` | Neutral tags. |
 
-- Every container edge is `1px solid #000`.
+- Every container edge is `1px solid #000`. The one other edge is dashed, for a part that is not there yet (see Lines).
 - Nothing is rounded: no `border-radius`, no round markers. The pie chart is the one round shape.
 - A top-level box is light gray (`--panel`). A box inside it is dark (`--inset`): a stat, table, or chart panel on a slide, a panel in a panel. The stylesheet does this by nesting; never set it by hand, and never make a top-level panel dark.
 - Depth comes from the gray steps. No soft shadows, no blur, no glow, no transparency.
 - No box has a head bar. Panel titles and callout kinds sit on the top border (see On the border). Table rows are `--inset`; heads are flat `--head`, one step darker, never textured, never coloured. A hovered row turns `--panel`.
 - Nothing has a gradient.
 
+## Lines and hatching
+
+A line's style has one meaning, and so does a hatched fill.
+
+| Look | Meaning | Where |
+| --- | --- | --- |
+| Solid line | It exists, or it was measured. | Every edge and line not named below. |
+| Dashed line | Not there yet: planned, projected, optional, or missing. | Borders and lines. |
+| Hatched fill | Not there yet, for a mark whose fill carries a value. | Bars, columns, segments, swatches. |
+| Dotted line | Hover for more. | Under a linked mark only (see Text). |
+
+- Mark a part that is not there yet with `.ghost`. What it draws depends on the part:
+  - A `.node` or `.layer`: a dashed box with no fill. A `.link`: a dashed arrow.
+  - In an SVG, a `.box`, a `.wire`, or a chart `.line`: dashed. A `.dot`: hollow.
+  - A `.bar-fill`, `.bar-seg`, `.col-fill`, or `.swatch`: its colour under ink hatching, with solid edges.
+- A box is emptied and a fill is hatched because a fill is data: its size is the value and its colour the series. An empty column would read as a missing value.
+- A hatched fill keeps solid ink edges. Never dash them: the hatch already says it, and dashes break up against the hatch lines.
+- The empty state wears the dashed frame. A chart's target is dashed too (see Charts).
+- A dash or a hatch never carries meaning alone. Put a word beside it: "Planned", "Forecast", "Goal 28M", or a legend entry with a `.swatch.ghost`.
+- Never use a dash or a hatch to tell two series apart, to separate, to decorate, or to dim. Colour and a label tell series apart; the gray steps dim.
+- Dashes are 4px with 4px gaps on a 1px edge, and 6px on a 2px line, which also carries the ink ring. Dots are 1px with 2px gaps. Hatch lines are 2px ink diagonals, 8px apart.
+- Never write `border-style: dashed` or `dotted`, a dash pattern, or a hatch of your own. The stylesheet draws them all on whole pixels: the browser's dashes are 2px long, its dots read as a solid line, and a gradient hatch has lines of uneven weight.
+- Charts from other tools follow the same meanings and lengths.
+
 ## Fills
 
 Every fill is flat: one colour inside a 1px ink edge.
 
-- This holds for data marks (bars, columns, stacked segments, pies, swatches), tags, and gray surfaces alike. Never add a gradient, a gloss, or a texture to a fill.
+- This holds for data marks (bars, columns, stacked segments, pies, swatches), tags, and gray surfaces alike. Never add a gradient, a gloss, or a texture to a fill. The one texture is the hatch on a fill that is not there yet (see Lines and hatching).
 - Melli, the WoW status-bar gradient, used to shade data fills. It was dropped: in a report it added a brightness change that carries no data, and a bar no longer matched its legend colour.
-- A data fill is written `background: var(--texture), <colour>`. `--texture` is `none`; it is the one place a texture would return. Never set it on a page.
+- A data fill is written `background: var(--texture), <colour>`. `--texture` is `none`; `.ghost` sets it to the hatch. Never set it on a page.
 
 ## Text
 
@@ -87,7 +111,7 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - Text has four colours: `--text` `#d9d9d9` for content, `--text-prose` `#bcbcbc` for long prose, `--text-dim` `#a3a3a3` for labels and captions, `--text-faint` `#888888` for markers and disabled items.
 - Prose is a plain `<p>`, `<ul>`, or `<ol>` placed straight in `.page` or `.flow`. The stylesheet sets it a size above body text and a shade dimmer, so `<strong>` stands out in `--text`. Give it no class, and never set these by hand.
 - Contrast is soft on purpose. Text is never pure white and no surface is darker than `--sunken`: near-white on near-black glared in the bold face. Never raise the contrast to make text stand out; use size or `<strong>`.
-- Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline. The one exception is a linked mark (`<mark data-key>`, see Explainers): it wears a dashed rule, so the reader knows the name can be hovered.
+- Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline. The one exception is a linked mark (`<mark data-key>`, see Explainers): it wears a dotted rule, so the reader knows the name can be hovered.
   - Mark names only. Never mark a number, a verdict, or a whole phrase, and never give a mark a state colour.
   - Mark running text only: body, leads, list items. Titles and headings stay white.
   - Keep it sparse: most sentences have no mark. When highlighting starts to compete with the content, remove marks.
@@ -98,6 +122,8 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - Bulleted lists use square markers at every level and nest three levels at most. Numbered lists switch to letters one level down. Numbers are `--text-dim`; bullets are `--text-faint`.
 - A quote is its own box with a large outlined opening mark in the accent colour on its top border, and the source in a `<cite>` at note size. The mark is an ornament and the only glyph off the type scale. Never mark a quote with only a side rule or dim text: it does not read as a quote.
 - Expressway has no arrows or triangles. Use `.delta` for up and down, and write "to".
+- A value that was replaced is `<del>`: struck and faint. The value that replaced it follows in `<ins>`, set like emphasis: "<del>37</del> <ins>21</ins>". Strike nothing else: not a wrong claim, not a finished task.
+- Numbers in a column use tabular digits, so they line up digit by digit. The stylesheet sets this on `.num` cells, legend values, and key-value values. Only Regular has tabular digits: Bold totals and stat values keep proportional ones.
 - Only the Regular cut has `≈ ≤ ≥ ≠ √`. Use them inside maths only, never in a heading, `<strong>`, or outlined text; elsewhere write "about" or "at most".
 
 ## On the border
@@ -167,6 +193,7 @@ Series colours, assigned in this order: `--c1` azure, `--c2` gold, `--c3` amethy
 - Never add an amber, lime, or second yellow. None separates from gold, least of all for colour-blind readers. `--yellow` separates only because it is much lighter: never darken it.
 - Set a fill with `style="--fill: var(--c2)"`.
 - A colour follows its entity across every chart on the page, whatever its rank.
+- To keep the reader on one series, mute the others: set them to `--c-other`, draw them first, and leave their labels dim. The series the chart is about keeps its colour and a `.series` label. Mute all the others or none, and still label each.
 - A chart with one series uses one colour.
 - Status colours mark state only, and always sit next to a word.
 - Colour never carries identity alone: label the mark or add a `.legend`.
@@ -180,13 +207,13 @@ Markup for each is in `assets/showcase.html`.
 - **Stat** (`.panel.stat`): note-size label on the top border at the left, `.stat-foot` with one `.delta` or `.tag` on the same border at the right, heading-size value inside, then an optional `.stat-note` caption at the bottom left saying what the delta compares against ("vs last week"), thin bar, or sparkline. A delta never appears without its comparison.
 - **Bar** (`.bar`): the signature mark, a flat colour fill in a sunken track. It carries no plain text. `.bar.thin` is the small one. `.bar.stack` splits one bar into `.bar-seg` parts, which may hold an ink label.
 - **Meter** (`.meter`): a ranked list of `.meter-row`s, each a label, a bar, and a value. The name sits on the bar's top edge at the left and the value on the same edge at the right, as a unit frame names a health bar. This is the horizontal bar chart.
-- **Table** (`.table`): 11px bold uppercase heads, label-size cells, numbers right-aligned with `.num`.
+- **Table** (`.table`): 11px bold uppercase heads, label-size cells, numbers right-aligned with `.num`, in tabular digits.
 - **Pie** (`.pie`): an SVG of `.pie-slice` circles and `.pie-cut` lines. Each slice sets `--v`, its share in percent, and `--at`, the sum of the shares before it. No arc geometry is needed.
 - **Tag** (`.tag`): a short state word, in bold.
 - **Icon**: see Icons below.
 - **Table extras**: `<tfoot>` holds totals, as dark as the head and bold. A `<th colspan>` row inside a `<tbody>` heads a group; give each group its own `<tbody>`. `class="sortable"` sorts on a click of a head; mark the starting column with `aria-sort`.
 - **Key-value list** (`dl.kv`): label and value pairs, ruled, values at the right. For a handful of facts about one thing.
-- **Empty state** (`.empty`): one dim centred line, with an optional glyph, in a panel that has nothing to show. Say what would fill it.
+- **Empty state** (`.empty`): one dim centred line, with an optional glyph, inside a dashed frame, in a panel that has nothing to show. Say what would fill it.
 - **Figure frame** (`figure.frame`): an image, SVG, or video in a 1px ink frame, caption below.
 - **Slide**: see Slides and decks below.
 
@@ -244,6 +271,13 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - Parts of each column: stack several `.col-fill` in one `.col`, top part first, one colour per series, with a legend.
 - Two series per category: put the fills side by side in `.col-bars`. Two series at most; values go in tooltips.
 - A value against a goal: add `<span class="bar-mark" style="--at:80">` inside the `.bar`. It is a white tick with an ink ring. Say what it marks in a caption or legend.
+- A goal or an average across an SVG chart: `<line class="target">`, a 1px gray dashed rule. It is not data: no series colour, no ink ring. Label it on the chart.
+- A forecast: continue the line with a second `<path class="line ghost">` in the same colour, from the last measured point. Give it no `pathLength`: it fades in once the solid line has traced. Label it "Forecast" on the chart. End it in a hollow marker: `<rect class="dot ghost">`, a 6px square, where a filled marker is 8px.
+- A forecast column, or a segment not reached yet: add `.ghost` to the `.col-fill` or `.bar-seg`. A hatched segment holds no label: ink text does not read on the hatch.
+- Where a bar is heading: put a `.bar-fill.ghost` with its own `--v` before the measured `.bar-fill`. The measured fill covers its start, so only the stretch still to come is hatched.
+- A moment on a chart, such as a patch or a roster change: `<line class="event">`, a solid 1px gray rule down the plot. It happened, so it is not dashed.
+- A period, such as a break or a weekend: `<rect class="band">`, the full height of the plot, in `--sunken`. Draw it first. Label events and bands at the top of the plot.
+- A range, such as best to worst or a margin of error: a closed `<path class="range">` under the line, with the line's `--fill`. It is a flat dark tone of that colour, never transparent. One range per chart, and say on the chart what it spans.
 - Gains and losses: `.bar.diverge`. The fill grows right from the middle for a gain and left (`.bar-fill.neg`) for a loss; `--v` is a share of one half. Gains are green, losses red, and the signed value sits beside each bar.
 - Two dimensions, such as day by hour: `.heat`. Each `.heat-cell` takes `--v` from 0 to 100. One hue only, set with `--fill`; never a rainbow. Put a `.heat-scale` key under it, and give every cell a tooltip.
 - Parts of a whole: `.bar.stack` with a legend, or a `.pie`.
@@ -258,7 +292,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 
 ## Explainers
 
-- **Diagram** (`.diagram`): a chain of `.node` boxes joined by `.link` arrows. `.diagram.down` runs top to bottom. A node holds a `<strong>` name and an optional `<span>` note.
+- **Diagram** (`.diagram`): a chain of `.node` boxes joined by `.link` arrows. `.diagram.down` runs top to bottom. A node holds a `<strong>` name and an optional `<span>` note. `.node.ghost` is a part not there yet, with `.link.ghost` as the arrow into it; say "Planned" or "Optional" in its note.
 - A diagram that branches or loops is an inline SVG `.chart` with `.box` rectangles, `.wire` paths, and `.arrow` heads. Wires are 2px light gray with an ink ring and mitered corners, and run only horizontally and vertically. Label a branch beside its wire. Draw it at the width it renders. Make each box at least 12px wider than its label on both sides: measure the label, never guess.
 - The font has no arrows. Never type an arrow character: use `.link`, or draw the head.
 - **Timeline** (`ol.timeline`): one `<li>` per event with its date in `.timeline-when`. Set `--fill` on an `<li>` to colour its marker; state colours only for state.
@@ -273,6 +307,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - **Layers** (`.layers`): `.layer` blocks stacked so each row rests on the row below. Use it for what depends on what, or for a stack such as network layers.
   - `--cols` on the stack and `--span` on a block set the widths. Rows fill left to right, top to bottom.
   - `.base` is a slab others stand on. `.fallen` marks a block knocked out, and every block that stood on it. Say the state in a `.tag` inside the block too; the gray alone is not enough.
+  - `.ghost` marks a block not built yet. A fallen block was there; a ghost never was.
 - **Stepper** (`.stepper` on a panel or figure): a figure that moves through numbered states. Use it when the explanation is a change: before and after, a process, a value growing.
   - Tabs in the head go to a state: `<button class="tab" data-go="2">`. Buttons with `data-go="prev"` and `data-go="next"` step; put them in the `.panel-foot`. A `.tag.step-count` reads "2 / 4".
   - `data-on="2 3"` shows a part on those states. `data-vis` does the same but keeps the part's room, so the figure does not jump.

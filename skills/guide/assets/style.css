@@ -96,6 +96,15 @@
      the first texture and was dropped: in a report it added a brightness
      change that carries no data. */
   --texture: none;
+  /* The one texture: ink hatching over a fill that is not there yet (.ghost).
+     An 8px tile holds a 2px diagonal drawn pixel by pixel, so it repeats
+     exactly and every line has one weight. A 45-degree gradient repeats every
+     8.49px across, and its lines came out uneven. The black is --ink: a data
+     URI cannot read a token. */
+  --hatch: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' shape-rendering='crispEdges'%3E%3Cpath d='M6 0h1v1h-1zM7 0h1v1h-1zM5 1h1v1h-1zM6 1h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM2 4h1v1h-1zM3 4h1v1h-1zM1 5h1v1h-1zM2 5h1v1h-1zM0 6h1v1h-1zM1 6h1v1h-1zM0 7h1v1h-1zM7 7h1v1h-1z' fill='%23000'/%3E%3C/svg%3E") 0 0 / 8px 8px;
+  /* The gray a mark sits on, for marks that paint with it: a hollow marker's
+     middle, the tone of a range. Boxes set it with their background. */
+  --surface: var(--page);
 
   /* Type: seven sizes, one meaning each. Line heights are even whole pixels:
      text on a border is offset by half a line, and a half pixel there blurs
@@ -125,6 +134,10 @@
   --ink-ring:
     drop-shadow(1px 0 0 var(--ink)) drop-shadow(-1px 0 0 var(--ink))
     drop-shadow(0 1px 0 var(--ink)) drop-shadow(0 -1px 0 var(--ink));
+  /* One 8px tile of a dashed ink edge: half a dash, a gap, half a dash. A tile
+     that starts and ends in ink closes every corner. */
+  --dash-x: linear-gradient(90deg, var(--ink) 0 25%, transparent 25% 75%, var(--ink) 75%);
+  --dash-y: linear-gradient(180deg, var(--ink) 0 25%, transparent 25% 75%, var(--ink) 75%);
 
   /* Space: seven steps, one meaning each. */
   --s1: 4px;   /* touch: bar to bar, swatch to label */
@@ -297,6 +310,11 @@ p, li, blockquote, .lead { max-width: var(--measure); }
    emphasis steps up to Extra-bold, the cut's only use. */
 strong, b { font-weight: 700; }
 .no-regular :is(strong, b) { font-weight: 800; }
+/* A value that was replaced is struck and faint; the value that replaced it
+   follows, set like emphasis. */
+del { color: var(--text-faint); text-decoration: line-through; }
+ins { color: var(--text); font-weight: 700; text-decoration: none; }
+.no-regular ins { font-weight: 800; }
 /* A highlight colours the name of a thing inside a sentence, as game text
    colours an item's name. Names only, and colour only: no background. */
 mark { background: none; color: var(--accent); }
@@ -540,13 +558,14 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* ── Panels and callouts ──────────────────────────────────────────────── */
 
 .panel, .callout {
+  --surface: var(--panel);
   background: var(--panel);
   border: var(--border);
 }
 .panel, .callout { position: relative; }
 /* A box inside a box is dark, so it reads as set into the lighter one: a stat
    or a chart panel on a slide, a panel in a panel. */
-:is(.panel, .slide, .callout) :is(.panel, .callout, blockquote, .node, .layer, .more) { background: var(--inset); }
+:is(.panel, .slide, .callout) :is(.panel, .callout, blockquote, .node, .layer, .more) { --surface: var(--inset); background: var(--inset); }
 /* Panels in one grid row share a height. A panel is a column so its body can
    take the spare height and fill it, never leave it empty at the bottom. */
 .panel { display: flex; flex-direction: column; }
@@ -810,6 +829,9 @@ figure > * + figcaption { margin-top: var(--s2); }
 .table tbody tr { background: var(--inset); transition: background-color var(--t-fast) var(--ease); }
 .table tbody tr:hover { background: var(--panel); }
 .table .num { text-align: right; }
+/* Numbers in a column line up digit by digit. Only the Regular cut has
+   tabular digits: a Bold total keeps its proportional ones. */
+.table .num, .legend-value, .kv > dd { font-variant-numeric: tabular-nums; }
 .table td.fit, .table th.fit { width: 1%; white-space: nowrap; }
 .table .bar { min-width: 64px; }
 /* Totals: a foot as dark as the head, in bold. */
@@ -829,6 +851,27 @@ figure > * + figcaption { margin-top: var(--s2); }
 }
 .table th[aria-sort="ascending"]::after { border-top-width: 0; border-bottom: 6px solid currentColor; }
 .table th[aria-sort="descending"]::after { border-bottom-width: 0; border-top: 6px solid currentColor; }
+
+/* Dashed: solid ink says a thing exists or was measured; a dashed line says it
+   is not there yet. .ghost marks a part that is planned, projected, optional
+   or missing, and an empty state wears the same frame. Say which in words
+   beside it.
+   The edge is drawn, not border-style: dashed, whose dashes Chrome makes 2px
+   long. Each side fits its 8px tile a whole number of times, so the dashes
+   stay even and the corners closed. */
+:root :is(.node, .layer).ghost, .empty {
+  border: 1px solid transparent;
+  background:
+    var(--dash-x) 0 0 / 8px 1px round no-repeat, var(--dash-x) 0 100% / 8px 1px round no-repeat,
+    var(--dash-y) 0 0 / 1px 8px no-repeat round, var(--dash-y) 100% 0 / 1px 8px no-repeat round;
+  background-origin: border-box;
+}
+
+/* A fill that is not there yet keeps its colour and solid edges and takes the
+   hatch: a forecast column, a projected segment, their swatch. On a bar, a
+   .bar-fill.ghost placed before the measured fill, with its own --v, shows
+   where the value is heading; the measured fill covers its start. */
+:is(.bar-fill, .bar-seg, .col-fill, .swatch).ghost { --texture: var(--hatch); }
 
 /* What a panel shows when it has no data: one dim line, centred. */
 .empty {
@@ -1027,6 +1070,22 @@ figure > * + figcaption { margin-top: var(--s2); }
 .chart .wire { fill: none; stroke: var(--text-dim); stroke-width: 2px; stroke-linejoin: miter; filter: var(--ink-ring); }
 .chart .arrow { fill: var(--text-dim); filter: var(--ink-ring); }
 .chart text.name { fill: var(--text); font-size: var(--fs-label); }
+/* Dashed in a chart: a forecast continues its line in the series colour, a
+   planned box has no fill, and a target is a thin gray rule, not data. A 2px
+   line takes longer dashes than a 1px edge. */
+.chart .line.ghost, .chart .wire.ghost { stroke-dasharray: 6 6; }
+.chart .box.ghost { fill: none; stroke-dasharray: 4 4; }
+.chart .target { stroke: var(--text-dim); stroke-width: 1px; stroke-dasharray: 4 4; shape-rendering: crispEdges; }
+/* A forecast's marker is hollow: a 6px square whose 2px edge in the series
+   colour brings it to the size of a filled marker. */
+.chart .dot.ghost { fill: var(--surface); stroke: var(--fill, var(--c1)); stroke-width: 2px; filter: var(--ink-ring); }
+/* Notes on a chart. An event is a solid gray rule down the plot: it happened,
+   so it is not dashed. A period is a band one step darker than any surface. A
+   range (best to worst, a margin of error) is a flat dark tone of its series
+   colour, under the line. Draw band and range before the lines. */
+.chart .event { stroke: var(--text-faint); stroke-width: 1px; shape-rendering: crispEdges; }
+.chart .band { fill: var(--sunken); }
+.chart .range { fill: color-mix(in oklab, var(--fill, var(--c1)) 30%, var(--surface)); }
 
 .spark { width: 100%; height: 32px; overflow: visible; filter: var(--ink-ring); }
 /* The sparkline stretches to fit, so its ring sits on the svg, in CSS pixels. */
@@ -1135,6 +1194,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   justify-content: center;
   aspect-ratio: 16 / 9;
   padding: var(--s7);
+  --surface: var(--panel);
   background: var(--panel);
   border: var(--border);
 }
@@ -1179,6 +1239,8 @@ figure > * + figcaption { margin-top: var(--s2); }
 .link { position: relative; flex: none; width: var(--s6); height: 8px; filter: var(--ink-ring); }
 .link::before { content: ""; position: absolute; top: 3px; left: 0; right: 6px; height: 2px; background: var(--text-dim); }
 .link::after { content: ""; position: absolute; top: 0; right: 0; border: 4px solid transparent; border-right-width: 0; border-left: 6px solid var(--text-dim); }
+/* A step not taken yet. Three 6px dashes and two 4px gaps fill the 26px shaft. */
+.link.ghost::before { background: repeating-linear-gradient(90deg, var(--text-dim) 0 6px, transparent 6px 10px); }
 /* Down: the chain runs top to bottom. The arrow turns; its layout box does not,
    so margins hold the room it needs. */
 .diagram.down { flex-direction: column; align-items: stretch; }
@@ -1460,9 +1522,16 @@ label.meter-row { display: block; }
 
 /* Linked prose: inside [data-link], a <mark data-key> in a sentence and the
    part of the figure with the same key light up together (style.js). The rest
-   of the keyed parts darken. A linked mark wears a dashed rule, the one mark
-   that is underlined: it tells the reader the name can be hovered. */
-mark[data-key] { border-bottom: 1px dashed currentColor; cursor: default; transition: color var(--t-fast) var(--ease); }
+   of the keyed parts darken. A linked mark wears a dotted rule, the one mark
+   that is underlined: it tells the reader the name can be hovered. Dotted
+   means only that; a dash means "not there yet". The dots are drawn, 1px on
+   and 2px off: border-style: dotted is 1px on, 1px off, and reads as a line. */
+mark[data-key] {
+  padding-bottom: 1px;
+  background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 3px) 0 100% / 100% 1px no-repeat;
+  cursor: default;
+  transition: color var(--t-fast) var(--ease);
+}
 mark.is-hot { color: var(--text); }
 [data-link] [data-key]:not(mark) { transition: filter var(--t-fast) var(--ease); }
 [data-link]:has(.is-hot) [data-key]:not(.is-hot, mark) { filter: brightness(0.55); }
@@ -1581,6 +1650,12 @@ mark.is-hot { color: var(--text); }
     stroke-dasharray: 1;
     animation: trace var(--t-slow) linear both;
     animation-delay: calc(var(--i, 0) * var(--t-step));
+  }
+  /* A dashed line cannot trace: it shows once the solid line has drawn. */
+  .anim .line.ghost {
+    stroke-dasharray: 6 6;
+    animation: fade var(--t-fast) var(--ease) both;
+    animation-delay: var(--t-slow);
   }
   /* A stretched sparkline measures dashes in screen pixels, so it cannot trace. */
   .anim .spark .line { stroke-dasharray: none; animation: none; }
