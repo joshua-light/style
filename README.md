@@ -95,13 +95,13 @@ For one Claude Code session:
 claude --plugin-dir /path/to/style
 ```
 
-To keep it loaded, make the clone a marketplace of its own. Write these two files in the clone; git ignores both.
+To keep it loaded, make the clone a local marketplace. It is private to your machine and separate from the public `joshua-light` one; `style-dev` below is only its local name. Write these two files in the clone; git ignores both.
 
 `.claude-plugin/marketplace.json`:
 
 ```json
 {
-  "name": "j-light-style",
+  "name": "style-dev",
   "owner": { "name": "Your Name" },
   "plugins": [{ "name": "style", "source": "./" }]
 }
@@ -111,7 +111,7 @@ To keep it loaded, make the clone a marketplace of its own. Write these two file
 
 ```json
 {
-  "name": "j-light-style",
+  "name": "style-dev",
   "plugins": [
     {
       "name": "style",
@@ -127,15 +127,15 @@ Then register the clone:
 
 ```sh
 claude plugin marketplace add /path/to/style
-claude plugin install style@j-light-style
+claude plugin install style@style-dev
 
 codex plugin marketplace add /path/to/style
-codex plugin add style@j-light-style
+codex plugin add style@style-dev
 ```
 
-Claude Code reads the plugin straight from the clone, so edits apply at the next session start or after `/reload-plugins`. Codex runs a cached copy: refresh it with `codex plugin add style@j-light-style`.
+Claude Code reads the plugin straight from the clone, so edits apply at the next session start or after `/reload-plugins`. Codex runs a cached copy: refresh it with `codex plugin add style@style-dev`.
 
-Install the plugin from one marketplace only. Two copies would both answer to `style:guide`.
+Install the plugin from one marketplace only: `style@style-dev` or `style@joshua-light`. Two copies would both answer to `style:guide`.
 
 ## License
 
