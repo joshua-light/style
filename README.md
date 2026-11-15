@@ -1,6 +1,6 @@
 # style
 
-My visual style, packaged as a plugin for Claude Code and Codex. It steers reports, explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings.
+My visual style, packaged as a plugin for Claude Code and Codex. It is listed in the [`joshua-light` marketplace](https://github.com/joshua-light/marketplace). It steers reports, explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings.
 
 Open `skills/guide/assets/showcase.html` in a browser to see every component. Open `examples/voyager-deck.html` to see a deck: step through it with the arrow keys or a click.
 
@@ -32,6 +32,8 @@ Install the TrueType file, `expressway rg.ttf` (version 6.000), not the OpenType
 
 Without the Bold file, Fira Sans sets everything, even where Expressway Regular is installed: the two faces never mix. Fira Sans takes Expressway's ascent and descent, so layouts match in either face.
 
+Add the files to a clone, not to an installed copy: an update replaces the installed copy. See Develop below.
+
 Embedding Expressway in pages you publish may need a web licence from Typodermic.
 
 ## Layout
@@ -51,38 +53,81 @@ Embedding Expressway in pages you publish may need a web licence from Typodermic
 | `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: ink rings on lines, outlined title. |
 | `examples/voyager-deck.html` | The reference deck: builds, growth, a popup, motion to scale, and a speed slider for review. |
 | `examples/eth-explainer.html` | A long explainer page: Michael Silveira's ETH explainer, restyled. Its licence sits beside it. |
-| `.claude-plugin/` | Claude Code plugin and marketplace manifests. |
+| `.claude-plugin/plugin.json` | Claude Code plugin manifest. |
 | `.codex-plugin/plugin.json` | Codex plugin manifest. |
-| `.agents/plugins/marketplace.json` | Codex marketplace manifest. |
 | `assets/icon.svg` | Icon source. Re-render the PNG with `rsvg-convert -w 1024 -h 1024 assets/icon.svg -o assets/icon.png`. |
 
 ## Install
 
+Add the marketplace once, then install the plugin from it.
+
 Claude Code:
 
 ```sh
-claude plugin marketplace add joshua-light/style
-claude plugin install style@j-light-style
+claude plugin marketplace add joshua-light/marketplace
+claude plugin install style@joshua-light
 ```
 
 Codex:
 
 ```sh
-codex plugin marketplace add joshua-light/style
-codex plugin add style@j-light-style
+codex plugin marketplace add joshua-light/marketplace
+codex plugin add style@joshua-light
 ```
 
-To edit the style, clone the repo and give either tool the clone's path instead of `joshua-light/style`.
+Claude then loads the `style:guide` skill before it builds anything visual.
 
-## Update after editing
+## Develop
 
-Installed from a local path, Claude Code reads the plugin straight from that directory. Edits apply at the next session start or after `/reload-plugins`.
+An installed plugin is a cached copy: it does not follow your edits, and it has no Expressway files. To work on the style, clone this repo and load the clone.
 
-Codex runs a cached copy. Refresh it by reinstalling; no version bump needed:
+For one Claude Code session:
 
 ```sh
+claude --plugin-dir /path/to/style
+```
+
+To keep it loaded, make the clone a marketplace of its own. Write these two files in the clone; git ignores both.
+
+`.claude-plugin/marketplace.json`:
+
+```json
+{
+  "name": "j-light-style",
+  "owner": { "name": "Your Name" },
+  "plugins": [{ "name": "style", "source": "./" }]
+}
+```
+
+`.agents/plugins/marketplace.json`, for Codex:
+
+```json
+{
+  "name": "j-light-style",
+  "plugins": [
+    {
+      "name": "style",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Creativity"
+    }
+  ]
+}
+```
+
+Then register the clone:
+
+```sh
+claude plugin marketplace add /path/to/style
+claude plugin install style@j-light-style
+
+codex plugin marketplace add /path/to/style
 codex plugin add style@j-light-style
 ```
+
+Claude Code reads the plugin straight from the clone, so edits apply at the next session start or after `/reload-plugins`. Codex runs a cached copy: refresh it with `codex plugin add style@j-light-style`.
+
+Install the plugin from one marketplace only. Two copies would both answer to `style:guide`.
 
 ## License
 

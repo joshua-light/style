@@ -1,3 +1,7 @@
 # Expressway is licensed, not redistributable. See README.
 skills/guide/assets/fonts/expressway*
 __pycache__/
+# A local marketplace over this clone, for developing the plugin. See README.
+# The public catalog is joshua-light/marketplace.
+.claude-plugin/marketplace.json
+.agents/
