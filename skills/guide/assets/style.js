@@ -50,19 +50,30 @@
    .rail: the link to the chapter being read gets aria-current, and the bar
    inside it fills with the share of the page scrolled.
 
-   html gets the class no-regular where Expressway Regular is not installed;
-   style.css then sets emphasis in Extra-bold.
+   html gets the class no-expressway where Expressway's Bold file is absent;
+   style.css then sets the page in Fira Sans. It gets no-regular where the
+   Bold file loads but Expressway Regular is not installed; style.css then
+   sets emphasis in Extra-bold.
 
    scripts/build.py inlines this file. */
 (() => {
-  // Text falls back to Bold where Expressway Regular is not installed, and
-  // Bold emphasis would vanish in it. Probe with the names style.css tries, so
-  // both agree; on a miss style.css steps emphasis up to Extra-bold.
-  if ("FontFace" in window) {
+  // Pick the face. Expressway needs its Bold file: without it Fira Sans takes
+  // every weight, so an installed Expressway Regular never pairs with Fira
+  // Sans Bold. A page with no Expressway rule was built without the file, and
+  // build.py has already pinned the fallback.
+  // With the Bold file, text falls back to Bold where Expressway Regular is
+  // not installed, and Bold emphasis would vanish in it. Probe with the names
+  // style.css tries, so both agree; on a miss emphasis steps up to Extra-bold.
+  if ("FontFace" in window && document.fonts) {
+    const root = document.documentElement;
+    const bold = [...document.fonts].find(
+      (face) => face.family.replace(/["']/g, "") === "Expressway" && face.weight === "700");
     const names = ["ExpresswayRg-Regular", "Expressway Regular", "Expressway-Regular"];
-    new FontFace("Expressway probe", names.map((name) => `local("${name}")`).join(", "))
-      .load()
-      .catch(() => document.documentElement.classList.add("no-regular"));
+    if (bold) bold.load().then(
+      () => new FontFace("Expressway probe", names.map((name) => `local("${name}")`).join(", "))
+        .load()
+        .catch(() => root.classList.add("no-regular")),
+      () => root.classList.add("no-expressway"));
   }
 
   const ANIMATED = ".bar-fill, .col-fill, .line, .dot, .pie-slice";

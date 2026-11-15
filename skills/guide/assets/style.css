@@ -1,7 +1,8 @@
 /* style — dark gray, black ink, Warrior-tan accent, flat data fills, outlined Expressway.
    Rules live in ../SKILL.md; markup for every component in showcase.html.
    style.js adds hover tooltips and linked highlighting.
-   scripts/build.py inlines both files and embeds the fonts as data URIs. */
+   scripts/build.py inlines both files and embeds the fonts as data URIs.
+   Fira Sans stands in where Expressway is absent. */
 
 /* Two cuts set the page: Regular 400 for text, Bold 700 for headings, labels
    and emphasis. Regular is licensed for desktop use only: its file may not be
@@ -30,6 +31,28 @@
   font-family: "Expressway";
   font-weight: 800;
   src: url("fonts/expressway-xb.woff2") format("woff2"), url("fonts/expressway-xb.ttf") format("truetype");
+}
+
+/* Fira Sans is the fallback, bundled under the Open Font License: it sets the
+   page where Expressway's Bold file is absent. The two never mix. A face that
+   fails falls through weight by weight, which would pair an installed
+   Expressway Regular with Fira Sans Bold; style.js sets .no-expressway there,
+   and Fira Sans takes every weight.
+   The overrides give it Expressway's ascent and descent, so text centred on a
+   border lands on the same pixel in either face. Its own sit 0.05em higher. */
+@font-face {
+  font-family: "Fira Sans";
+  font-weight: 400;
+  src: url("fonts/fira-sans-400.woff2") format("woff2");
+  ascent-override: 98.1%;
+  descent-override: 21.9%;
+}
+@font-face {
+  font-family: "Fira Sans";
+  font-weight: 700;
+  src: url("fonts/fira-sans-700.woff2") format("woff2");
+  ascent-override: 98.1%;
+  descent-override: 21.9%;
 }
 
 :root {
@@ -110,7 +133,8 @@
      text on a border is offset by half a line, and a half pixel there blurs
      it. A scale a tenth larger was tried while text was set in the Bold cut;
      Regular text reads well at these sizes. */
-  --font: "Expressway", "Overpass", "Barlow", "Arial Narrow", sans-serif;
+  --font-fallback: "Fira Sans", sans-serif;
+  --font: "Expressway", var(--font-fallback);
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --fs-title: 40px;      --lh-title: 48px;       /* the name of the whole piece; once */
   --fs-heading: 28px;    --lh-heading: 36px;     /* section heads and hero numbers */
@@ -172,6 +196,9 @@
   --t-step: 40ms;   /* stagger between siblings */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
+/* Without Expressway's Bold file the fallback sets every weight. style.js adds
+   the class; build.py pins the same value on a page built without the file. */
+:root.no-expressway { --font: var(--font-fallback); }
 
 /* ── Base ─────────────────────────────────────────────────────────────── */
 

@@ -10,13 +10,14 @@
     mpl_style.finish(fig)           # ink rings, outlined title
     fig.savefig("chart.png")
 
-use() returns the font family in use. Expressway ships only as woff2, which
-matplotlib cannot read, so use() converts it once into a cache directory (this
-needs fontTools and brotli). Without them, or without the font files, text
-falls back to matplotlib's default sans and use() says so on stderr.
+use() returns the font family in use: Expressway where its Bold file is in
+assets/fonts, and Fira Sans, the bundled fallback, where it is not. The fonts
+ship as woff2, which matplotlib cannot read, so use() converts each once into a
+cache directory (this needs fontTools and brotli). Without them text falls back
+to matplotlib's default sans and use() says so on stderr.
 
-Text is Expressway Regular where that cut is installed on the machine (its
-licence forbids bundling it here), and Expressway Bold where it is not.
+With Expressway, text is the Regular cut where that is installed on the machine
+(its licence forbids bundling it here), and Bold where it is not.
 """
 import sys
 from dataclasses import replace
@@ -31,27 +32,36 @@ INK = "#000000"
 PX = 0.72  # one pixel in points, at the theme's 100 dpi
 
 
+def _load(stem):
+    """Register a font from assets/fonts. Returns whether it loaded."""
+    source = next((ASSETS / "fonts" / (stem + ext) for ext in (".ttf", ".otf", ".woff2")
+                   if (ASSETS / "fonts" / (stem + ext)).exists()), None)
+    if source is None:
+        return False
+    path = source
+    if source.suffix == ".woff2":
+        path = CACHE / (stem + ".ttf")
+        if not path.exists():
+            try:
+                from fontTools.ttLib import TTFont
+                CACHE.mkdir(parents=True, exist_ok=True)
+                font = TTFont(source)
+                font.flavor = None
+                font.save(path)
+            except Exception as error:  # missing fontTools or brotli, or an unreadable file
+                print(f"mpl_style: cannot convert {source.name}: {error}", file=sys.stderr)
+                return False
+    font_manager.fontManager.addfont(str(path))
+    return True
+
+
 def _font():
-    """Register Expressway and return its family name, or None when it cannot be loaded."""
-    for stem in ("expressway", "expressway-xb"):
-        source = next((ASSETS / "fonts" / (stem + ext) for ext in (".ttf", ".otf", ".woff2")
-                       if (ASSETS / "fonts" / (stem + ext)).exists()), None)
-        if source is None:
-            continue
-        path = source
-        if source.suffix == ".woff2":
-            path = CACHE / (stem + ".ttf")
-            if not path.exists():
-                try:
-                    from fontTools.ttLib import TTFont
-                    CACHE.mkdir(parents=True, exist_ok=True)
-                    font = TTFont(source)
-                    font.flavor = None
-                    font.save(path)
-                except Exception as error:  # missing fontTools or brotli, or an unreadable file
-                    print(f"mpl_style: cannot convert {source.name}: {error}", file=sys.stderr)
-                    continue
-        font_manager.fontManager.addfont(str(path))
+    """Register the fonts and return the family name, or None when none can be loaded."""
+    # Expressway needs its Bold file, as on a page: an installed Regular alone
+    # would leave titles without a cut, so Fira Sans sets everything instead.
+    if not _load("expressway"):
+        return "Fira Sans" if all([_load("fira-sans-400"), _load("fira-sans-700")]) else None
+    _load("expressway-xb")
     # An Expressway installed after matplotlib built its font cache is not in the list yet.
     for installed in font_manager.findSystemFonts():
         if "expressway" in Path(installed).name.lower():
@@ -63,8 +73,7 @@ def _font():
     # a weight only within one family, so file it with Bold and Extra-bold.
     fonts = font_manager.fontManager.ttflist
     fonts[:] = [replace(f, name="Expressway") if f.name == "Expressway Rg" else f for f in fonts]
-    names = {f.name for f in font_manager.fontManager.ttflist}
-    return next((name for name in ("Expressway", "Overpass") if name in names), None)
+    return "Expressway"
 
 
 def use():
@@ -72,7 +81,7 @@ def use():
     plt.style.use(str(ASSETS / "style.mplstyle"))
     family = _font()
     if family is None:
-        print("mpl_style: Expressway is not available; using matplotlib's default sans", file=sys.stderr)
+        print("mpl_style: no font could be loaded; using matplotlib's default sans", file=sys.stderr)
         family = plt.rcParams["font.sans-serif"][0]
     plt.rcParams["font.family"] = family
     regular = any(f.name == family and f.style == "normal" and f.weight in (400, "normal", "regular")

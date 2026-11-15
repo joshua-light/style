@@ -18,7 +18,7 @@ Paths are relative to this skill's directory.
 3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
 4. Open or screenshot the result and check it against the rules below.
 
-Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. If `build.py` warns that Expressway is missing, the page falls back to Overpass; tell the user.
+Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. Where Expressway's files are absent, `build.py` sets the page in Fira Sans, the bundled fallback, and says so. That is the intended look on such a machine.
 
 ## Surfaces and ink
 
@@ -87,6 +87,9 @@ Expressway sets everything except code, in two cuts. Nothing is italic.
 - Where Regular is not installed, plain text falls back to Bold and the page looks heavier. A Bold word would vanish in Bold text, so `style.js` detects the fallback and sets `<strong>` in Extra-bold there. That is the cut's only use, and the script's alone. When a page is meant for other readers, say that they will see the Bold fallback.
 
 - One face only. Roboto for text under Expressway headings was tried and dropped.
+- Fira Sans is the fallback. It ships in `assets/fonts/` under the Open Font License and sets the whole page, in both weights, where Expressway's Bold file is absent. The two never mix: an installed Expressway Regular does not pair with Fira Sans Bold.
+- Fira Sans takes Expressway's ascent and descent, so text on a border sits on the same pixel in either face. Never tune a size, a gap, or an offset for the fallback, and never name either family on a page: use `var(--font)`.
+- Write for Expressway's limits even where the page shows in Fira Sans: no arrows, and the maths signs only inside maths.
 - Prose is never tracked: no `letter-spacing` on body text, lists, or callouts. Extra tracking belongs only to uppercase labels and outlined text.
 
 Each size has one meaning. Pick the size by meaning, never by looks, and never use a size off the scale. Line heights are even whole pixels, because text on a border is offset by half a line. A scale a tenth larger was tried while text was Bold and dropped once text became Regular.
@@ -478,4 +481,4 @@ Motion is judged by eye, slowed down.
 
 ## Recording preferences
 
-When the user states a visual preference or corrects how something looks, offer to record it. Edit the source repo (`joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `assets/showcase.html`, then the matching rule here. Write each rule as a concrete instruction.
+When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `assets/showcase.html`, then the matching rule here. Write each rule as a concrete instruction.
