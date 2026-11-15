@@ -245,6 +245,7 @@ img, svg { display: block; max-width: 100%; }
   :root .slide { aspect-ratio: auto; padding: var(--s5); }
   :root .slide.split { display: flex; }
   :root .slide.split > * + * { margin-top: var(--s5); }
+  :root .popup { top: var(--s3); left: var(--s3); width: calc(100% - 2 * var(--s3)); padding: var(--s4); }
 }
 
 /* ── Text ─────────────────────────────────────────────────────────────── */
@@ -618,10 +619,8 @@ figure > * + figcaption { margin-top: var(--s2); }
   white-space: nowrap;
 }
 /* The kind's glyph leads the tag, so the kind reads before the word does. It
-   is ink on a solid chip and drops the outline: an ink stroke on ink would
-   only thicken the shape and close its counters at 16px. */
+   is ink on a solid chip, plain like the word beside it. */
 .callout-head:has(> .glyph) { gap: var(--s1); padding-left: var(--s1); }
-.callout-head > .glyph > svg * { stroke: none; }
 .panel-body, .callout-body { padding: var(--s4); }
 .panel-body > * + *, .callout-body > * + * { margin-top: var(--s3); }
 /* Tabs and steppers hide parts with the hidden attribute. The first part that
@@ -695,9 +694,8 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* A glyph is a symbol from Remix Icon's fill set (scripts/icon.py prints the
    markup). It has no background. It belongs to the text beside it: the same
    colour, and as tall as one line of that text, so it sits on the first line
-   whatever the size. It wears the ink outline of a heading: a stroke painted
-   under the fill, in screen pixels whatever the viewBox. --outline reads the
-   font size, so the glyph's size sets the outline's weight. */
+   whatever the size. It is outlined only where that text is: an outlined
+   glyph beside a plain eyebrow looked heavier than its label. */
 .glyph {
   display: block;
   flex: none;
@@ -707,7 +705,11 @@ figure > * + figcaption { margin-top: var(--s2); }
   color: inherit;
 }
 .glyph > svg, .icon > svg { display: block; width: 100%; height: 100%; overflow: visible; }
-:is(.glyph, .icon) > svg * {
+/* The outline, beside outlined text and in a tile: a stroke painted under the
+   fill, in screen pixels whatever the viewBox. --outline reads the font size,
+   so the glyph's size sets the outline's weight. */
+:is(h1, .title, h2, .heading, h3, .subheading, .stat-value, .hero-number, .panel-head, .stat-label, .meter-label, .meter-value) .glyph > svg *,
+.icon > svg * {
   stroke: var(--ink);
   stroke-width: calc(2 * var(--outline));
   stroke-linejoin: miter;
@@ -1205,6 +1207,76 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* The slide's number: a tag on the top border at the right, as on a panel. */
 .slide-no { position: absolute; top: -10px; right: var(--s3); }
 .slide > .slide-no + * { margin-top: 0; }
+/* In a deck, style.js marks the slide nearest the middle of the window as
+   current and the rest go dark, the way a hovered mark darkens its siblings. */
+.deck > .slide { transition: filter var(--t-fast) var(--ease); }
+.deck:has(> .is-current) > .slide:not(.is-current) { filter: brightness(0.55); }
+/* Builds: a [data-build] piece waits for its click. It keeps its room while
+   hidden, so the slide does not jump as pieces arrive. Without the script the
+   deck is not live and every piece shows. */
+.deck.is-live [data-build]:not(.is-built) { visibility: hidden; }
+/* While a part grows, style.js lays this rule in the box the part is placed
+   against. Beside a framed box it stands at the growing edge: the box's right
+   border until the real one is reached. Under a ruled row it is the
+   underline, growing. It takes no margin from the flow around it. */
+.build-edge { position: absolute; z-index: 2; width: 1px; margin: 0 !important; background: var(--ink); pointer-events: none; }
+.build-edge.ghost { background: var(--dash-y) 0 0 / 1px 8px no-repeat round; }
+/* While a popup pops, style.js lays this hollow frame over the slide: the
+   popup's border, growing out of one point. It shows only while it grows. */
+.build-frame { position: absolute; z-index: 6; margin: 0 !important; border: var(--border); visibility: hidden; pointer-events: none; }
+/* While a piece is being written, the text still to come waits in this span:
+   it holds its room, so the lines already break where they will. */
+.unwritten { visibility: hidden; }
+/* A timeline's rule runs on to the next event: it waits for that event. */
+.deck.is-live .timeline > li:has(+ [data-build]:not(.is-built))::after { visibility: hidden; }
+/* Popup: a throwaway note laid over its slide, for an explanation that should
+   not take room on the slide itself. It explains the piece written just
+   before it. It sits in the slide's top left corner, over the padding, and
+   reaches to the slide's middle; its height is its content's. It is the
+   slide's own gray inside an ink border, a top-level box: what it holds is
+   dark, as on a slide. Three things say what it is about and that it is on
+   top: the slide behind it goes dark, by the same share as the slides around
+   the current one; the piece it explains stays lit; and a wire joins the two.
+   No shadow lifts it. A popup that covered the slide's whole content area,
+   centred, was tried first: nothing showed which block it explained.
+   style.js opens it on its own step, draws the wire, and shuts it one step
+   after its last piece. Without the script, and on paper, it never shows. */
+.popup {
+  position: absolute;
+  z-index: 5;
+  top: var(--s5);
+  left: var(--s5);
+  width: calc(50% - var(--s5));
+  margin: 0 !important;
+  padding: var(--s5);
+  --surface: var(--panel);
+  background: var(--panel);
+  border: var(--border);
+  visibility: hidden;
+}
+.popup > * + * { margin-top: var(--s5); }
+.popup > .eyebrow + * { margin-top: var(--s1); }
+.popup > :is(h2, h3) + p { margin-top: var(--s2); }
+.deck.is-live .popup.is-built:not(.is-shut) { visibility: visible; }
+/* The dark slide is a filter laid over it, under the popup: a filter on the
+   slide itself would darken the popup too. The piece the popup explains is
+   raised above that filter, so it alone stays lit; so does the slide's number. */
+.slide:has(.popup.is-built:not(.is-shut))::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  backdrop-filter: brightness(0.55);
+  animation: dim var(--t-fast) var(--ease) backwards;
+}
+.slide :has(+ .popup.is-built:not(.is-shut)) { position: relative; z-index: 4; }
+.slide:has(.popup) > .slide-no { z-index: 4; }
+@keyframes dim { from { backdrop-filter: brightness(1); } }
+/* The wire from the explained piece to the popup: a diagram's wire, drawn by
+   style.js over the slide, in horizontal and vertical runs only. */
+.popup-wire { position: absolute; z-index: 4; inset: 0; width: 100%; height: 100%; margin: 0 !important; overflow: visible; pointer-events: none; }
+.popup-wire path { fill: none; stroke: var(--text-dim); stroke-width: 2px; stroke-linejoin: miter; filter: var(--ink-ring); }
+
 /* Split: the claim at the left, its figure at the right. A full-width figure
    left half the slide empty for a pie or a short bar list. */
 .slide.split { display: grid; grid-template-columns: 5fr 7fr; column-gap: var(--s7); align-items: center; }
@@ -1213,12 +1285,14 @@ figure > * + figcaption { margin-top: var(--s2); }
 .slide.divider { justify-content: flex-end; }
 .slide.divider > :is(h1, h2) { padding-top: var(--s4); border-top: var(--border); }
 /* Big number: one figure on a slide of its own, the only text above title
-   size. The outline keeps the title's weight: a twentieth of the size. */
+   size. Its outline is the 2px of a title, the most any text wears. Scaled
+   with the size it was 4px: it looked heavy and filled the gaps between
+   letters. */
 .hero-number {
   font-size: 80px;
   line-height: 88px;
   font-weight: 700;
-  -webkit-text-stroke: 8px var(--ink);
+  -webkit-text-stroke: calc(2 * var(--outline)) var(--ink);
   paint-order: stroke fill;
 }
 .slide > .hero-number + * { margin-top: var(--s2); }
@@ -1610,11 +1684,12 @@ mark.is-hot { color: var(--text); }
 
 /* ── Motion ───────────────────────────────────────────────────────────── */
 
-/* Motion is for data marks only: bars fill, columns rise, lines trace, pies
-   sweep. Panels and text never animate in: a fade and rise held text between
-   pixels, so it looked blurred until it settled. Opt in with .anim on a
-   container. Everything plays once: when its panel scrolls into view if
-   style.js is loaded, on page load if not. */
+/* Motion is for data marks: bars fill, columns rise, lines trace, pies sweep.
+   Panels and text never animate in on a page: a fade and rise held text
+   between pixels, so it looked blurred until it settled. Opt in with .anim on
+   a container. Everything plays once: when its panel scrolls into view if
+   style.js is loaded, on page load if not. The one exception is a build piece
+   in a deck, which grows in (see the end of this section). */
 .stagger > :nth-child(2) { --i: 1; }
 .stagger > :nth-child(3) { --i: 2; }
 .stagger > :nth-child(4) { --i: 3; }
@@ -1687,6 +1762,38 @@ mark.is-hot { color: var(--text); }
 @keyframes pie { from { stroke-dasharray: 0 100; } }
 @keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
+/* Nothing on a slide just appears: every part of a build piece grows in, the
+   way a bar fills. style.js grows most parts: a framed box widens from its
+   left edge with its frame whole, text is written a character at a time, a
+   value counts up, and rules and shapes grow from their start. A veil sliding
+   off a finished piece was tried first and dropped: the piece looked
+   uncovered, not grown. No part moves, scales or fades in, so text stays on
+   whole pixels. A data mark draws itself, and the parts below are drawn by
+   pseudo-elements the script cannot reach. */
+@media (prefers-reduced-motion: no-preference) {
+  /* A timeline's rule grows down from the event before. The new event's
+     marker fills like a small bar once the rule has reached it: in the second
+     half of the time, by when the eased rule is all but there. The first
+     event has no rule to wait for. */
+  .deck.is-live .timeline > li:has(+ .is-built)::after { animation: grow-down var(--t-slow) var(--ease) backwards; }
+  .deck.is-live .timeline > li.is-built::before { animation: grow-x calc(var(--t-slow) / 2) var(--ease) calc(var(--t-slow) / 2) backwards; }
+  .deck.is-live .timeline > li:first-child.is-built::before { animation-duration: var(--t-slow); animation-delay: 0s; }
+  /* A dashed line waits for the solid line to trace. In a piece with no such
+     line there is nothing to wait for: it grows at once, and the marker at
+     its end still waits for it. */
+  .deck.is-live [data-build]:is(.dot, .line.ghost),
+  .deck.is-live [data-build]:not(:has(.line:not(.ghost))) .line.ghost { animation-delay: 0s; }
+}
+/* Both ends are spelled out: a clip cannot blend from a shape to none, so
+   with only a start the part stayed hidden for half the time and then popped. */
+@keyframes grow-x { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+@keyframes grow-down { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0); } }
+/* In a live deck a mark waits for its slide to be the current one, and for the
+   piece around it to be built. */
+.deck.is-live > .slide:not(.is-seen) :is(.bar-fill, .col, .col-fill, .line, .dot, .pie-slice),
+.deck.is-live [data-build]:not(.is-built) :is(.bar-fill, .col, .col-fill, .line, .dot, .pie-slice),
+.deck.is-live [data-build]:not(.is-built):is(.bar-fill, .col, .col-fill, .line, .dot, .pie-slice) { animation-play-state: paused; }
+
 /* ── Print ────────────────────────────────────────────────────────────── */
 
 /* Paper keeps the dark surfaces. A deck (.deck on the page) prints one slide
@@ -1701,6 +1808,10 @@ mark.is-hot { color: var(--text); }
   .panel, .callout, blockquote, pre, figure, .table tr { break-inside: avoid; }
   h1, h2, h3 { break-after: avoid; }
   .deck { max-width: none; padding: 0; }
-  .deck > .slide { page: slide; width: 100%; margin: 0 !important; border: 0; break-after: page; break-inside: avoid; }
+  .deck > .slide { page: slide; width: 100%; margin: 0 !important; border: 0; break-after: page; break-inside: avoid; filter: none !important; }
+  /* Paper has no clicks: every slide prints lit, with every piece built. */
+  .deck [data-build] { visibility: visible !important; animation: none !important; }
+  /* A popup is a throwaway: it would print over its slide. */
+  .deck .popup { display: none !important; }
   .deck > .slide > .slide-no { top: var(--s3); }
 }

@@ -13,8 +13,8 @@ Apply these rules to every visual output. Where another design skill disagrees o
 
 Paths are relative to this skill's directory.
 
-1. Read `assets/showcase.html`. It holds the markup for every component.
-2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, the contents rail, and stepping through a deck.
+1. Read `assets/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck.
+2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, the contents rail, and stepping through a deck, its builds, and its popups.
 3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
 4. Open or screenshot the result and check it against the rules below.
 
@@ -102,7 +102,7 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 | `--fs-note` | 12 / 16 | Captions, axis ticks, units, eyebrows, tags. |
 
 - Headings and titles wear the black outline: title, heading, subheading, hero numbers (`.stat-value`), the titles of boxes (panel heads, stat labels), and text that sits on a border (stat deltas, meter names and values). Everything else stays plain: prose, table cells, legends, chart text.
-- The outline scales with the text: 7% of the font size, between 1.25px and 2px. That gives 1.25px on small titles, 1.4px at 20px, and 2px from 28px.
+- The outline scales with the text: 7% of the font size, between 1.25px and 2px. That gives 1.25px on small titles, 1.4px at 20px, and 2px from 28px. Nothing wears more than 2px, a slide's big number included: at 4px its outline looked heavy and filled the gaps between letters.
 - Draw it as a stroke under the fill, twice the visible width (`-webkit-text-stroke: calc(2 * var(--outline)) #000` with `paint-order: stroke fill`). Never fake it with stacked `text-shadow`s: they look lumpy.
 - Outlined letters must sit at least 2px apart, or the fills swallow the line between them and a letter looks half-outlined. The stylesheet's `--fit` adds that spacing to headings.
 - Plain text keeps the browser's default rendering. Never set `-webkit-font-smoothing`, `text-rendering`, `paint-order`, or a text stroke (even `0px`) on it: together they made body text look soft in Chrome. Only headings and titles get the stroke.
@@ -256,7 +256,8 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
   - A glyph has no background. This is the default for every icon.
   - A glyph takes the colour of the text it is attached to: accent beside an eyebrow, white beside a value, dim beside a caption. Never give a glyph a colour of its own.
   - A glyph is as tall as one line of that text: 16px beside a note, 24px beside body text, 36px beside a hero number. The stylesheet sizes it; never set a size by hand.
-  - A glyph wears the same black outline as a heading. Never show one without it, except in a callout's tag: there it is ink on a solid chip, 16px, 4px from the word, and the stylesheet drops the outline.
+  - A glyph is outlined only where its text is. Beside a heading, a hero number, or a box title it wears the same black outline. Beside plain text it is plain: an eyebrow, body text, a caption, a list item. An outlined glyph beside a plain label looked heavier than the label. The stylesheet decides; never add or remove the outline by hand.
+  - In a callout's tag the glyph is ink on a solid chip, 16px, 4px from the word.
   - Never use line icons, pixel icons, emoji, or a second icon set: thin strokes cannot carry the outline.
 - Attach a glyph to its text with `<span class="with-icon">GLYPH<span>Label</span></span>`, 8px apart. `.with-icon` also works as a class on the text's own element, such as `<p class="eyebrow with-icon">`.
 - An icon never carries meaning alone: pair it with a word.
@@ -349,8 +350,13 @@ For pages that are used, not only read.
 
 A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one supporting line, and one figure.
 
+A deck shows one thing at a time. The viewer never meets a full slide: each piece of information arrives on its own click, and it arrives by growing, the way a progress bar fills. `../../examples/voyager-deck.html` is the reference deck. Read it before writing one: it uses every rule below.
+
+### Slides
+
 - The figure sits in an inner `.panel`, so stats, tables, and charts all rest on the dark inset gray. No chart sits bare on a slide.
-- A deck is `<main class="page deck anim">` holding only slides. `.deck` turns on stepping with the arrow keys, Page Up/Down, and Space, and one slide per printed page.
+- A deck is `<main class="page deck anim">` holding only slides. `.deck` turns on stepping with the arrow keys, Page Up/Down, Space, and a click, and one slide per printed page.
+- The slide nearest the middle of the window is the current one. The others go dark, as a hovered mark darkens its siblings. A click on a dark slide goes to it.
 - Decks use the 960px page. The type scale is fixed, so a wider slide looks half empty.
 - Number each slide with `<span class="tag slide-no">3 / 9</span>` as its first child. It sits on the top border at the right.
 - Layouts:
@@ -361,9 +367,84 @@ A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one su
   - **Quote** (`.slide.quote`): one `<blockquote>`.
 - A slide's title states the finding, not the topic: "Flips arrived on day seven and took over", not "Income per day".
 
+### Builds
+
+Every slide in a deck builds: each piece of information arrives on its own click, so the viewer is never handed a full slide at once.
+
+- Mark each piece with `data-build`. Pieces arrive in the order written. Forward builds the next piece, then moves to the next slide; back takes the last piece away.
+- The eyebrow and title carry no `data-build`: they show when the slide does. Everything after them is a piece: the lead, then each stat, row, event, node, or series of the figure.
+- One click, one idea. `data-build="with"` brings a part in with the piece before it: a value with its label, a node with the arrow into it.
+- A box that holds pieces is a piece too. It arrives with its first one, so no box shows empty.
+- A number sets the order where it differs from the order written: `data-build="2"`. Number every piece on a slide, or none. Use it to bring a lead in after its figure, or a line in before the rules drawn under it.
+- In an SVG chart, wrap each piece in a `<g data-build>`: a line with its end marker and label, an event with its label.
+- A piece keeps its room while hidden, so the slide never jumps.
+- A divider does not build. On a big number, the number is the first piece. On a quote, the source is the only one.
+- Without `style.js`, every piece shows.
+
+### Growth
+
+Nothing on a slide just appears. Every part of a piece grows in, the way a progress bar fills.
+
+- A framed box widens from its left edge with its frame whole: a panel, a stat, a node. Its right border travels with it. In a piece with no frame, each framed part widens on its own: a bar's track, a swatch, a tag.
+- What a box holds arrives over the same time: its text is written and its value counts while the frame widens, so all three land together.
+- Text is written, a character at a time at a steady pace: a lead, a big number, a label, a caption. The text itself gains characters.
+- A value counts up from zero, the way a meter ticks: a stat's value, a meter's, a column's. Only its first number counts. Its unit, sign, and any second number stand still: "25.9B km" climbs from "0.0B km".
+- A rule grows from its start: the underline of a ruled row, the rule that joins two timeline events, an event rule in a chart. A timeline marker fills like a small bar once the rule reaches it.
+- A data mark draws as it always does: a bar fills, a line traces. A dashed forecast line grows from the measured one.
+- An arrow, a glyph, and any other shape grow from the left edge.
+- A piece taken away and built again grows again: a line retraces, a bar refills.
+- A growing part never moves, scales, or fades in, so its text stays on whole pixels.
+- Rows that arrive one by one take no `.stagger`.
+- `style.js` and the stylesheet pick the growth from the part. Never write an entrance animation on a page. When a new component has a part that pops in, give that part a growth there.
+
+Three earlier versions were tried and dropped. Do not bring them back:
+
+- A veil sliding off a finished piece, left to right. The piece looked uncovered, not grown.
+- A frame widening over text that was already written. It passed the text at once, then grew over nothing.
+- A typewriter faked with a clip stepping across finished text. It cut the outline of big letters.
+
+### Popups
+
+A popup (`aside.popup` with `data-build`) is a throwaway note laid over its slide. Use it to explain one piece of the slide without giving the explanation room there: what a figure means, where a number comes from.
+
+- Write it right after the piece it explains, as a child of the slide or of a `.grid` in it. Never put it inside a panel: it is placed against the slide.
+- It is small, and it sits in the slide's top left corner, reaching to the slide's middle. Its height is its content's.
+- Three things tie it to its piece and put it on top. The slide goes dark behind it, as the slides around the current one do. The piece it explains stays lit, alone. A wire runs from that piece to the popup. It has the slide's own gray and an ink border, and no shadow.
+- It pops. The wire is traced from the explained piece first; then the frame grows out of the wire's end in every direction at once, its border whole, in half of `--t-slow`. Its text is written once the frame shows.
+- The pop has no overshoot and no scaling: nothing in the style bounces, and scaled text blurs.
+- Build it like a small slide: an eyebrow, an `h3` that states the finding, then pieces of its own, each `data-build`. It opens with its eyebrow and title; its first piece waits for the next click.
+- The click after its last piece shuts it. The frame draws back into the wire's end, the wire draws back to the piece, the slide lights up, and the slide's remaining pieces carry on. Back over that click opens it again, whole.
+- Keep the piece it explains clear of the corner the popup takes: a popup laid over its own piece gets no wire.
+- It never prints, and never shows without `style.js`. Put nothing in it that the slide needs.
+- One popup per slide at most. A slide that needs two wants to be two slides.
+
+Two earlier versions were tried and dropped:
+
+- A centred popup over the slide's whole content area. Nothing showed which block it explained.
+- A frame that widened from its left edge, as other boxes do. It read as one more box on the slide, not as something popping up over it.
+
+### Motion to scale
+
+To show a speed or a pace, show the motion itself, scaled. Bars standing in for it are not enough.
+
+- First the fast thing crosses its lane. On the next click the slow thing sets off at its true share of that pace, and is left to crawl. In the reference deck, Voyager 1 crosses in about two seconds; the airliner moves at 1/68 of that for as long as the popup stays open.
+- A mover is an icon tile riding the leading edge of its bar, so the bar behind it is the distance covered. Rotate the glyph to face the way it travels.
+- It moves at one steady pace: linear, never eased. Set its time in page CSS as a multiple of `--t-slow`, so a speed control still scales it.
+- Say the scale and both ends of the lane beside it.
+- This is the one case where a mark runs longer than `--t-slow`.
+
+### Reviewing motion
+
+Motion is judged by eye, slowed down.
+
+- Give a deck a speed slider while its motion is under review: a `.slider` that multiplies `--t-fast`, `--t-slow`, and `--t-step`, from real speed to ten times slower, and remembers its setting. The reference deck has one. It is a review tool, not part of the style; it stays off paper.
+- When an animation is in question, do not guess twice. Build a lab page: the same blocks in each candidate, a Play button on each, and a speed slider. Let the user pick by eye, move the pick into `style.js`, and delete the lab.
+- Check an animation by reading computed values part-way through it, at a slowed speed. One screenshot cannot tell growth from a late pop.
+- Give a `clip-path` keyframe both its ends. A clip cannot blend from a shape to none: with only a start, the part stays hidden for half the time and then pops.
+
 ## Print
 
-- Pages print with their dark surfaces. Disclosures print open; a stepper prints the state it is on. A deck prints one slide per page, edge to edge: open the print dialog and save as PDF.
+- Pages print with their dark surfaces. Disclosures print open; a stepper prints the state it is on. A deck prints one slide per page, edge to edge, every slide lit and every piece built: open the print dialog and save as PDF. Popups stay off paper.
 - Animations do not run on paper; every mark prints finished.
 
 ## Motion
@@ -374,12 +455,14 @@ A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one su
 | `--t-slow` | 480ms | Data draws: bars fill, columns rise, lines trace. |
 | `--t-step` | 40ms | Delay between staggered siblings. |
 
-- Motion is for data marks only: bars fill, columns rise, lines trace, pies sweep. Add `.anim` to a container to turn it on.
-- Panels, text, and boxes never animate in. A fade and rise held text between pixels, so it looked blurred until it settled.
+- Motion is for data marks: bars fill, columns rise, lines trace, pies sweep. Add `.anim` to a container to turn it on.
+- On a page, panels, text, and boxes never animate in. A fade and rise held text between pixels, so it looked blurred until it settled.
+- The one exception is a build piece in a deck (see Growth). It grows in over `--t-slow` with the same easing as a bar. The piece never fades, moves, or scales, so its text stays sharp. Never animate a piece any other way.
+- In a deck, a mark waits for its slide to be the current one and for its piece to be built.
 - `.stagger` on a parent delays each child's mark by one step.
 - With `style.js` loaded, each panel plays when a fifth of it scrolls into view, not on page load. Its marks start together.
 - A line needs `pathLength="1"` to trace. A pie slice needs `pathLength="100"`.
-- Everything plays once. Nothing replays on scrolling back, loops, or bounces.
+- On a page everything plays once: nothing replays on scrolling back. In a deck a piece grows again each time it is built. Nothing loops or bounces.
 - The stylesheet already honours reduced-motion settings.
 
 ## Hover

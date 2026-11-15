@@ -104,6 +104,7 @@
   <h3>Icons</h3>
   <!-- Glyph: a symbol from Remix Icon's fill set, with no background. Get the markup from scripts/icon.py NAME.
        .with-icon attaches it to its text: the glyph takes that text's colour and the height of one line.
+       It is outlined only where that text is: beside a heading, not beside an eyebrow, body text or a caption.
        Tile (scripts/icon.py --tile --fill c1 NAME) is the exception, for an icon that stands as its own mark.
        A picture icon is <span class="icon"><img src="…" alt=""></span>; put one first in a .meter-row to stand it left of the bar. -->
   <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><span>Beside an eyebrow</span></p>
@@ -1082,26 +1083,48 @@
     </div>
   </section>
 
-  <!-- More slide layouts. A deck is <main class="page deck anim"> holding only slides: .deck turns on arrow-key stepping
-       and one slide per printed page. .slide-no is the slide's number, a tag on its top border. -->
+  <!-- More slide layouts. A deck is <main class="page deck anim"> holding only slides: .deck turns on stepping with the
+       arrow keys and a click, darkens every slide but the current one, and prints one slide per page. .slide-no is the
+       slide's number, a tag on its top border.
+       Builds: in a deck, each [data-build] piece arrives on its own click, in the order written. The eyebrow and title
+       carry none. data-build="with" joins the piece before it; data-build="2" names the step; a box that holds pieces
+       arrives with its first one. This page is not a deck, so the attributes below do nothing here. -->
   <!-- Split: the claim at the left, its figure at the right. For a figure that would not fill the slide's width. -->
   <section class="slide split">
     <span class="tag slide-no">2 / 5</span>
     <div class="flow">
       <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><span>Damage</span></p>
       <h1>Three players do half the damage</h1>
-      <p class="lead"><mark>Ellesmere</mark>, <mark>Tukz</mark> and <mark>Melli</mark> lead every night.</p>
+      <p class="lead" data-build><mark>Ellesmere</mark>, <mark>Tukz</mark> and <mark>Melli</mark> lead every night.</p>
     </div>
-    <div class="panel">
+    <div class="panel" data-build>
       <div class="panel-body">
         <div class="meter">
-          <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">4.92M</span></div>
-          <div class="meter-row"><span class="meter-label">Tukz</span><div class="bar" style="--v:91; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">4.48M</span></div>
-          <div class="meter-row"><span class="meter-label">Melli</span><div class="bar" style="--v:84; --fill:var(--c3)"><span class="bar-fill"></span></div><span class="meter-value">4.13M</span></div>
-          <div class="meter-row"><span class="meter-label">Everyone else</span><div class="bar" style="--v:60; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">2.96M</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Ellesmere</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">4.92M</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Tukz</span><div class="bar" style="--v:91; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">4.48M</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Melli</span><div class="bar" style="--v:84; --fill:var(--c3)"><span class="bar-fill"></span></div><span class="meter-value">4.13M</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Everyone else</span><div class="bar" style="--v:60; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">2.96M</span></div>
         </div>
       </div>
     </div>
+    <!-- Popup: aside.popup with data-build, a throwaway note about the piece written just before it. In a deck it opens
+         on its own click in the slide's top left corner: the slide goes dark behind it, the piece it explains stays lit,
+         and a wire joins the two. Its own [data-build] pieces arrive one by one, and the click after the last shuts it.
+         Write it right after the piece it explains, outside any panel. It never shows on a page that is not a deck, so
+         it does not show here. -->
+    <aside class="popup" data-build>
+      <p class="eyebrow">What the meter counts</p>
+      <h3>Damage done is damage to bosses only</h3>
+      <p data-build>Trash pulls would add a third to every bar.</p>
+      <div class="panel" data-build>
+        <div class="panel-body">
+          <dl class="kv">
+            <dt>Bosses</dt><dd>17.99M</dd>
+            <dt>Trash</dt><dd>5.84M</dd>
+          </dl>
+        </div>
+      </div>
+    </aside>
   </section>
 
   <!-- Divider: opens a section. The eyebrow counts the section; the title names it. -->
@@ -1115,8 +1138,8 @@
   <section class="slide">
     <span class="tag slide-no">4 / 5</span>
     <p class="eyebrow">Dimensius</p>
-    <p class="hero-number">24 pulls</p>
-    <p class="lead">More than the other seven bosses together.</p>
+    <p class="hero-number" data-build>24 pulls</p>
+    <p class="lead" data-build>More than the other seven bosses together.</p>
   </section>
 
   <!-- Quote: a slide that holds one quote, at lead size. -->
@@ -1124,7 +1147,7 @@
     <span class="tag slide-no">5 / 5</span>
     <blockquote>
       <p>Wipe it. We go again with three healers, and this time nobody stands in the fire.</p>
-      <cite>Tukz, raid lead</cite>
+      <cite data-build>Tukz, raid lead</cite>
     </blockquote>
   </section>
 

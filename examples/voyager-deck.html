@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Voyager 1, One Light-Day Out</title>
+<meta name="description" content="A 14-slide deck on Voyager 1 reaching one light-day from Earth on 18 November 2026: how it got there, what still works, and what comes next.">
+<link rel="stylesheet" href="../skills/guide/assets/style.css">
+<script src="../skills/guide/assets/style.js" defer></script>
+<style>
+/* The speed control of this sample: it follows the reader down the deck and stays off paper.
+   Its top padding is the room a meter's name needs. */
+.deck-speed { position: sticky; top: 0; z-index: 3; padding: var(--s5) 0 var(--s3); background: var(--page); border-bottom: var(--border); }
+@media print { .deck-speed { display: none; } }
+/* The race in the speed popup: real motion, to scale. A craft is a tile that rides the leading edge
+   of its bar, so the bar behind it is the distance flown. Voyager 1 crosses at one steady pace in four
+   times the usual draw; the airliner takes 68 times as long, its true share of the speed. The bar lets
+   the tile hang over its ends and edges. */
+.race .lane + * { margin-top: var(--s3); }
+.race .lane > .bar { margin-top: var(--s2); overflow: visible; }
+.race .lane-head { display: flex; justify-content: space-between; }
+.deck .race .bar-fill { animation-duration: calc(var(--t-slow) * 4); animation-timing-function: linear; }
+.deck .race .slow .bar-fill { animation-duration: calc(var(--t-slow) * 4 * 68); }
+.race .racer { position: absolute; top: 50%; right: calc(var(--icon) / -2); margin-top: calc(var(--icon) / -2); }
+/* The glyphs point up; these craft fly to the right. */
+.race .racer > svg { rotate: 90deg; }
+</style>
+</head>
+<body>
+<!-- The reference deck for the style. Arrow keys, Page Up/Down, Space and a click step through it, one piece
+     at a time: every piece is a [data-build] and grows in. Slide 1 carries a popup with motion to scale.
+     Above the slides sits a speed control, a tool for reviewing motion that is not part of the style.
+     Facts as of 15 November 2026. -->
+<main class="page deck anim">
+
+  <!-- Speed: how many times slower than real every animation runs, for a close look. The script at the
+       end of the page scales the timing tokens and remembers the setting. Not part of the style. -->
+  <div class="meter deck-speed">
+    <label class="meter-row"><span class="meter-label">Slower by</span><input class="slider" type="range" min="1" max="10" step="1" value="1" data-speed><output class="meter-value" data-speed-show>Real speed</output></label>
+  </div>
+
+  <!-- 1. Title: plain layout with a row of stats. The eyebrow and title show first; every [data-build]
+       piece after them arrives on its own click. -->
+  <section class="slide">
+    <span class="tag slide-no">1 / 14</span>
+    <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.498 20.005h7.004A6.52 6.52 0 0 1 12 23.507a6.52 6.52 0 0 1-3.502-3.502M18 14.81l2 2.268v1.927H4v-1.927l2-2.268V9.005c0-3.483 2.504-6.447 6-7.545c3.496 1.098 6 4.062 6 7.545zm-6-3.805a2 2 0 1 0 0-4a2 2 0 0 0 0 4"/></svg></span><span>Voyager 1 · 15 November 2026</span></p>
+    <h1>Voyager 1 is three days from one light-day</h1>
+    <p class="lead" data-build>No machine has ever gone farther from Earth.</p>
+    <div class="grid">
+      <div class="panel stat span-3" data-build>
+        <div class="stat-label">Launched</div>
+        <div class="stat-value">1977</div>
+      </div>
+      <div class="panel stat span-3" data-build>
+        <div class="stat-label">Distance</div>
+        <div class="stat-value">25.9B km</div>
+      </div>
+      <div class="panel stat span-3" data-build>
+        <div class="stat-label">Speed</div>
+        <div class="stat-value">17 km/s</div>
+      </div>
+      <!-- Popup: a throwaway note over this slide, written right after the piece it explains. That piece
+           stays lit while the rest of the slide goes dark, and a wire joins the two. The popup opens on its
+           own click, builds its own pieces, and the click after the last one shuts it. The race panel arrives
+           with its body, the first piece in it; its foot, the verdict, waits for the next click.
+           The race: both bars run for the time Voyager 1 needs to cross, so the airliner's stops at 82 of 5,570 km. -->
+      <aside class="popup" data-build>
+        <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 13.333l-9.223 6.149A.5.5 0 0 1 2 19.066V4.934a.5.5 0 0 1 .777-.416L12 10.667V4.934a.5.5 0 0 1 .777-.416l10.599 7.066a.5.5 0 0 1 0 .832l-10.599 7.066a.5.5 0 0 1-.777-.416z"/></svg></span><span>What 17 km/s means</span></p>
+        <h3>New York to London in 5 min 28 s</h3>
+        <p data-build>The crossing is 5,570 km. An airliner needs about six hours.</p>
+        <!-- The race: real motion, to scale. Each craft rides the leading edge of its bar across the lane.
+             Voyager 1 crosses in four times the usual draw; the airliner moves at 1/68 of that pace, its true
+             share of the speed, so it only crawls for as long as the popup stays open. -->
+        <figure class="panel race" data-build>
+          <div class="panel-body">
+            <div class="lane" data-build>
+              <div class="lane-head label"><strong>Voyager 1</strong><span class="dim">17 km/s</span></div>
+              <div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"><span class="icon racer" style="--fill:var(--c1)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.498 20.005h7.004A6.52 6.52 0 0 1 12 23.507a6.52 6.52 0 0 1-3.502-3.502M18 14.81l2 2.268v1.927H4v-1.927l2-2.268V9.005c0-3.483 2.504-6.447 6-7.545c3.496 1.098 6 4.062 6 7.545zm-6-3.805a2 2 0 1 0 0-4a2 2 0 0 0 0 4"/></svg></span></span></div>
+            </div>
+            <div class="lane slow" data-build>
+              <div class="lane-head label"><strong>Airliner</strong><span class="dim">0.25 km/s</span></div>
+              <div class="bar" style="--v:100; --fill:var(--c2)"><span class="bar-fill"><span class="icon racer" style="--fill:var(--c2)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 8.947L22 14v2l-8-2.526v5.36l3 1.666V22l-4.5-1L8 22v-1.5l3-1.667v-5.36L3 16v-2l8-5.053V3.5a1.5 1.5 0 0 1 3 0z"/></svg></span></span></div>
+            </div>
+            <div class="lane-head note"><span>New York</span><span>London, 5,570 km</span></div>
+          </div>
+          <div class="panel-foot" data-build><p>Voyager 1 has landed. The airliner lands six hours later.</p></div>
+        </figure>
+      </aside>
+      <div class="panel stat span-3" data-build>
+        <div class="stat-label">Milestone in</div>
+        <div class="stat-value">3 days</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Big number. -->
+  <section class="slide">
+    <span class="tag slide-no">2 / 14</span>
+    <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m1-10V7h-2v7h6v-2z"/></svg></span><span>One light-day</span></p>
+    <p class="hero-number" data-build>24 hours</p>
+    <p class="lead" data-build>A radio signal needs a full day to cross the gap. Ask on Monday; the answer arrives on Wednesday.</p>
+  </section>
+
+  <!-- 3. Divider. -->
+  <section class="slide divider">
+    <span class="tag slide-no">3 / 14</span>
+    <p class="eyebrow">Part one</p>
+    <h1>How it got there</h1>
+  </section>
+
+  <!-- 4. Split: timeline. The panel is a piece that holds pieces, so it arrives with its first event. -->
+  <section class="slide split">
+    <span class="tag slide-no">4 / 14</span>
+    <div class="flow">
+      <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 15V8.5a4.5 4.5 0 0 1 9 0v7a2.5 2.5 0 0 0 5 0V8.83a3.001 3.001 0 1 1 2 0v6.67a4.5 4.5 0 1 1-9 0v-7a2.5 2.5 0 0 0-5 0V15h3l-4 5l-4-5z"/></svg></span><span>Route</span></p>
+      <h1>Two flybys, then 46 years of open space</h1>
+      <p class="lead" data-build><mark>Titan</mark>, a moon of Saturn, bent its path up and out of the plane of the planets.</p>
+    </div>
+    <div class="panel" data-build>
+      <div class="panel-body">
+        <ol class="timeline">
+          <li data-build><span class="timeline-when">Sep 1977</span><div><strong>Launch</strong><br><span class="dim">Sixteen days after Voyager 2.</span></div></li>
+          <li data-build><span class="timeline-when">Mar 1979</span><div><strong>Jupiter</strong><br><span class="dim">Finds volcanoes on Io.</span></div></li>
+          <li data-build><span class="timeline-when">Nov 1980</span><div><strong>Saturn</strong><br><span class="dim">Passes Titan. The last planet it visits.</span></div></li>
+          <li data-build><span class="timeline-when">Aug 2012</span><div><strong>Interstellar space</strong><br><span class="dim">First craft to leave the Sun's bubble.</span></div></li>
+          <li data-build><span class="timeline-when">Nov 2026</span><div><strong>One light-day</strong><br><span class="dim">Due on the 18th.</span></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Plain: line chart on an 828×240 viewBox, the width it renders. Plot area x 48–780, y 8–208.
+       x = 48 + (year − 1977) × 12.407; y = 208 − AU × 0.8333.
+       The pieces are numbered: the measured line is drawn last, to sit on top, but arrives first. -->
+  <section class="slide">
+    <span class="tag slide-no">5 / 14</span>
+    <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 13.333l-9.223 6.149A.5.5 0 0 1 2 19.066V4.934a.5.5 0 0 1 .777-.416L12 10.667V4.934a.5.5 0 0 1 .777-.416l10.599 7.066a.5.5 0 0 1 0 .832l-10.599 7.066a.5.5 0 0 1-.777-.416z"/></svg></span><span>Pace</span></p>
+    <h1>It adds 3.6 AU every year</h1>
+    <p class="lead" data-build="1">Since Saturn the line has not bent.</p>
+    <figure class="panel" data-build="2">
+      <div class="panel-body">
+        <svg class="chart" viewBox="0 0 828 240" role="img" aria-label="Voyager 1's distance from the Sun by year: 172 AU today, forecast to reach 205 AU in 2036">
+          <line class="gridline" x1="48" x2="780" y1="8" y2="8"/>
+          <line class="gridline" x1="48" x2="780" y1="58" y2="58"/>
+          <line class="gridline" x1="48" x2="780" y1="108" y2="108"/>
+          <line class="gridline" x1="48" x2="780" y1="158" y2="158"/>
+          <line class="axis" x1="48" x2="780" y1="208" y2="208"/>
+          <text class="end" x="40" y="12">240 AU</text>
+          <text class="end" x="40" y="62">180</text>
+          <text class="end" x="40" y="112">120</text>
+          <text class="end" x="40" y="162">60</text>
+          <text class="end" x="40" y="212">0</text>
+          <text class="mid" x="85" y="228">1980</text>
+          <text class="mid" x="209" y="228">1990</text>
+          <text class="mid" x="333" y="228">2000</text>
+          <text class="mid" x="457" y="228">2010</text>
+          <text class="mid" x="582" y="228">2020</text>
+          <text class="mid" x="706" y="228">2030</text>
+          <g data-build="3">
+            <line class="event" x1="210.5" x2="210.5" y1="8" y2="208"/>
+            <text x="216" y="20">Photo of Earth, 1990</text>
+          </g>
+          <g data-build="4">
+            <line class="event" x1="490.5" x2="490.5" y1="8" y2="208"/>
+            <text class="end" x="484" y="20">Interstellar space, 2012</text>
+          </g>
+          <g data-build="5">
+            <path class="line ghost" style="--fill:var(--c1)" d="M667 64.5 L780 37.3"/>
+            <rect class="dot ghost" style="--fill:var(--c1)" x="777" y="34.3" width="6" height="6" data-tip="2036, forecast" data-tip-value="205 AU"/>
+            <text class="series end" x="770" y="26">Forecast, 205 AU</text>
+          </g>
+          <g data-build="2">
+            <path class="line" pathLength="1" style="--fill:var(--c1)" d="M56.4 207.2 L75 203.7 L96 200.1 L210.8 174.3 L310.2 150.2 L394.9 129.7 L490.3 106.7 L581.5 84.7 L667 64.5"/>
+            <rect class="dot" style="--fill:var(--c1)" x="663" y="60.5" width="8" height="8" data-tip="November 2026" data-tip-value="172 AU"/>
+            <text class="series end" x="654" y="54">Today, 172 AU</text>
+          </g>
+        </svg>
+        <figcaption data-build="6">Distance from the Sun. One AU is the distance from Earth to the Sun; this month Earth sits about 1 AU farther off.</figcaption>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 6. Split: meter. The deck is about Voyager 1, so it keeps its colour and the rest are muted. -->
+  <section class="slide split">
+    <span class="tag slide-no">6 / 14</span>
+    <div class="flow">
+      <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m4.929 13.314l2.121 2.121l1.415-1.414L6.343 11.9l2.122-2.122l2.828 2.829l1.414-1.414L9.88 8.364L12 6.243l2.121 2.121l1.415-1.414l-2.122-2.121L16.243 2a1 1 0 0 1 1.414 0l4.95 4.95a1 1 0 0 1 0 1.414l-14.85 14.85a1 1 0 0 1-1.414 0l-4.95-4.95a1 1 0 0 1 0-1.415z"/></svg></span><span>Distance</span></p>
+      <h1>Four times as far out as Pluto</h1>
+      <p class="lead" data-build><mark>Voyager 2</mark> left first and trails by 28 AU.</p>
+    </div>
+    <figure class="panel" data-build>
+      <div class="panel-body">
+        <div class="meter">
+          <div class="meter-row" data-build><span class="meter-label">Voyager 1</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">172 AU</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Voyager 2</span><div class="bar" style="--v:84; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">144 AU</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Edge of the Sun's bubble</span><div class="bar" style="--v:70; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">120 AU</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Pluto</span><div class="bar" style="--v:23; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">39 AU</span></div>
+          <div class="meter-row" data-build><span class="meter-label">Neptune</span><div class="bar" style="--v:17; --fill:var(--c-other)"><span class="bar-fill"></span></div><span class="meter-value">30 AU</span></div>
+        </div>
+        <figcaption>Distance from the Sun, rounded. Pluto at its average.</figcaption>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 7. Divider. -->
+  <section class="slide divider">
+    <span class="tag slide-no">7 / 14</span>
+    <p class="eyebrow">Part two</p>
+    <h1>What still works</h1>
+  </section>
+
+  <!-- 8. Split: key-value list. data-build="with" brings a value in with its label. -->
+  <section class="slide split">
+    <span class="tag slide-no">8 / 14</span>
+    <div class="flow">
+      <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14 20h-4v2H8v-2H5a1 1 0 0 1-1-1v-3H2v-2h2v-4H2V8h2V5a1 1 0 0 1 1-1h3V2h2v2h4V2h2v2h3a1 1 0 0 1 1 1v3h2v2h-2v4h2v2h-2v3a1 1 0 0 1-1 1h-3v2h-2zM7 7v4h4V7z"/></svg></span><span>Hardware</span></p>
+      <h1>It runs on 69 KB of memory</h1>
+      <p class="lead" data-build>Built in the 1970s and reprogrammed from Earth ever since.</p>
+    </div>
+    <section class="panel" data-build>
+      <div class="panel-head">On board</div>
+      <div class="panel-body">
+        <dl class="kv">
+          <dt data-build>Memory</dt><dd data-build="with">69 KB</dd>
+          <dt data-build>Computers</dt><dd data-build="with">3, each with a spare</dd>
+          <dt data-build>Radio transmitter</dt><dd data-build="with">23 W</dd>
+          <dt data-build>Dish</dt><dd data-build="with">3.7 m</dd>
+          <dt data-build>Data rate to Earth</dt><dd data-build="with">160 bit/s</dd>
+        </dl>
+      </div>
+    </section>
+  </section>
+
+  <!-- 9. Plain: before and after. -->
+  <section class="slide">
+    <span class="tag slide-no">9 / 14</span>
+    <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1m2 3v8h4V8zm16 1h2v6h-2z"/></svg></span><span>Power</span></p>
+    <h1>The generator has lost half its power</h1>
+    <p class="lead" data-build>Its plutonium decays, and output falls about 4 watts a year.</p>
+    <div class="compare">
+      <section class="panel" data-build>
+        <div class="panel-head">470 watts <span class="tag">1977</span></div>
+        <div class="panel-body"><p class="label">Enough for ten instruments, their heaters and the radio.</p></div>
+      </section>
+      <span class="link" data-build></span>
+      <section class="panel" data-build="with">
+        <div class="panel-head">About 225 watts <span class="tag">2026</span></div>
+        <div class="panel-body"><p class="label">Enough for two instruments and the radio.</p></div>
+      </section>
+    </div>
+  </section>
+
+  <!-- 10. Split: waffle, a share of ten. Numbered, so the lead that names the two arrives last. -->
+  <section class="slide split">
+    <span class="tag slide-no">10 / 14</span>
+    <div class="flow">
+      <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m13.196 2.268l3.25 5.63a1 1 0 0 1-.366 1.365l-1.3.75l1.001 1.732l-1.732 1l-1-1.733l-1.299.751a1 1 0 0 1-1.366-.366L8.546 8.215a5 5 0 0 0-3.222 6.56A4.97 4.97 0 0 1 8 14c1.684 0 3.174.833 4.08 2.109l7.688-4.439l1 1.733l-7.878 4.548a5 5 0 0 1 .01 2.05L21 20v2l-17 .001A4.98 4.98 0 0 1 3 19c0-1.007.298-1.945.81-2.73a7.003 7.003 0 0 1 3.717-9.82l-.393-.682a2 2 0 0 1 .732-2.732l2.598-1.5a2 2 0 0 1 2.732.732"/></svg></span><span>Science</span></p>
+      <h1>Two of ten instruments are still on</h1>
+      <p class="lead" data-build="4">The <mark>magnetometer</mark> and the <mark>plasma wave subsystem</mark>. The last shutdown came in April.</p>
+    </div>
+    <figure class="panel" data-build="1">
+      <div class="panel-body">
+        <div class="chart-row">
+          <div class="waffle" data-build="1" style="--v:2; --rows:1; --cell:24px; --fill:var(--c1)" role="img" aria-label="2 of 10 instruments are still on" data-tip="Still on" data-tip-value="2 of 10"></div>
+          <div class="legend list">
+            <span class="legend-item" data-build="2"><span class="swatch" style="--fill:var(--c1)"></span>Still on<span class="legend-value">2</span></span>
+            <span class="legend-item" data-build="3"><span class="swatch" style="--fill:var(--sunken)"></span>Switched off<span class="legend-value">8</span></span>
+          </div>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 11. Divider. -->
+  <section class="slide divider">
+    <span class="tag slide-no">11 / 14</span>
+    <p class="eyebrow">Part three</p>
+    <h1>What comes next</h1>
+  </section>
+
+  <!-- 12. Plain: diagram. Every step after today is a forecast, so it is a ghost with the word beside it. -->
+  <section class="slide">
+    <span class="tag slide-no">12 / 14</span>
+    <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 4H4V2h16v2h-2v2c0 1.615-.816 2.915-1.844 3.977c-.703.726-1.558 1.395-2.425 2.023c.867.628 1.722 1.297 2.425 2.023C17.184 15.085 18 16.385 18 18v2h2v2H4v-2h2v-2c0-1.615.816-2.915 1.844-3.977c.703-.726 1.558-1.395 2.425-2.023c-.867-.628-1.722-1.297-2.425-2.023C6.816 8.915 6 7.615 6 6zm2 0v2c0 .685.26 1.335.771 2h6.458c.51-.665.771-1.315.771-2V4zm4 9.222c-1.045.738-1.992 1.441-2.719 2.192a7 7 0 0 0-.51.586h6.458a7 7 0 0 0-.51-.586c-.727-.751-1.674-1.454-2.719-2.192"/></svg></span><span>Ahead</span></p>
+    <h1>The mission has about ten years left</h1>
+    <p class="lead" data-build>The science stops first. The radio follows.</p>
+    <figure class="panel" data-build>
+      <div class="panel-body">
+        <div class="diagram">
+          <div class="node" data-build><strong>Today</strong><span>Two instruments on</span></div>
+          <span class="link ghost" data-build></span>
+          <div class="node ghost" data-build="with"><strong>One light-day</strong><span>18 Nov 2026, forecast</span></div>
+          <span class="link ghost" data-build></span>
+          <div class="node ghost" data-build="with"><strong>Last instrument off</strong><span>Early 2030s, forecast</span></div>
+          <span class="link ghost" data-build></span>
+          <div class="node ghost" data-build="with"><strong>Out of radio range</strong><span>About 2036, forecast</span></div>
+        </div>
+      </div>
+    </figure>
+  </section>
+
+  <!-- 13. Big number. -->
+  <section class="slide">
+    <span class="tag slide-no">13 / 14</span>
+    <p class="eyebrow with-icon"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12 18.26l-7.053 3.948l1.575-7.928L.588 8.792l8.027-.952L12 .5l3.385 7.34l8.027.952l-5.934 5.488l1.575 7.928z"/></svg></span><span>After that</span></p>
+    <p class="hero-number" data-build>40,000 years</p>
+    <p class="lead" data-build>Until it drifts past another star: <mark>Gliese 445</mark>, at a distance of 1.6 light-years.</p>
+  </section>
+
+  <!-- 14. Quote. -->
+  <section class="slide quote">
+    <span class="tag slide-no">14 / 14</span>
+    <blockquote>
+      <p>Look again at that dot. That's here. That's home. That's us.</p>
+      <cite data-build>Carl Sagan, on the photo of Earth that Voyager 1 took in 1990</cite>
+    </blockquote>
+  </section>
+
+</main>
+<script>
+// The speed control: scale the three timing tokens by a whole factor and remember it across reloads.
+(() => {
+  const input = document.querySelector("[data-speed]");
+  const show = document.querySelector("[data-speed-show]");
+  const root = document.documentElement;
+  const real = {};
+  for (const token of ["--t-fast", "--t-slow", "--t-step"]) real[token] = parseFloat(getComputedStyle(root).getPropertyValue(token));
+  const apply = () => {
+    const rate = Number(input.value);
+    // A bar or line already drawn would start again under the new timing: hold each one at its end.
+    const drawn = document.getAnimations().filter((run) => run.playState === "finished");
+    for (const token in real) root.style.setProperty(token, real[token] * rate + "ms");
+    // The new timing reaches the animations at the next style pass: force it, then hold them.
+    void root.offsetWidth;
+    for (const run of drawn) run.finish();
+    show.textContent = rate === 1 ? "Real speed" : rate + " times";
+    try { localStorage.setItem("deck-speed", rate); } catch {}
+  };
+  try {
+    const saved = Number(localStorage.getItem("deck-speed"));
+    if (saved >= 1 && saved <= 10) input.value = saved;
+  } catch {}
+  input.addEventListener("input", apply);
+  // Hand the arrow keys back to the deck once the slider is let go.
+  input.addEventListener("change", () => input.blur());
+  apply();
+})();
+</script>
+</body>
+</html>

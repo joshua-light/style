@@ -2,7 +2,7 @@
 
 My visual style, packaged as a plugin for Claude Code and Codex. It steers reports, explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings.
 
-Open `skills/guide/assets/showcase.html` in a browser to see every component.
+Open `skills/guide/assets/showcase.html` in a browser to see every component. Open `examples/voyager-deck.html` to see a deck: step through it with the arrow keys or a click.
 
 ## Credits
 
@@ -34,7 +34,7 @@ Without them, pages fall back to Overpass. Embedding the font in pages you publi
 | --- | --- |
 | `skills/guide/SKILL.md` | The rules. Both tools load it. |
 | `skills/guide/assets/style.css` | Tokens and components. |
-| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, steppers, quizzes, bound sliders, the contents rail, deck keys. |
+| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, steppers, quizzes, bound sliders, the contents rail, deck keys, builds, and popups. |
 | `skills/guide/assets/style.mplstyle` | The same look for matplotlib charts. |
 | `skills/guide/assets/showcase.html` | Reference markup for every component. |
 | `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
@@ -42,6 +42,8 @@ Without them, pages fall back to Overpass. Embedding the font in pages you publi
 | `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
 | `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup. Needs Pygments. |
 | `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: ink rings on lines, outlined title. |
+| `examples/voyager-deck.html` | The reference deck: builds, growth, a popup, motion to scale, and a speed slider for review. |
+| `examples/eth-explainer.html` | A long explainer page. |
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests. |
 | `.codex-plugin/plugin.json` | Codex plugin manifest. |
 | `.agents/plugins/marketplace.json` | Codex marketplace manifest. |
