@@ -1,11 +1,11 @@
 ---
 name: guide
-description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, Melli-textured data fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look). Use before creating or restyling anything meant to be looked at — reports, explainers, dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
+description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look). Use before creating or restyling anything meant to be looked at — reports, explainers, dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
 ---
 
 # Visual style guide
 
-The look comes from ElvUI and EllesmereUI, the World of Warcraft interfaces: dark gray panels, one-pixel black borders, square corners, flat dark heads, a tan accent on text, colour fills under the Melli texture, and Expressway text with black-outlined headings. It reads like an inked comic panel.
+The look comes from ElvUI and EllesmereUI, the World of Warcraft interfaces: dark gray panels, one-pixel black borders, square corners, flat dark heads, a tan accent on text, flat colour fills, and Expressway text with black-outlined headings. It reads like an inked comic panel.
 
 Apply these rules to every visual output. Where another design skill disagrees on palette, font, rounding, or light mode, these rules win. Use other skills for method only, such as choosing a chart form.
 
@@ -38,18 +38,15 @@ The style is dark only. Never add a light theme.
 - A top-level box is light gray (`--panel`). A box inside it is dark (`--inset`): a stat, table, or chart panel on a slide, a panel in a panel. The stylesheet does this by nesting; never set it by hand, and never make a top-level panel dark.
 - Depth comes from the gray steps. No soft shadows, no blur, no glow, no transparency.
 - No box has a head bar. Panel titles and callout kinds sit on the top border (see On the border). Table rows are `--inset`; heads are flat `--head`, one step darker, never textured, never coloured. A hovered row turns `--panel`.
-- Melli is the only gradient.
+- Nothing has a gradient.
 
-## Melli
+## Fills
 
-Melli is a status-bar texture: a vertical luminance curve that multiplies the colour under it.
+Every fill is flat: one colour inside a 1px ink edge.
 
-- Melli goes on data marks only: bars, columns, stacked segments, pies, swatches.
-- Tags and callout kinds are flat, coloured or not: Melli muddied the colour behind the word.
-- Gray surfaces stay flat: the page, panel bodies, every head.
-- In CSS: `background: var(--melli), <colour>`.
-- Melli always runs top to bottom, on columns too. Never rotate it.
-- Outside CSS, multiply the colour by this curve, top to bottom: 0.69 at 0%, 0.83 at 40%, 0.97 at 73%, 1.0 from 84% to 90%, 0.76 at 100%.
+- This holds for data marks (bars, columns, stacked segments, pies, swatches), tags, and gray surfaces alike. Never add a gradient, a gloss, or a texture to a fill.
+- Melli, the WoW status-bar gradient, used to shade data fills. It was dropped: in a report it added a brightness change that carries no data, and a bar no longer matched its legend colour.
+- A data fill is written `background: var(--texture), <colour>`. `--texture` is `none`; it is the one place a texture would return. Never set it on a page.
 
 ## Text
 
@@ -57,8 +54,8 @@ Expressway sets everything except code, in three cuts. Nothing is italic.
 
 | Weight | Cut | Use |
 | --- | --- | --- |
-| 400 | Regular | Everything plain: prose, cells, tags, captions, controls, chart text. |
-| 700 | Bold | Small outlined text: stat labels, deltas, meter names and values. |
+| 400 | Regular | Everything plain: prose, cells, captions, buttons and inputs, chart text. |
+| 700 | Bold | Uppercase labels: eyebrows, tags, callout kinds, tabs, table heads. Small outlined text: stat labels, deltas, meter names and values. |
 | 800 | Extra-bold | Headings, panel titles, hero numbers, `<strong>`, table totals. |
 
 - Outlined text is never Regular: the stroke eats into thin stems.
@@ -133,6 +130,7 @@ Every gap is one of seven steps. Each has one meaning.
 
 - Panel padding equals the gutter, so a grid of panels looks evenly spaced inside and out.
 - `.page` and `.flow` space their children by these rules. Do not add margins by hand.
+- A plain list sits 8px under the paragraph that introduces it, the same gap as between its items. A full block gap cut the list off from its lead-in.
 - `.page` is 960px wide; `.page.wide` is 1200px for dashboards.
 - Grid columns sit 16px apart and rows 24px apart: titles on a top border need the room.
 - No panel shows empty space. Panels in a grid row share a height, and the content takes the spare room: table rows stretch, a sparkline grows, a chart row centres. Pick spans so the content also fills the width; a `.legend.list` takes what a pie leaves.
@@ -151,7 +149,7 @@ Data and state colours are three metals and six enamels:
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--azure` | `#639fd0` | Series. Also neutral notes. |
+| `--azure` | `#528ebf` | Series. Also neutral notes. A mid blue: the first, lighter azure read too bright on note tags. |
 | `--gold` | `#c3ad48` | Series. |
 | `--amethyst` | `#9466ba` | Series. |
 | `--copper` | `#ce7b47` | Series. |
@@ -180,11 +178,11 @@ Markup for each is in `assets/showcase.html`.
 - **Panel** (`.panel`): an optional `.panel-head` title on the top border, body padded 16px. A `.tag` inside the head lands on the border at the right. `.panel-body.flush` lets a table run edge to edge; under a title, the strip between the panel's top border and the table head is `--head` too, and the table head keeps a black line above and below it.
 - **Callout** (`.callout.note|tip|warn|bad`): the kind's name in a tag of the kind's colour, on the top border at the left. Keep to one or two per screen.
 - **Stat** (`.panel.stat`): note-size label on the top border at the left, `.stat-foot` with one `.delta` or `.tag` on the same border at the right, heading-size value inside, then an optional `.stat-note` caption at the bottom left saying what the delta compares against ("vs last week"), thin bar, or sparkline. A delta never appears without its comparison.
-- **Bar** (`.bar`): the signature mark, a Melli fill in a sunken track. It carries no plain text. `.bar.thin` is the small one. `.bar.stack` splits one bar into `.bar-seg` parts, which may hold an ink label.
+- **Bar** (`.bar`): the signature mark, a flat colour fill in a sunken track. It carries no plain text. `.bar.thin` is the small one. `.bar.stack` splits one bar into `.bar-seg` parts, which may hold an ink label.
 - **Meter** (`.meter`): a ranked list of `.meter-row`s, each a label, a bar, and a value. The name sits on the bar's top edge at the left and the value on the same edge at the right, as a unit frame names a health bar. This is the horizontal bar chart.
-- **Table** (`.table`): 11px uppercase heads, label-size cells, numbers right-aligned with `.num`.
+- **Table** (`.table`): 11px bold uppercase heads, label-size cells, numbers right-aligned with `.num`.
 - **Pie** (`.pie`): an SVG of `.pie-slice` circles and `.pie-cut` lines. Each slice sets `--v`, its share in percent, and `--at`, the sum of the shares before it. No arc geometry is needed.
-- **Tag** (`.tag`): a short state word.
+- **Tag** (`.tag`): a short state word, in bold.
 - **Icon**: see Icons below.
 - **Table extras**: `<tfoot>` holds totals, as dark as the head and extra-bold. A `<th colspan>` row inside a `<tbody>` heads a group; give each group its own `<tbody>`. `class="sortable"` sorts on a click of a head; mark the starting column with `aria-sort`.
 - **Key-value list** (`dl.kv`): label and value pairs, ruled, values at the right. For a handful of facts about one thing.
@@ -235,7 +233,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
   - Never use line icons, pixel icons, emoji, or a second icon set: thin strokes cannot carry the outline.
 - Attach a glyph to its text with `<span class="with-icon">GLYPH<span>Label</span></span>`, 8px apart. `.with-icon` also works as a class on the text's own element, such as `<p class="eyebrow with-icon">`.
 - An icon never carries meaning alone: pair it with a word.
-- **Tile** (`.icon` holding a glyph): the glyph in a bordered 24px square, from `icon.py --tile NAME`, dark or with `--fill c1` on a colour under Melli. The exception: use it only where the icon must stand as a mark of its own, such as beside a meter bar. A tile on a colour follows the colour rules.
+- **Tile** (`.icon` holding a glyph): the glyph in a bordered 24px square, from `icon.py --tile NAME`, dark or with `--fill c1` on a colour. The exception: use it only where the icon must stand as a mark of its own, such as beside a meter bar. A tile on a colour follows the colour rules.
 - **Picture icon** (`.icon` holding an image): real art, such as a game item: `<span class="icon"><img src="…" alt=""></span>`. 24px, with a black border; the image is zoomed 20% and cropped to trim the frame game icons carry.
 - Beside a meter bar: put a tile or picture icon first in the `.meter-row`. It stands left of the bar, centred on it, 4px away, and the name stays over the bar.
 
@@ -249,21 +247,22 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - Gains and losses: `.bar.diverge`. The fill grows right from the middle for a gain and left (`.bar-fill.neg`) for a loss; `--v` is a share of one half. Gains are green, losses red, and the signed value sits beside each bar.
 - Two dimensions, such as day by hour: `.heat`. Each `.heat-cell` takes `--v` from 0 to 100. One hue only, set with `--fill`; never a rainbow. Put a `.heat-scale` key under it, and give every cell a tooltip.
 - Parts of a whole: `.bar.stack` with a legend, or a `.pie`.
-- A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line, and Melli runs top to bottom over the whole disc. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
-- A single trend where the amount matters: add an `.area` under the line, with a second copy as `.area-melli` and the `#melli` gradient from the showcase. One series only: areas hide each other.
+- A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
+- A single trend where the amount matters: add an `.area` under the line. One series only: areas hide each other.
 - Change over time: an inline SVG `.chart`. Lines are 2px with mitered joins and a black ring; markers are 8px squares; gridlines are `--sunken`; the baseline is ink. Label each line at its end and keep the legend.
 - A trend inside a stat: `.spark`.
 - An SVG chart scales as a whole, text included. Draw its `viewBox` at the width it will render.
-- For matplotlib, use the ready theme: `plt.style.use("assets/style.mplstyle")`, then `from mpl_style import finish` (in `scripts/`) and call `finish(fig)` before saving. It adds the Melli shading, the ink edges, and the outlined title.
-- Charts from other tools (matplotlib, plotly) follow the same tokens: `--panel` background, 1px black edges on every mark, square markers, mitered joins, the Melli curve on fills, plain Expressway labels with the outline on the title only (font files are in `assets/fonts/`).
+- For matplotlib, use the ready theme: `plt.style.use("assets/style.mplstyle")`, then `from mpl_style import finish` (in `scripts/`) and call `finish(fig)` before saving. It adds the ink ring on lines and the outlined title.
+- Charts from other tools (matplotlib, plotly) follow the same tokens: `--panel` background, 1px black edges on every mark, square markers, mitered joins, flat fills, plain Expressway labels with the outline on the title only (font files are in `assets/fonts/`).
 
 ## Explainers
 
 - **Diagram** (`.diagram`): a chain of `.node` boxes joined by `.link` arrows. `.diagram.down` runs top to bottom. A node holds a `<strong>` name and an optional `<span>` note.
-- A diagram that branches or loops is an inline SVG `.chart` with `.box` rectangles, `.wire` paths, and `.arrow` heads. Wires are 2px light gray with an ink ring and mitered corners, and run only horizontally and vertically. Label a branch beside its wire. Draw it at the width it renders.
+- A diagram that branches or loops is an inline SVG `.chart` with `.box` rectangles, `.wire` paths, and `.arrow` heads. Wires are 2px light gray with an ink ring and mitered corners, and run only horizontally and vertically. Label a branch beside its wire. Draw it at the width it renders. Make each box at least 12px wider than its label on both sides: measure the label, never guess.
 - The font has no arrows. Never type an arrow character: use `.link`, or draw the head.
 - **Timeline** (`ol.timeline`): one `<li>` per event with its date in `.timeline-when`. Set `--fill` on an `<li>` to colour its marker; state colours only for state.
-- **Steps** (`ol.steps`): a numbered list with its numbers in squares. `.steps.across` sets three to five short steps side by side.
+- **Steps** (`ol.steps`): a numbered list with its numbers in coloured squares, in ink bold. Each step takes the next series colour, which marks the steps as distinct and lets text point back at one. Six steps at most; `--fill` on a step overrides its colour, and on the list gives every step one colour.
+- **Step reference** (`<span class="step-ref" data-step="2">2</span>`): the step's square inline, in the same colour. Use it to cite a step in a sentence. Never cite a step by colour name, and never use the chip for anything but a step. `.steps.across` sets three to five short steps side by side.
 - **Icon list** (`ul.icon-list`): each item is a glyph and its text. Use it where each line is a different kind of thing; use plain bullets otherwise.
 - **Before and after** (`.compare`): two panels with a `.link` between them. Tag each panel on its top border.
 

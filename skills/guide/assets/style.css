@@ -1,4 +1,4 @@
-/* style — dark gray, black ink, Warrior-tan accent, Melli data fills, outlined Expressway.
+/* style — dark gray, black ink, Warrior-tan accent, flat data fills, outlined Expressway.
    Rules live in ../SKILL.md; markup for every component in showcase.html.
    style.js adds hover tooltips and linked highlighting.
    scripts/build.py inlines both files and embeds the fonts as data URIs. */
@@ -58,7 +58,7 @@
   --gold: #c3ad48;
   --silver: #bec1c6;
   --copper: #ce7b47;
-  --azure: #639fd0;
+  --azure: #528ebf;  /* a step darker than the first azure, which read too bright on note tags */
   --amethyst: #9466ba;
   --rose: #d28aac;
   /* Red and green both lean toward yellow, by request: a warm red, not a
@@ -85,15 +85,11 @@
   --c6: var(--rose);
   --c-other: #7a7a7a;
 
-  /* Melli: the texture's luminance curve as a black overlay, so it multiplies
-     whatever colour sits under it — the way a WoW status bar tints its texture.
-     Colour fills only: gray surfaces, heads included, stay flat. */
-  --melli-stops:
-    rgba(0, 0, 0, 0.314) 0.8%, rgba(0, 0, 0, 0.271) 16.4%, rgba(0, 0, 0, 0.165) 39.8%,
-    rgba(0, 0, 0, 0.075) 58.6%, rgba(0, 0, 0, 0.027) 72.7%, rgba(0, 0, 0, 0.004) 83.6%,
-    rgba(0, 0, 0, 0.004) 89.8%, rgba(0, 0, 0, 0.027) 91.4%, rgba(0, 0, 0, 0.063) 93%,
-    rgba(0, 0, 0, 0.2) 97.7%, rgba(0, 0, 0, 0.239) 99.2%;
-  --melli: linear-gradient(to bottom, var(--melli-stops));
+  /* Data fills are flat. --texture is an overlay every data fill carries, so
+     one token could texture them all. Melli, the WoW status-bar gradient, was
+     the first texture and was dropped: in a report it added a brightness
+     change that carries no data. */
+  --texture: none;
 
   /* Type: seven sizes, one meaning each. Line heights are even whole pixels:
      text on a border is offset by half a line, and a half pixel there blurs
@@ -277,6 +273,7 @@ small, .note:not(.callout), figcaption {
 .eyebrow {
   font-size: var(--fs-note);
   line-height: var(--lh-note);
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--accent);
@@ -354,7 +351,16 @@ blockquote cite {
 .icon-list { display: grid; gap: var(--s3); padding: 0; list-style: none; }
 .icon-list > li { display: flex; align-items: flex-start; gap: var(--s2); margin: 0; }
 
-/* Numbered steps: each number sits in a square the size of an icon. */
+/* Numbered steps: each number sits in a coloured square the size of an icon.
+   Each step takes the next series colour, so text can point back at a step
+   with the same square inline (.step-ref). --fill on a step, or on the list
+   for one colour throughout, overrides it. */
+.steps > li:nth-child(1), .step-ref[data-step="1"] { --step: var(--c1); }
+.steps > li:nth-child(2), .step-ref[data-step="2"] { --step: var(--c2); }
+.steps > li:nth-child(3), .step-ref[data-step="3"] { --step: var(--c3); }
+.steps > li:nth-child(4), .step-ref[data-step="4"] { --step: var(--c4); }
+.steps > li:nth-child(5), .step-ref[data-step="5"] { --step: var(--c5); }
+.steps > li:nth-child(6), .step-ref[data-step="6"] { --step: var(--c6); }
 .steps { display: grid; gap: var(--s4); padding: 0; list-style: none; counter-reset: step; }
 .steps > li {
   position: relative;
@@ -372,9 +378,26 @@ blockquote cite {
   place-items: center;
   width: var(--icon);
   height: var(--icon);
-  background: var(--raised);
+  background: var(--texture), var(--fill, var(--step, var(--c-other)));
   border: var(--border);
+  color: var(--ink);
   font-size: var(--fs-label);
+  font-weight: 700;
+  line-height: 1;
+}
+/* A step cited in a sentence: its square, tag-sized, on the text's line. */
+.step-ref {
+  display: inline-grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 var(--s1);
+  vertical-align: text-bottom;
+  background: var(--texture), var(--fill, var(--step, var(--c-other)));
+  border: var(--border);
+  color: var(--ink);
+  font-size: var(--fs-note);
+  font-weight: 700;
   line-height: 1;
 }
 /* Across: the steps stand side by side, joined by a rule through their numbers. */
@@ -410,7 +433,7 @@ blockquote cite {
   left: calc(var(--when) + var(--s5) / 2 - 4px);
   width: 8px;
   height: 8px;
-  background: var(--melli), var(--fill, var(--c1));
+  background: var(--texture), var(--fill, var(--c1));
   border: var(--border);
 }
 .timeline > li:not(:last-child)::after {
@@ -530,9 +553,9 @@ figure > * + figcaption { margin-top: var(--s2); }
   font-weight: 800;
   white-space: nowrap;
 }
-/* A tag is a solid chip, so it drops the title's outline and weight. */
+/* A tag is a solid chip, so it drops the title's outline and takes a pill's weight. */
 .panel-head > :is(.tag, .tabs) {
-  font-weight: 400;
+  font-weight: 700;
   -webkit-text-stroke: 0;
   paint-order: normal;
   letter-spacing: 0.03em;
@@ -553,12 +576,16 @@ figure > * + figcaption { margin-top: var(--s2); }
   color: var(--ink);
   font-size: var(--fs-note);
   line-height: var(--lh-note);
+  font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 .panel-body, .callout-body { padding: var(--s4); }
 .panel-body > * + *, .callout-body > * + * { margin-top: var(--s3); }
+/* A list belongs to the paragraph that introduces it: it sits as close to it
+   as its own items sit to each other. A full block gap cut the two apart. */
+:is(.page, .flow, .slide, .panel-body, .callout-body) > p + :is(ul, ol):not([class]) { margin-top: var(--s2); }
 /* The title or tag reaches half a line into the body. */
 .panel-head + .panel-body, .callout-head + .callout-body { padding-top: var(--s5); }
 /* A table may run edge to edge inside a panel. Under a title it starts below
@@ -589,6 +616,8 @@ figure > * + figcaption { margin-top: var(--s2); }
   border: var(--border);
   font-size: var(--fs-note);
   line-height: var(--lh-note);
+  /* Bold: a pill's one short word has to read at a glance, on a colour too. */
+  font-weight: 700;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -597,8 +626,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .tag.warn { --fill: var(--warn); }
 .tag.bad { --fill: var(--bad); }
 .tag.info { --fill: var(--info); }
-/* A coloured tag is a flat chip with ink text. Melli is for data marks: on a
-   20px chip it muddied the colour behind the word. */
+/* A coloured tag is a flat chip with ink text. */
 .tag.good, .tag.warn, .tag.bad, .tag.info, .tag[style*="--fill"] {
   background: var(--fill);
   color: var(--ink);
@@ -644,11 +672,11 @@ figure > * + figcaption { margin-top: var(--s2); }
 }
 .icon > img { display: block; width: 120%; height: 120%; margin: -10%; max-width: none; object-fit: cover; }
 /* A tile: a glyph inside the same bordered square, on the sunken gray or, with
-   --fill set, on a colour under Melli. The exception, for an icon that must
+   --fill set, on a colour. The exception, for an icon that must
    stand as a mark of its own: beside a meter bar, or carrying a colour. The
    glyph is 18px and stays outlined white, as a bar's name does on its bar. */
 .icon:has(> svg) { display: grid; place-items: center; font-size: 18px; color: var(--text); }
-.icon:has(> svg)[style*="--fill"] { background: var(--melli), var(--fill); }
+.icon:has(> svg)[style*="--fill"] { background: var(--texture), var(--fill); }
 .icon > svg { width: 18px; height: 18px; }
 /* An icon beside its name, in a table cell or a line of text. */
 .with-icon { display: flex; align-items: center; gap: var(--s2); }
@@ -733,7 +761,7 @@ figure > * + figcaption { margin-top: var(--s2); }
      note size read larger than the cells under it. */
   font-size: 11px;
   line-height: 16px;
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-dim);
@@ -777,7 +805,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   text-align: center;
 }
 
-/* ── Bars: the Melli status bar ───────────────────────────────────────── */
+/* ── Bars: the status bar ─────────────────────────────────────────────── */
 
 /* No plain text on a bar: white fails on the fills, ink fails on the track.
    A meter's outlined name and value may cross a bar's top edge. */
@@ -793,7 +821,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   position: absolute;
   inset: 0 auto 0 0;
   width: calc(var(--v, 0) * 1%);
-  background: var(--melli), var(--fill, var(--c1));
+  background: var(--texture), var(--fill, var(--c1));
   box-shadow: 1px 0 0 var(--ink);
 }
 .bar.thin { height: 8px; }
@@ -812,8 +840,8 @@ figure > * + figcaption { margin-top: var(--s2); }
 }
 /* Diverging: the fill grows from the middle, right for a gain and left (.neg)
    for a loss. --v is a share of one half. Gains are green and losses red. */
-.bar.diverge .bar-fill { inset: 0 auto 0 50%; width: calc(var(--v, 0) * 0.5%); background: var(--melli), var(--good); }
-.bar.diverge .bar-fill.neg { inset: 0 50% 0 auto; background: var(--melli), var(--bad); box-shadow: -1px 0 0 var(--ink); }
+.bar.diverge .bar-fill { inset: 0 auto 0 50%; width: calc(var(--v, 0) * 0.5%); background: var(--texture), var(--good); }
+.bar.diverge .bar-fill.neg { inset: 0 50% 0 auto; background: var(--texture), var(--bad); box-shadow: -1px 0 0 var(--ink); }
 .bar.diverge::after { content: ""; position: absolute; inset: 0 auto 0 50%; width: 1px; background: var(--ink); }
 
 /* Stacked: segments share one bar and split it by weight. A segment is all
@@ -825,7 +853,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   align-items: center;
   min-width: 0;
   padding: 0 var(--s2);
-  background: var(--melli), var(--fill, var(--c1));
+  background: var(--texture), var(--fill, var(--c1));
   color: var(--ink);
   font-size: var(--fs-label);
   line-height: var(--lh-label);
@@ -876,8 +904,9 @@ figure > * + figcaption { margin-top: var(--s2); }
 }
 .col-value { margin-bottom: var(--s1); font-size: var(--fs-label); line-height: var(--lh-label); }
 .col-fill {
-  height: calc(var(--v, 0) / var(--max) * var(--h));
-  background: var(--melli), var(--fill, var(--c1));
+  --col-h: calc(var(--v, 0) / var(--max) * var(--h));
+  height: var(--col-h);
+  background: var(--texture), var(--fill, var(--c1));
   border: var(--border);
 }
 .col-label {
@@ -891,7 +920,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 }
 .col-fill + .col-label { margin-top: -1px; }
 /* Stacked: several fills in one column share an ink line. */
-.col > .col-fill + .col-fill { margin-top: -1px; }
+.col > .col-fill + .col-fill { --lap: -1px; margin-top: var(--lap); }
 /* Grouped: fills stand side by side in .col-bars, one per series. */
 .col-bars { display: flex; align-items: flex-end; }
 .col-bars > .col-fill { flex: 1; }
@@ -917,7 +946,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .heat-cell {
   height: var(--cell);
   margin: 0 -1px -1px 0;
-  background: var(--melli), color-mix(in oklab, var(--fill, var(--c1)) calc(var(--v, 0) * 1%), var(--sunken));
+  background: var(--texture), color-mix(in oklab, var(--fill, var(--c1)) calc(var(--v, 0) * 1%), var(--sunken));
   border: var(--border);
 }
 /* The key: five cells from low to high, between the words for each end. */
@@ -951,10 +980,8 @@ figure > * + figcaption { margin-top: var(--s2); }
   stroke: var(--ink);
   stroke-width: 1px;
 }
-/* Area: a flat fill under a line. A second copy of the path with .area-melli
-   lays the texture over it; it needs the #melli gradient from the showcase. */
+/* Area: a flat fill under a line. */
 .chart .area { fill: var(--fill, var(--c1)); }
-.chart .area-melli { fill: url(#melli); pointer-events: none; }
 /* Diagram shapes for an SVG: an inset box with an ink edge, and a light wire
    with an ink ring that ends in an arrowhead. */
 .chart .box { fill: var(--inset); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
@@ -1023,7 +1050,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   flex: none;
   width: 12px;
   height: 12px;
-  background: var(--melli), var(--fill, var(--c1));
+  background: var(--texture), var(--fill, var(--c1));
   border: var(--border);
 }
 
@@ -1049,14 +1076,14 @@ figure > * + figcaption { margin-top: var(--s2); }
   vector-effect: non-scaling-stroke;
   transform: rotate(calc(var(--at, 0) * 3.6deg));
 }
-/* Melli and the ink rim sit over the whole disc, and let the pointer through
-   to the slices. */
+/* The ink rim sits over the whole disc, and lets the pointer through to the
+   slices. */
 .pie::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: var(--melli);
+  background: var(--texture);
   border: var(--border);
   border-radius: 50%;
 }
@@ -1132,7 +1159,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   background: var(--sunken);
   border: var(--border);
   color: var(--text-dim);
-  font: 400 var(--fs-note) / var(--lh-note) var(--font);
+  font: 700 var(--fs-note) / var(--lh-note) var(--font);
   letter-spacing: 0.03em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1160,7 +1187,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .button:hover { filter: brightness(1.15); }
 .button:active { filter: brightness(0.9); }
 /* The one action that matters: a colour fill with ink text, like a coloured tag. */
-.button.primary { background: var(--melli), var(--fill, var(--c1)); color: var(--ink); }
+.button.primary { background: var(--texture), var(--fill, var(--c1)); color: var(--ink); }
 .button:disabled { color: var(--text-faint); filter: none; cursor: default; }
 
 .input {
@@ -1195,7 +1222,7 @@ select.input {
   border: var(--border);
   cursor: pointer;
 }
-.check:checked::before { content: ""; width: 8px; height: 8px; background: var(--melli), var(--fill, var(--c1)); box-shadow: 0 0 0 1px var(--ink); }
+.check:checked::before { content: ""; width: 8px; height: 8px; background: var(--texture), var(--fill, var(--c1)); box-shadow: 0 0 0 1px var(--ink); }
 /* A field: a note-size label above its control. */
 .field { display: grid; gap: var(--s1); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
 :is(.tab, .button, .input, .check):focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
@@ -1230,6 +1257,13 @@ select.input {
     animation: fill-y var(--t-slow) var(--ease) both;
     animation-delay: calc(var(--i, 0) * var(--t-step));
   }
+  /* A stacked column rises as one piece: grown one by one, its parts floated
+     apart until they met. The column is unveiled from its baseline instead. */
+  .anim .col:has(> .col-fill + .col-fill) {
+    animation: rise var(--t-slow) var(--ease) backwards;
+    animation-delay: calc(var(--i, 0) * var(--t-step));
+  }
+  .anim .col:has(> .col-fill + .col-fill) > .col-fill { animation: none; }
   /* Needs pathLength="1" on the path. */
   .anim .line {
     stroke-dasharray: 1;
@@ -1246,13 +1280,23 @@ select.input {
 
 /* style.js sets js-reveal and holds each animation at its first frame until
    the panel around it gets in-view. */
-.js-reveal .anim :is(.bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: paused; }
-.js-reveal .anim .in-view:is(.bar-fill, .col-fill, .line, .dot, .pie-slice),
-.js-reveal .anim .in-view :is(.bar-fill, .col-fill, .line, .dot, .pie-slice) { animation-play-state: running; }
+.js-reveal .anim :is(.bar-fill, .col, .col-fill, .line, .dot, .pie-slice) { animation-play-state: paused; }
+.js-reveal .anim .in-view:is(.bar-fill, .col, .col-fill, .line, .dot, .pie-slice),
+.js-reveal .anim .in-view :is(.bar-fill, .col, .col-fill, .line, .dot, .pie-slice) { animation-play-state: running; }
 
 @keyframes fade { from { opacity: 0; } }
 @keyframes fill-x { from { width: 0; } }
-@keyframes fill-y { from { height: 0; } }
+/* A column rises from its baseline. Shrinking only its height would shrink
+   the chart too, so the baseline slid down as the columns grew and they looked
+   poured from the top. The margin holds the column's full room while it grows;
+   2px is the least a bordered box can be. */
+@keyframes fill-y { from { height: 2px; margin-top: calc(var(--col-h) - 2px + var(--lap, 0px)); } }
+/* The veil starts just above the column's label and lifts. Its sides reach
+   past the column, where the label's rule runs on to meet its neighbours. */
+@keyframes rise {
+  from { clip-path: inset(calc(100% - var(--lh-note) - var(--s1) - 1px) calc(-1 * var(--s1)) 0 calc(-1 * var(--s1))); }
+  to { clip-path: inset(0 calc(-1 * var(--s1)) 0 calc(-1 * var(--s1))); }
+}
 @keyframes pie { from { stroke-dasharray: 0 100; } }
 @keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 

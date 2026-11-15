@@ -1,6 +1,6 @@
 # style
 
-My visual style, packaged as a plugin for Claude Code and Codex. It steers reports, explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, Melli-textured fills, and Expressway text with outlined headings.
+My visual style, packaged as a plugin for Claude Code and Codex. It steers reports, explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings.
 
 Open `skills/guide/assets/showcase.html` in a browser to see every component.
 
@@ -10,7 +10,6 @@ The style builds on work by others:
 
 - [ElvUI](https://tukui.org/elvui) by the Tukui team. Its pixel-thin black borders, dark backdrops, and outlined text set the look.
 - [EllesmereUI](https://www.curseforge.com/wow/addons/ellesmereui) by Ellesmere. Its overall polish is the starting point.
-- **Melli**, the status-bar texture shipped with ElvUI. `style.css` reproduces its luminance curve as a CSS gradient; the texture file is not included.
 - [Expressway](https://typodermicfonts.com/) by Ray Larabie, Typodermic Fonts. The typeface both interfaces use.
 - [Remix Icon](https://remixicon.com) by Remix Design. Its fill set supplies the symbol icons.
 
@@ -40,7 +39,7 @@ Without them, pages fall back to Overpass. Embedding the font in pages you publi
 | `skills/guide/scripts/build.py` | Inlines the stylesheet, script, and fonts into a page. |
 | `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
 | `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup. Needs Pygments. |
-| `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: Melli shading, ink edges, outlined title. |
+| `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: ink rings on lines, outlined title. |
 | `.claude-plugin/` | Claude Code plugin and marketplace manifests. |
 | `.codex-plugin/plugin.json` | Codex plugin manifest. |
 | `.agents/plugins/marketplace.json` | Codex marketplace manifest. |

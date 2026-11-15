@@ -3,7 +3,7 @@
 #   import mpl_style
 #   mpl_style.use()        # this file, plus the Expressway font
 #   ...draw...
-#   mpl_style.finish(fig)  # Melli shading, ink edges, outlined title
+#   mpl_style.finish(fig)  # ink rings on lines, outlined title
 #
 # Sizes are points at 100 dpi, so 0.72pt is one pixel: 8.64pt is the 12px note
 # size, 10.08pt the 14px label, 14.4pt the 20px subheading.
@@ -30,7 +30,7 @@ grid.color: 212121
 grid.linewidth: 0.72
 
 # Series colours, in order: azure, gold, amethyst, copper, silver, rose.
-axes.prop_cycle: cycler('color', ['639fd0', 'c3ad48', '9466ba', 'ce7b47', 'bec1c6', 'd28aac'])
+axes.prop_cycle: cycler('color', ['528ebf', 'c3ad48', '9466ba', 'ce7b47', 'bec1c6', 'd28aac'])
 
 font.size: 8.64
 text.color: d9d9d9

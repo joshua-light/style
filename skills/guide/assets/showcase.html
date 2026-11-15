@@ -16,7 +16,7 @@
   <!-- ── Text ── -->
   <p class="eyebrow">Design system · draft 1</p>
   <h1>Raid performance report</h1>
-  <p class="lead">Seven sizes, seven spacings, one border. Dark gray surfaces, black ink, a tan accent, Melli fills.</p>
+  <p class="lead">Seven sizes, seven spacings, one border. Dark gray surfaces, black ink, a tan accent, flat fills.</p>
 
   <h2>Text</h2>
   <p>Prose runs at 18px on a 30px line, a shade dimmer than headings, and never wider than 560px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Extra-bold marks emphasis</strong>; nothing is italic.</p>
@@ -378,19 +378,16 @@
       </div>
     </figure>
 
-    <!-- Area: the line chart with a filled .area under the line and a second copy, .area-melli, for the texture.
-         The <defs> gradient is Melli for SVG; copy it with the chart. One series only: areas hide each other. -->
+    <!-- Area: the line chart with a filled .area under the line. One series only: areas hide each other. -->
     <figure class="panel span-6">
       <div class="panel-head">Raid DPS, Thursday</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull on Thursday, rising from 9M to 24M">
-          <defs><linearGradient id="melli" x1="0" y1="0" x2="0" y2="1"><stop offset="0.008" stop-color="#000" stop-opacity="0.314"/><stop offset="0.164" stop-color="#000" stop-opacity="0.271"/><stop offset="0.398" stop-color="#000" stop-opacity="0.165"/><stop offset="0.586" stop-color="#000" stop-opacity="0.075"/><stop offset="0.727" stop-color="#000" stop-opacity="0.027"/><stop offset="0.836" stop-color="#000" stop-opacity="0.004"/><stop offset="0.898" stop-color="#000" stop-opacity="0.004"/><stop offset="0.914" stop-color="#000" stop-opacity="0.027"/><stop offset="0.93" stop-color="#000" stop-opacity="0.063"/><stop offset="0.977" stop-color="#000" stop-opacity="0.2"/><stop offset="0.992" stop-color="#000" stop-opacity="0.239"/></linearGradient></defs>
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
           <line class="gridline" x1="32" x2="428" y1="48" y2="48"/>
           <line class="gridline" x1="32" x2="428" y1="88" y2="88"/>
           <line class="gridline" x1="32" x2="428" y1="128" y2="128"/>
           <path class="area" style="--fill:var(--c1)" d="M32 132 L65 124 L98 128 L131 108 L164 112 L197 96 L230 100 L263 84 L296 88 L329 76 L362 80 L395 68 L428 72 L428 168 L32 168 Z"/>
-          <path class="area-melli" d="M32 132 L65 124 L98 128 L131 108 L164 112 L197 96 L230 100 L263 84 L296 88 L329 76 L362 80 L395 68 L428 72 L428 168 L32 168 Z"/>
           <line class="axis" x1="32" x2="428" y1="168" y2="168"/>
           <text class="end" x="24" y="12">40M</text>
           <text class="end" x="24" y="52">30M</text>
@@ -465,22 +462,22 @@
       <div class="panel-head">What ends a pull</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 176" role="img" aria-label="A pull ends in a kill if the boss dies before the enrage timer, and in a wipe if not">
-          <path class="wire" d="M104 88 H156"/>
-          <polygon class="arrow" points="156,84 164,88 156,92"/>
-          <path class="wire" d="M276 88 H300 V40 H328"/>
-          <polygon class="arrow" points="328,36 336,40 328,44"/>
-          <path class="wire" d="M276 88 H300 V136 H328"/>
-          <polygon class="arrow" points="328,132 336,136 328,140"/>
-          <rect class="box" x="8.5" y="64.5" width="96" height="48"/>
-          <rect class="box" x="164.5" y="64.5" width="112" height="48"/>
-          <rect class="box" x="336.5" y="16.5" width="96" height="48"/>
-          <rect class="box" x="336.5" y="112.5" width="96" height="48"/>
-          <text class="name mid" x="56" y="93">Pull</text>
-          <text class="name mid" x="220" y="93">Dead by enrage?</text>
-          <text class="name mid" x="384" y="45">Kill</text>
-          <text class="name mid" x="384" y="141">Wipe</text>
-          <text x="306" y="30">yes</text>
-          <text x="306" y="154">no</text>
+          <path class="wire" d="M72 88 H116"/>
+          <polygon class="arrow" points="116,84 124,88 116,92"/>
+          <path class="wire" d="M268 88 H296 V40 H320"/>
+          <polygon class="arrow" points="320,36 328,40 320,44"/>
+          <path class="wire" d="M268 88 H296 V136 H320"/>
+          <polygon class="arrow" points="320,132 328,136 320,140"/>
+          <rect class="box" x="8.5" y="64.5" width="64" height="48"/>
+          <rect class="box" x="124.5" y="64.5" width="144" height="48"/>
+          <rect class="box" x="328.5" y="16.5" width="104" height="48"/>
+          <rect class="box" x="328.5" y="112.5" width="104" height="48"/>
+          <text class="name mid" x="40" y="93">Pull</text>
+          <text class="name mid" x="196" y="93">Dead by enrage?</text>
+          <text class="name mid" x="380" y="45">Kill</text>
+          <text class="name mid" x="380" y="141">Wipe</text>
+          <text x="302" y="30">yes</text>
+          <text x="302" y="154">no</text>
         </svg>
       </div>
     </figure>
@@ -498,7 +495,8 @@
       </div>
     </section>
 
-    <!-- Steps: an ordered list with its numbers in squares. .steps.across sets them side by side, for three to five short steps. -->
+    <!-- Steps: an ordered list with its numbers in squares, one series colour per step. .steps.across sets them side
+         by side, for three to five short steps. .step-ref cites a step in a sentence: the same square, inline. -->
     <section class="panel span-12">
       <div class="panel-head">Before the pull</div>
       <div class="panel-body">
@@ -508,6 +506,7 @@
           <li><strong>Assign interrupts</strong><br><span class="dim label">Two players per cast.</span></li>
           <li><strong>Ready check</strong><br><span class="dim label">Pull on the count of five.</span></li>
         </ol>
+        <p class="label dim">Skipping <span class="step-ref" data-step="3">3</span> cost two wipes on Dimensius; <span class="step-ref" data-step="1">1</span> and <span class="step-ref" data-step="2">2</span> take five minutes together.</p>
       </div>
     </section>
 
@@ -556,9 +555,7 @@
       <svg viewBox="0 0 440 160" role="img" aria-label="A unit frame: a health bar over a power bar">
         <rect x="24.5" y="40.5" width="56" height="56" fill="var(--panel)" stroke="var(--ink)"/>
         <rect x="88.5" y="40.5" width="328" height="36" fill="var(--good)" stroke="var(--ink)"/>
-        <rect x="88.5" y="40.5" width="328" height="36" fill="url(#melli)"/>
         <rect x="88.5" y="80.5" width="236" height="16" fill="var(--azure)" stroke="var(--ink)"/>
-        <rect x="88.5" y="80.5" width="236" height="16" fill="url(#melli)"/>
         <rect x="324.5" y="80.5" width="92" height="16" fill="var(--sunken)" stroke="var(--ink)"/>
       </svg>
       <figcaption>A unit frame: portrait, health bar, power bar. The frame around a picture is the same 1px ink.</figcaption>
