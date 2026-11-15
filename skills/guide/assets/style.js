@@ -274,7 +274,41 @@
     if (input.hasAttribute("data-go") && input.closest(".stepper")) setStep(input.closest(".stepper"), input.value);
   });
 
+  // A toast: the callout inside <template id="…"> shows at the window's bottom
+  // right, and leaves after four seconds or on a click.
+  function toast(button) {
+    const template = document.getElementById(button.dataset.toast);
+    const note = template && template.content.firstElementChild;
+    if (!note) return;
+    let stack = document.querySelector(".toasts");
+    if (!stack) {
+      stack = document.createElement("div");
+      stack.className = "toasts";
+      stack.setAttribute("role", "status");
+      document.body.append(stack);
+    }
+    const shown = stack.appendChild(note.cloneNode(true));
+    setTimeout(() => shown.remove(), Number(button.dataset.toastMs) || 4000);
+  }
+
   document.addEventListener("click", (e) => {
+    // A menu shuts on a pick and on a click anywhere outside it.
+    for (const menu of document.querySelectorAll("details.menu[open]")) {
+      if (!menu.contains(e.target) || e.target.closest(".menu-item")) menu.open = false;
+    }
+    const opener = e.target.closest("[data-open]");
+    if (opener) {
+      const dialog = document.querySelector(opener.dataset.open);
+      if (dialog && dialog.showModal) dialog.showModal();
+      return;
+    }
+    // A dialog shuts on its own buttons and on a click on the page behind it.
+    const closer = e.target.closest("dialog [data-close]") || (e.target.matches("dialog.panel") && e.target);
+    if (closer) return closer.closest("dialog").close();
+    const toaster = e.target.closest("[data-toast]");
+    if (toaster) return toast(toaster);
+    const shown = e.target.closest(".toasts > *");
+    if (shown) return shown.remove();
     const tab = e.target.closest(".tab[data-tab]");
     if (tab) return pickTab(tab);
     const th = e.target.closest("table.sortable thead th");

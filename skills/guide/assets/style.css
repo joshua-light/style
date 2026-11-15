@@ -115,6 +115,31 @@
   --c6: var(--rose);
   --c-other: #7a7a7a;
 
+  /* Domain palettes: colours a subject's readers already know. They stand in
+     for the series colours when the marks are players or items, and each is
+     softened by the same 12% as the rest. Warrior is the accent's own hue. */
+  --class-death-knight: #bc3241;
+  --class-demon-hunter: #9d3ebf;
+  --class-druid: #ee7c2d;
+  --class-evoker: #408f7d;
+  --class-hunter: #a3c773;
+  --class-mage: #4dbcdc;
+  --class-monk: #3bed94;
+  --class-paladin: #e489b1;
+  --class-priest: #ededed;
+  --class-rogue: #ede36d;
+  --class-shaman: #2172d0;
+  --class-warlock: #8486df;
+  --class-warrior: #bb966e;
+  --quality-poor: #979797;
+  --quality-common: #ededed;
+  --quality-uncommon: #41ed34;
+  --quality-rare: #2172d0;
+  --quality-epic: #9d44df;
+  --quality-legendary: #ee802a;
+  --quality-artifact: #d7c17f;
+  --quality-heirloom: #34c1ed;
+
   /* Data fills are flat. --texture is an overlay every data fill carries, so
      one token could texture them all. Melli, the WoW status-bar gradient, was
      the first texture and was dropped: in a report it added a brightness
@@ -219,6 +244,13 @@ body {
 
 h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre, table { margin: 0; }
 img, svg { display: block; max-width: 100%; }
+/* Selected text is ink on light gray: the browser's blue is off-palette. */
+::selection { background: var(--text-dim); color: var(--ink); }
+/* Scrollbars are a sunken track and a raised square thumb with an ink edge. */
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: var(--sunken); }
+::-webkit-scrollbar-thumb { background: var(--raised); border: var(--border); }
+@supports not selector(::-webkit-scrollbar) { * { scrollbar-color: var(--raised) var(--sunken); } }
 /* A component's own display would otherwise beat the hidden attribute. */
 [hidden] { display: none !important; }
 
@@ -347,6 +379,15 @@ ins { color: var(--text); font-weight: 700; text-decoration: none; }
 /* A highlight colours the name of a thing inside a sentence, as game text
    colours an item's name. Names only, and colour only: no background. */
 mark { background: none; color: var(--accent); }
+/* A name from a domain palette takes that colour: an item in its quality colour. */
+mark[style*="--fill"] { color: var(--fill); }
+/* A short form explained on hover wears the dotted rule, as a linked mark does. */
+abbr[data-tip] {
+  padding-bottom: 1px;
+  background: repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px 3px) 0 100% / 100% 1px no-repeat;
+  text-decoration: none;
+  cursor: default;
+}
 
 /* A border, not text-decoration: a heading's outline would stroke an underline too. */
 a {
@@ -520,6 +561,9 @@ blockquote cite {
 /* A picture or screenshot in an ink frame, with its caption below. */
 .frame > :is(img, svg, video), .frame > .pins > :is(img, svg, video) { width: 100%; background: var(--sunken); border: var(--border); }
 
+/* A picture keeps its shape when its width and height attributes are set. */
+.frame > :is(img, video) { height: auto; }
+
 hr { height: 1px; margin: 0; border: 0; background: var(--ink); }
 
 code, kbd, pre {
@@ -533,6 +577,8 @@ code, kbd {
   background: var(--sunken);
   border: var(--border);
 }
+/* A key is a raised thing: it takes the neutral tag's gray. */
+kbd { background: var(--raised); }
 pre {
   padding: var(--s3) var(--s4);
   background: var(--sunken);
@@ -657,6 +703,9 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* A list belongs to the paragraph that introduces it: it sits as close to it
    as its own items sit to each other. A full block gap cut the two apart. */
 :is(.page, .flow, .slide, .panel-body, .callout-body) > p + :is(ul, ol):not([class]) { margin-top: var(--s2); }
+/* A box that wears text on its border keeps a block of clear space above it,
+   inside a body too. */
+:is(.panel-body, .callout-body) > * + :is(.panel, .callout, .code) { margin-top: var(--s5); }
 /* The title or tag reaches half a line into the body. */
 .panel-head + .panel-body, .callout-head + .callout-body { padding-top: var(--s5); }
 /* A table may run edge to edge inside a panel. Under a title it starts below
@@ -1087,6 +1136,9 @@ figure > * + figcaption { margin-top: var(--s2); }
   stroke-linecap: butt;
   filter: var(--ink-ring);
 }
+/* A marker is a circle, 8px across (r="4") with an ink edge: the end of a
+   line, a mark of a scatter, a point the chart names. With the pie it is the
+   one round shape. Squares were used first and dropped: a point is not a box. */
 .chart .dot {
   fill: var(--fill, var(--c1));
   stroke: var(--ink);
@@ -1106,8 +1158,8 @@ figure > * + figcaption { margin-top: var(--s2); }
 .chart .line.ghost, .chart .wire.ghost { stroke-dasharray: 6 6; }
 .chart .box.ghost { fill: none; stroke-dasharray: 4 4; }
 .chart .target { stroke: var(--text-dim); stroke-width: 1px; stroke-dasharray: 4 4; shape-rendering: crispEdges; }
-/* A forecast's marker is hollow: a 6px square whose 2px edge in the series
-   colour brings it to the size of a filled marker. */
+/* A forecast's marker is hollow: a 6px circle (r="3") whose 2px edge in the
+   series colour brings it to the size of a filled marker. */
 .chart .dot.ghost { fill: var(--surface); stroke: var(--fill, var(--c1)); stroke-width: 2px; filter: var(--ink-ring); }
 /* Notes on a chart. An event is a solid gray rule down the plot: it happened,
    so it is not dashed. A period is a band one step darker than any surface. A
@@ -1534,7 +1586,7 @@ label.meter-row { display: block; }
 
 /* A field: a note-size label above its control. */
 .field { display: grid; gap: var(--s1); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
-:is(.tab, .button, .input, .check, .slider, .more > summary):focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
+:is(.tab, .button, .input, .check, .slider, .toggle, .menu-item, .more > summary):focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
 
 /* ── Explainers ───────────────────────────────────────────────────────── */
 
@@ -1689,6 +1741,339 @@ mark.is-hot { color: var(--text); }
   .page:not(.wide) > .rail > .bar { display: flex; }
 }
 
+/* ── More chart forms ─────────────────────────────────────────────────── */
+
+/* Histogram: the bins touch and share ink edges, because the scale under them
+   is continuous. Each label marks where its bin starts. */
+.cols.hist { gap: 0; }
+.cols.hist > .col + .col { margin-left: -1px; }
+.cols.hist .col-label { margin-inline: 0; text-align: left; overflow: visible; }
+
+/* Signed columns: gains rise from a zero line and losses hang under it. --v on
+   the .col is the size of the value; .neg hangs it. --min is the scale's
+   lowest value, a negative number. Each half keeps room for its values. */
+.cols.signed {
+  --min: -100;
+  --span: calc(var(--max) - var(--min));
+  --up: calc(var(--max) / var(--span) * var(--h));
+  --down: calc(-1 * var(--min) / var(--span) * var(--h));
+  --pad: calc(var(--lh-label) + var(--s1));
+  position: relative;
+  align-items: stretch;
+}
+.cols.signed::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: calc(var(--pad) + var(--up) - 1px);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--ink);
+}
+.cols.signed > .col { display: grid; grid-template-rows: calc(var(--pad) + var(--up)) calc(var(--down) + var(--pad)) auto; }
+.cols.signed > .col > * { --col-h: calc(var(--v, 0) / var(--span) * var(--h)); grid-column: 1; }
+.cols.signed .col-fill { grid-row: 1; align-self: end; background: var(--texture), var(--good); }
+.cols.signed .col-value { grid-row: 1; align-self: end; margin: 0 0 calc(var(--col-h) + var(--s1)); }
+.cols.signed .neg > .col-fill { grid-row: 2; align-self: start; margin-top: -1px; background: var(--texture), var(--bad); }
+.cols.signed .neg > .col-value { grid-row: 2; align-self: start; margin: calc(var(--col-h) + var(--s1) - 1px) 0 0; }
+.cols.signed .col-label { grid-row: 3; margin-top: 0; border-top: 0; }
+
+/* Diverging heat: two hues around a sunken zero, for a value that is a gain
+   or a loss. .neg marks a loss; --v is the size of either. */
+.diverge > .heat-cell { --fill: var(--good); }
+.diverge > .heat-cell.neg { --fill: var(--bad); }
+
+/* Range bar: the fill runs from --from to --v, for lowest to highest. A
+   .bar-mark stands at the middle value. */
+.bar.range .bar-fill {
+  left: calc(var(--from, 0) * 1%);
+  width: calc((var(--v, 0) - var(--from, 0)) * 1%);
+  box-shadow: 1px 0 0 var(--ink), -1px 0 0 var(--ink);
+}
+
+/* Small multiples: past six series, each gets a small chart of its own, in
+   one colour on one shared scale. The ink rule under each is its baseline. */
+.multiples { --cols: 4; display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: var(--s4); }
+.multiple { margin: 0; border-bottom: var(--border); font-size: var(--fs-label); line-height: var(--lh-label); }
+.multiple-head { display: flex; justify-content: space-between; gap: var(--s2); }
+.multiple-head > :last-child { color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.multiple > .spark { height: 48px; margin-top: var(--s1); }
+
+/* A leader joins a label to the point it names, where the label cannot sit
+   beside the point. */
+.chart .leader { stroke: var(--text-dim); stroke-width: 1px; shape-rendering: crispEdges; }
+
+/* ── Diagram forms ────────────────────────────────────────────────────── */
+
+/* A zone groups boxes: a well with its name on its top border, outlined like
+   every text on a border. Lanes are zones stacked. A lifeline is an ink rule,
+   as in a tree: structure, not flow. A start marker is a small filled square. */
+.chart .zone { fill: var(--sunken); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+.chart text.zone-name {
+  fill: var(--text-dim);
+  font-weight: 700;
+  text-transform: uppercase;
+  stroke: var(--ink);
+  stroke-width: 2.5px;
+  paint-order: stroke fill;
+}
+.chart .life { stroke: var(--ink); stroke-width: 2px; shape-rendering: crispEdges; }
+.chart .start { fill: var(--text-dim); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+
+/* ── Technical blocks ─────────────────────────────────────────────────── */
+
+/* A code block may wear its file's name on its top border, in a neutral chip. */
+.code { position: relative; }
+.code-head {
+  position: absolute;
+  z-index: 1;
+  top: -10px;
+  left: var(--s3);
+  display: flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--s2);
+  background: var(--raised);
+  border: var(--border);
+  font: 400 var(--fs-note) / var(--lh-note) var(--font-mono);
+  white-space: nowrap;
+}
+.code-head + pre { padding-top: var(--s5); }
+/* Lines: each line of the block in a span.line that ends in its own newline.
+   A line may be lit (.hl), numbered (pre.numbered), added or removed (.add,
+   .del in pre.diff). A diff tints the line with a flat dark tone of the state
+   colour, and the sign in the gutter says which. */
+pre .line { display: block; margin: 0 calc(-1 * var(--s4)); padding: 0 var(--s4); }
+pre .line.hl { background: var(--panel); box-shadow: inset 2px 0 0 var(--text); }
+pre.numbered { counter-reset: line; }
+pre.numbered .line::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  min-width: 2ch;
+  margin-right: var(--s4);
+  text-align: right;
+  color: var(--text-faint);
+  user-select: none;
+}
+pre.diff .line::before { content: ""; display: inline-block; width: 2ch; user-select: none; }
+pre.diff .line.add { background: color-mix(in oklab, var(--good) 22%, var(--sunken)); }
+pre.diff .line.del { background: color-mix(in oklab, var(--bad) 22%, var(--sunken)); }
+pre.diff .line.add::before { content: "+"; color: var(--good); }
+pre.diff .line.del::before { content: "-"; color: var(--bad); }
+/* Terminal output: what was typed is bright, what came back is dim, and a
+   state word may take its state colour. */
+pre.term { color: var(--text-dim); }
+pre.term .cmd { color: var(--text); }
+pre.term .prompt { color: var(--accent); user-select: none; }
+pre.term .good { color: var(--good); }
+pre.term .warn { color: var(--warn); }
+pre.term .bad { color: var(--bad); }
+
+/* A file tree: nested lists in the code face, each level behind an ink rule.
+   A folder is bright and ends in a slash; a note sits beside a name. */
+.files { font: 400 var(--fs-label) / var(--lh-body) var(--font-mono); color: var(--text-dim); }
+.files, .files ul { margin: 0; padding: 0; list-style: none; }
+.files ul { margin-left: 6px; padding-left: var(--s3); border-left: var(--border); }
+.files li { max-width: none; margin: 0; }
+.files .dir { color: var(--text); }
+.files small { margin-left: var(--s3); font-family: var(--font); color: var(--text-faint); }
+
+/* A transcript: each message is a callout that names its speaker in its tag.
+   The reader's own messages stand at the right. */
+.chat { display: grid; gap: var(--s5); }
+.chat > .callout { justify-self: start; max-width: min(100%, var(--measure)); }
+.chat > .callout.me { justify-self: end; }
+.chat .callout-body { font-size: var(--fs-body); line-height: var(--lh-body); }
+
+/* ── Data states ──────────────────────────────────────────────────────── */
+
+/* Loading, failed and empty all wear the dashed frame: the data is not there.
+   A word says which. A bar under the word shows how far a load has come. */
+.empty > .bar { width: 160px; max-width: 100%; }
+.empty > .button { color: var(--text); }
+/* Busy: a load of unknown length. A short fill crosses the track at a steady
+   pace, the one mark that loops. */
+.bar.busy .bar-fill { width: 25%; box-shadow: 1px 0 0 var(--ink), -1px 0 0 var(--ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .bar.busy .bar-fill { animation: busy calc(3 * var(--t-slow)) linear infinite; }
+}
+@keyframes busy { from { left: -25%; } to { left: 100%; } }
+
+/* A quiet state: a small square in the state's colour and a word, for a cell
+   or a line where a tag would shout. */
+.state { --fill: var(--c-other); display: inline-flex; align-items: center; gap: var(--s2); white-space: nowrap; }
+.state::before { content: ""; flex: none; width: 12px; height: 12px; background: var(--texture), var(--fill); border: var(--border); }
+.state.good { --fill: var(--good); }
+.state.warn { --fill: var(--warn); }
+.state.bad { --fill: var(--bad); }
+.state.info { --fill: var(--info); }
+
+/* ── App controls ─────────────────────────────────────────────────────── */
+
+textarea.input { display: block; width: 100%; height: auto; min-height: 76px; padding: var(--s2); resize: vertical; }
+.input:disabled { color: var(--text-faint); cursor: default; }
+/* A wrong value: a bar of the state colour inside the ink edge, and a line
+   under the field that says what is wrong. The edge itself stays black. */
+.input[aria-invalid="true"] { box-shadow: inset 2px 0 0 var(--bad); }
+.field-note { display: flex; align-items: center; gap: var(--s2); }
+
+/* A toggle is a two-stop slider: the same handle, at the left for off and at
+   the right for on, where the track fills. */
+.toggle {
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: var(--bar-height);
+  margin: 0;
+  background: var(--sunken);
+  border: var(--border);
+  cursor: pointer;
+}
+.toggle::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 8px; background: var(--text-dim); box-shadow: 1px 0 0 var(--ink); }
+.toggle:checked { background: var(--texture), var(--fill, var(--c1)); }
+.toggle:checked::before { inset: 0 0 0 auto; background: var(--text); box-shadow: -1px 0 0 var(--ink); }
+
+/* A toolbar: a strip of filters over a panel's table, as dark as the head. */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s2) var(--s3);
+  padding: var(--s3) var(--s4);
+  background: var(--head);
+  border-bottom: var(--border);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--text-dim);
+}
+.panel-head + .toolbar { padding-top: var(--s5); }
+.toolbar > .push, .panel-foot > .push { margin-left: auto; }
+/* Pages of rows: the tabs, with the current page lit. */
+.tab[aria-current="page"] { background: var(--raised); color: var(--text); }
+
+/* A menu: a button that opens a sunken list, as dark as a tooltip. */
+.menu { position: relative; display: inline-block; }
+.menu > summary { list-style: none; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu > summary::after { content: ""; border: 4px solid transparent; border-bottom-width: 0; border-top: 6px solid var(--text-dim); }
+.menu-list {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + var(--s1));
+  left: 0;
+  display: grid;
+  min-width: 160px;
+  padding: var(--s1) 0;
+  background: var(--sunken);
+  border: var(--border);
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  height: var(--head-height);
+  padding: 0 var(--s3);
+  background: none;
+  border: 0;
+  color: var(--text);
+  font: 400 var(--fs-label) / var(--lh-label) var(--font);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.menu-item:hover { background: var(--panel); }
+.menu-item:disabled { background: none; color: var(--text-faint); cursor: default; }
+.menu-list > hr { margin: var(--s1) 0; }
+
+/* A dialog is a panel laid over the page, which goes dark behind it by the
+   share a deck's other slides do. No shadow lifts it. */
+dialog.panel {
+  position: fixed;
+  inset: 0;
+  width: min(440px, calc(100vw - 2 * var(--s4)));
+  height: fit-content;
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  color: var(--text);
+}
+dialog.panel:not([open]) { display: none; }
+dialog.panel::backdrop { background: none; backdrop-filter: brightness(0.55); }
+
+/* A toast: a callout that reports what just happened, at the window's bottom
+   right. It floats, so it is as dark as a tooltip. style.js shows it and takes
+   it away. */
+.toasts {
+  position: fixed;
+  z-index: 90;
+  right: var(--s5);
+  bottom: var(--s5);
+  display: grid;
+  gap: var(--s5);
+  width: min(320px, calc(100vw - 2 * var(--s4)));
+}
+.toasts > .callout, .callout.toast { background: var(--sunken); cursor: pointer; }
+
+/* ── Page furniture ───────────────────────────────────────────────────── */
+
+/* Where the page sits: a path of links above the eyebrow. */
+.crumbs { display: flex; flex-wrap: wrap; gap: var(--s2); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.crumbs a { border: 0; color: var(--text-dim); }
+.crumbs a:hover { color: var(--text); }
+.crumbs > * + *::before { content: "/"; margin-right: var(--s2); color: var(--text-faint); }
+.page > .crumbs + * { margin-top: var(--s2); }
+/* Who wrote the page and when: one note line under the lead. */
+.byline { font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.page > .lead + .byline { margin-top: var(--s2); }
+/* A footnote's number in the text, and the notes at the foot of the page. */
+a.fn { padding: 0 1px; border: 0; font-size: 0.75em; line-height: 0; vertical-align: super; }
+.footnotes { font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.footnotes li + li { margin-top: var(--s1); }
+/* The page's last line: where the data came from and when the page was made. */
+.page-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding-top: var(--s4);
+  border-top: var(--border);
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  color: var(--text-dim);
+}
+/* A light picture on the dark page sits on a sunken mat, so its white never
+   touches the page gray. */
+.frame.mat > :is(img, svg, video) { padding: var(--s4); }
+
+/* ── Decisions ────────────────────────────────────────────────────────── */
+
+/* Reasons for and against: each wears a drawn sign in a state square. */
+.pros, .cons { display: grid; gap: var(--s2); padding: 0; list-style: none; font-size: var(--fs-label); line-height: var(--lh-label); }
+:is(.pros, .cons) > li { position: relative; max-width: none; margin: 0; padding-left: calc(16px + var(--s2)); }
+:is(.pros, .cons) > li::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  border: var(--border);
+  background: linear-gradient(var(--ink) 0 0) center / 8px 2px no-repeat, var(--bad);
+}
+.pros > li::before {
+  background:
+    linear-gradient(var(--ink) 0 0) center / 8px 2px no-repeat,
+    linear-gradient(var(--ink) 0 0) center / 2px 8px no-repeat,
+    var(--good);
+}
+/* The option picked, in a table of options: its column is one step lighter. */
+.table .pick { background: var(--panel); }
+.table th.pick { color: var(--text); }
+.table th > .tag { margin-left: var(--s2); vertical-align: 1px; }
+
 /* Phone layouts for the components above. They sit here, after every rule they
    override: placed with the layout rules at the top, the later component rules
    won and a chain, a comparison and steps across kept their desktop shape. */
@@ -1708,6 +2093,7 @@ mark.is-hot { color: var(--text); }
   .layers { grid-template-columns: minmax(0, 1fr); }
   .layer { grid-column: auto; }
   .page > .margin { float: none; width: auto; padding-top: 0; }
+  .multiples { --cols: 2; }
 }
 
 /* ── Motion ───────────────────────────────────────────────────────────── */
@@ -1748,6 +2134,7 @@ mark.is-hot { color: var(--text); }
     animation-delay: calc(var(--i, 0) * var(--t-step));
   }
   .anim .col:has(> .col-fill + .col-fill) > .col-fill { animation: none; }
+  .anim .cols.signed .neg > .col-fill { animation-name: fill-down; }
   /* Needs pathLength="1" on the path. */
   .anim .line {
     stroke-dasharray: 1;
@@ -1787,6 +2174,8 @@ mark.is-hot { color: var(--text); }
   from { clip-path: inset(calc(100% - var(--lh-note) - var(--s1) - 1px) calc(-1 * var(--s1)) 0 calc(-1 * var(--s1))); }
   to { clip-path: inset(0 calc(-1 * var(--s1)) 0 calc(-1 * var(--s1))); }
 }
+/* A loss hangs from the zero line, so it grows down from it. */
+@keyframes fill-down { from { height: 2px; } }
 @keyframes pie { from { stroke-dasharray: 0 100; } }
 @keyframes trace { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
@@ -1830,7 +2219,7 @@ mark.is-hot { color: var(--text); }
 @page slide { size: 960px 540px; margin: 0; }
 @media print {
   :root { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  .tooltip { display: none !important; }
+  .tooltip, .toasts, dialog.panel { display: none !important; }
   /* Reveal on scroll never fires on paper: show every mark finished. */
   .anim * { animation: none !important; }
   .panel, .callout, blockquote, pre, figure, .table tr { break-inside: avoid; }

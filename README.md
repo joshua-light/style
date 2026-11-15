@@ -49,15 +49,18 @@ Embedding Expressway in pages you publish may need a web licence from Typodermic
 | --- | --- |
 | `skills/guide/SKILL.md` | The rules. Both tools load it. |
 | `skills/guide/assets/style.css` | Tokens and components. |
-| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, steppers, quizzes, bound sliders, the contents rail, deck keys, builds, and popups. |
+| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, deck keys, builds, and popups. |
 | `skills/guide/assets/style.mplstyle` | The same look for matplotlib charts. |
+| `skills/guide/assets/mermaid.json` | The same look for Mermaid diagrams. |
 | `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
 | `skills/guide/assets/fonts/` | Fira Sans, the fallback face, and its licence. Your Expressway files go here too; git ignores them. |
 | `skills/guide/scripts/build.py` | Inlines the stylesheet, script, and fonts into a page. |
 | `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
-| `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup. Needs Pygments. |
+| `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup, with numbered or lit lines, or as a diff. Needs Pygments. |
 | `skills/guide/scripts/mpl_style.py` | Finishes a matplotlib figure: ink rings on lines, outlined title. |
+| `skills/guide/scripts/plotly_style.py` | Registers the plotly template. |
 | `examples/showcase.html` | Reference markup for every component. The guide reads it before it builds a page. |
+| `examples/showcase-mermaid.png`, `examples/showcase-plotly.png` | The showcase's samples of the Mermaid and plotly themes. |
 | `examples/voyager-deck.html` | The reference deck: builds, growth, a popup, motion to scale, and a speed slider for review. |
 | `examples/eth-explainer.html` | A long explainer page: Michael Silveira's ETH explainer, restyled. Its licence sits beside it. |
 | `.claude-plugin/plugin.json` | Claude Code plugin manifest. |

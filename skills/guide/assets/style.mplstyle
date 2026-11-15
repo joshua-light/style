@@ -49,7 +49,7 @@ ytick.major.size: 0
 xtick.major.pad: 6
 ytick.major.pad: 6
 
-# Every mark has a 1px ink edge. Lines are 2px with mitered joins; markers are 8px squares.
+# Every mark has a 1px ink edge. Lines are 2px with mitered joins; markers are 8px circles.
 patch.edgecolor: 000000
 patch.linewidth: 0.72
 patch.force_edgecolor: True
@@ -59,7 +59,7 @@ lines.solid_capstyle: butt
 lines.markersize: 5.76
 lines.markeredgecolor: 000000
 lines.markeredgewidth: 0.72
-scatter.marker: s
+scatter.marker: o
 
 legend.frameon: False
 legend.fontsize: 10.08

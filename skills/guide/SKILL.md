@@ -14,7 +14,7 @@ Apply these rules to every visual output. Where another design skill disagrees o
 Paths are relative to this skill's directory.
 
 1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck.
-2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, the contents rail, and stepping through a deck, its builds, and its popups.
+2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups.
 3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
 4. Open or screenshot the result and check it against the rules below.
 
@@ -34,7 +34,7 @@ The style is dark only. Never add a light theme.
 | `--raised` | `#3f3f3f` | Neutral tags. |
 
 - Every container edge is `1px solid #000`. The one other edge is dashed, for a part that is not there yet (see Lines).
-- Nothing is rounded: no `border-radius`, no round markers. The pie chart is the one round shape.
+- Nothing is rounded: no `border-radius`. Two shapes are round: the pie chart, and a chart's markers (see Charts). Every box, tag, swatch, and list marker stays square.
 - A top-level box is light gray (`--panel`). A box inside it is dark (`--inset`): a stat, table, or chart panel on a slide, a panel in a panel. The stylesheet does this by nesting; never set it by hand, and never make a top-level panel dark.
 - Depth comes from the gray steps. No soft shadows, no blur, no glow, no transparency.
 - No box has a head bar. Panel titles and callout kinds sit on the top border (see On the border). Table rows are `--inset`; heads are flat `--head`, one step darker, never textured, never coloured. A hovered row turns `--panel`.
@@ -116,9 +116,11 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - Contrast is soft on purpose. Text is never pure white and no surface is darker than `--sunken`: near-white on near-black glared in the bold face. Never raise the contrast to make text stand out; use size or `<strong>`.
 - Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline. The one exception is a linked mark (`<mark data-key>`, see Explainers): it wears a dotted rule, so the reader knows the name can be hovered.
   - Mark names only. Never mark a number, a verdict, or a whole phrase, and never give a mark a state colour.
+  - A name from a domain palette takes that colour: an item's name in its quality colour (see Domain palettes).
   - Mark running text only: body, leads, list items. Titles and headings stay white.
   - Keep it sparse: most sentences have no mark. When highlighting starts to compete with the content, remove marks.
-- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour.
+- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour. The exceptions are a mark in a domain colour, and a state word in terminal output (see Code).
+- A short form the reader may not know is `<abbr data-tip="DPS" data-tip-note="Damage per second">`. It wears the dotted rule, as a linked mark does: hover for more.
 - Uppercase with extra tracking appears only at note size: eyebrows, tags, stat labels.
 - Table heads are uppercase too, at 11px on a 16px line. That is the one size below the scale: a row of capitals at note size read larger than the cells under it. Nothing else uses it.
 - Prose lines stop at 560px (`--measure`), about 65 characters. A list's indent sits inside that width.
@@ -128,6 +130,29 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - A value that was replaced is `<del>`: struck and faint. The value that replaced it follows in `<ins>`, set like emphasis: "<del>37</del> <ins>21</ins>". Strike nothing else: not a wrong claim, not a finished task.
 - Numbers in a column use tabular digits, so they line up digit by digit. The stylesheet sets this on `.num` cells, legend values, and key-value values. Only Regular has tabular digits: Bold totals and stat values keep proportional ones.
 - Only the Regular cut has `≈ ≤ ≥ ≠ √`. Use them inside maths only, never in a heading, `<strong>`, or outlined text; elsewhere write "about" or "at most".
+
+## Numbers and dates
+
+A number is written one way everywhere on a page.
+
+| Kind | Write | Not | Rule |
+| --- | --- | --- | --- |
+| Small count | 1,284 | 1284 | Whole digits with a comma, up to 9,999. |
+| Large amount | 41.8M | 41,800,000 | Three figures and K, M, or B from 10,000 up. |
+| Column of amounts | 4.92M, 0.28M | 4.92M, 280K | One unit and one precision down a column. |
+| Percent | 6.4% | 6.4 % | No space before the sign. One decimal at most. |
+| Unit | 25.9B km | 25.9Bkm | A space before a unit that is a word. |
+| Change | +6.4%, -3.1% | 6.4% | A change always shows its sign. The minus is a hyphen. |
+| Change in a share | +4 pts | +4% | Points between two percentages. |
+| Range | 12 to 31 | 12-31 | "to": a dash reads as a minus. |
+| Ratio | 8 / 8 | 8/8 | A space each side of the slash. |
+| Rough value | about 40 | ~40 | A word, outside maths. |
+| Duration | 2h 14m, 4m 05s | 2:14:00 | Two units at most, the larger first. |
+| Date | 15 Nov 2026 | 11/15/26 | Day, short month, year. No year inside the current one. |
+| Time of day | 21:30 | 9:30 PM | The 24-hour clock. |
+| Recent time | 3h ago | 180 minutes ago | For anything less than a day old. |
+| Date in data | 2026-11-15 | 15.11.2026 | Year first, in code and file names only. |
+| No value | a faint dash | 0, blank, N/A | `<span class="faint">–</span>`. Zero is a value: write 0. |
 
 ## On the border
 
@@ -141,7 +166,7 @@ Titles and key values sit across a box's top border, not inside it. They look la
 - Only the top border carries text. Never hang text off the bottom or the sides.
 - Text on a border is always outlined, so it reads over both surfaces. A tag is a solid chip and needs none.
 - Centre it with an offset of half the line height, in whole pixels. Never use a transform: it lands on half pixels and blurs the text.
-- A box with text on its border needs 24px of clear space above it.
+- A box with text on its border needs 24px of clear space above it. The stylesheet keeps that gap inside a panel or callout body too.
 
 ## Space
 
@@ -192,6 +217,17 @@ State tokens: `--good` green, `--warn` yellow, `--bad` red, `--info` azure.
 
 Series colours, assigned in this order: `--c1` azure, `--c2` gold, `--c3` amethyst, `--c4` copper, `--c5` silver, `--c6` rose. `--c-other` `#7a7a7a` holds everything past six. A mark with no `--fill` takes `--c1`.
 
+### Domain palettes
+
+Where a subject has colours its readers already know, those stand in for the series colours.
+
+- Two ship with the stylesheet. Class colours: `--class-death-knight`, `-demon-hunter`, `-druid`, `-evoker`, `-hunter`, `-mage`, `-monk`, `-paladin`, `-priest`, `-rogue`, `-shaman`, `-warlock`, `-warrior`. Item quality: `--quality-poor`, `-common`, `-uncommon`, `-rare`, `-epic`, `-legendary`, `-artifact`, `-heirloom`.
+- A player's mark takes the class colour: `style="--fill: var(--class-mage)"`. An item's name takes its quality colour: `<mark style="--fill: var(--quality-epic)">`.
+- Use a domain palette only for the thing it names. Bosses, nights, and schools keep the series colours.
+- A domain colour is not a state. Hunter green is not "good" and Death Knight red is not "bad": state still needs its own tag or word.
+- Name the class or quality in a label, a legend, or a tooltip. The colour alone is not enough.
+- A new domain palette is softened like every colour here.
+
 - Every colour here is a pure hue mixed 12% toward mid gray (`#707070`, in OKLab), so fills sit with the softened text. Soften a new colour by the same share; never paste in a pure hue.
 - Never add an amber, lime, or second yellow. None separates from gold, least of all for colour-blind readers. `--yellow` separates only because it is much lighter: never darken it.
 - Set a fill with `style="--fill: var(--c2)"`.
@@ -213,11 +249,12 @@ Markup for each is in `../../examples/showcase.html`.
 - **Table** (`.table`): 11px bold uppercase heads, label-size cells, numbers right-aligned with `.num`, in tabular digits.
 - **Pie** (`.pie`): an SVG of `.pie-slice` circles and `.pie-cut` lines. Each slice sets `--v`, its share in percent, and `--at`, the sum of the shares before it. No arc geometry is needed.
 - **Tag** (`.tag`): a short state word, in bold.
+- **State** (`.state.good|warn|bad|info`): a 12px square in the state's colour and a word. Use it in a table cell or a line where a tag would shout: a yes or no cell, a row's status. Without a kind it is gray.
 - **Icon**: see Icons below.
 - **Table extras**: `<tfoot>` holds totals, as dark as the head and bold. A `<th colspan>` row inside a `<tbody>` heads a group; give each group its own `<tbody>`. `class="sortable"` sorts on a click of a head; mark the starting column with `aria-sort`.
 - **Key-value list** (`dl.kv`): label and value pairs, ruled, values at the right. For a handful of facts about one thing.
 - **Empty state** (`.empty`): one dim centred line, with an optional glyph, inside a dashed frame, in a panel that has nothing to show. Say what would fill it.
-- **Figure frame** (`figure.frame`): an image, SVG, or video in a 1px ink frame, caption below.
+- **Figure frame** (`figure.frame`): an image, SVG, or video in a 1px ink frame, caption below. A light picture, such as a screenshot of a light interface, takes `figure.frame.mat`: a sunken mat keeps its white off the page gray. Never dim or invert the picture.
 - **Slide**: see Slides and decks below.
 
 ## Maths
@@ -247,10 +284,16 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 | Punctuation, operators | `--text-dim` |
 | Other names | white |
 
-- Never add a colour outside this table: no green, azure, amethyst, or rose in code.
+- Never add a colour outside this table: no green, azure, amethyst, or rose in code. A diff and a terminal are the exceptions below: there the colour marks a state.
 - Code has one weight and no italics, comments included.
 - Never write token colours into a page. The stylesheet owns them through the `--code-*` tokens.
 - Keep lines under 60 characters where the block sits in half a page, so nothing scrolls sideways.
+- A key is `<kbd>`: a raised gray chip, where code is sunken. "Press <kbd>Ctrl</kbd> <kbd>K</kbd>."
+- A block may wear its file's name: wrap the `<pre>` in `.code` and lead with a `.code-head`, a neutral chip on the top border.
+- Lines: `highlight.py --number` numbers a block and `--hl 5,7-9` lights lines. Both put each line in a `span.line` that ends in its own newline. Never write a newline between two such spans: it shows as an empty line.
+- A diff is `pre.diff`, from `highlight.py diff FILE`. An added line is a flat dark tone of green and a removed line of red, and a sign in the gutter says which. A diff has no token colours.
+- Terminal output is `pre.term`. A `span.prompt` and a `span.cmd` mark what was typed; what came back stays dim. A state word (PASS, FAIL, SKIP) may be `.good`, `.warn`, or `.bad`. Colour nothing else.
+- A file tree is `ul.files`, nested, in the code face behind ink rules. A folder is `span.dir` and ends in a slash; a `<small>` beside a name holds a note.
 
 ## Icons
 
@@ -274,9 +317,18 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - Values over a few categories: `.cols`. Label each column directly; there is no y-axis. `--max` sets the scale.
 - Parts of each column: stack several `.col-fill` in one `.col`, top part first, one colour per series, with a legend.
 - Two series per category: put the fills side by side in `.col-bars`. Two series at most; values go in tooltips.
+- A marker is a circle: `<circle class="dot" r="4">`, 8px across with an ink edge. It marks the end of a line, each mark of a scatter, and a point the chart names. Never draw a square marker: squares were used first and dropped.
+- Two numbers per mark: a scatter. An SVG `.chart` with one `.dot` per mark, ticks on both axes, and each axis named on the chart. One colour. Name only the marks the text is about, with a `.series` label, and give every dot a tooltip.
+- How values spread: `.cols.hist`. The bins touch, because the scale under them is continuous, and each label marks where its bin starts. Say the bin's width in the caption.
+- Lowest to highest: `.bar.range` in a `.meter`. The fill runs from `--from` to `--v`; a `.bar-mark` stands at the middle value. The value reads "2m to 4m". Say in the caption what the scale and the tick are.
+- Gains and losses across categories: `.cols.signed`. `--v` on each `.col` is the size of the value and `.neg` hangs it under the zero line; `--max` and `--min` set the scale. Gains are green, losses red, and each column shows its signed value.
+- More than six series over time: `.multiples`. Each series is a `figure.multiple` with its name, its last value, and a `.spark`. One colour and one scale: every spark shares a `viewBox`. Say the scale in the caption. `--cols` sets the columns.
+- A gain or a loss in two dimensions: `.heat.diverge`. A cell with `.neg` is a loss, and `--v` is the size of either. Two hues around a sunken zero, with a `.heat-scale.diverge` key from the lowest value to the highest.
+- A point the chart names, such as a peak: a `.dot` on it and a `.series` label beside it. Where the label cannot sit beside the point, join the two with a `<line class="leader">`.
+- A gap in the data: stop the line, and bridge the gap with a `.line.ghost` in the same colour. Say "No data" beside the bridge. Never draw a solid line across a gap.
 - A value against a goal: add `<span class="bar-mark" style="--at:80">` inside the `.bar`. It is a white tick with an ink ring. Say what it marks in a caption or legend.
 - A goal or an average across an SVG chart: `<line class="target">`, a 1px gray dashed rule. It is not data: no series colour, no ink ring. Label it on the chart.
-- A forecast: continue the line with a second `<path class="line ghost">` in the same colour, from the last measured point. Give it no `pathLength`: it fades in once the solid line has traced. Label it "Forecast" on the chart. End it in a hollow marker: `<rect class="dot ghost">`, a 6px square, where a filled marker is 8px.
+- A forecast: continue the line with a second `<path class="line ghost">` in the same colour, from the last measured point. Give it no `pathLength`: it fades in once the solid line has traced. Label it "Forecast" on the chart. End it in a hollow marker: `<circle class="dot ghost" r="3">`, 6px across, where a filled marker is 8px.
 - A forecast column, or a segment not reached yet: add `.ghost` to the `.col-fill` or `.bar-seg`. A hatched segment holds no label: ink text does not read on the hatch.
 - Where a bar is heading: put a `.bar-fill.ghost` with its own `--v` before the measured `.bar-fill`. The measured fill covers its start, so only the stretch still to come is hatched.
 - A moment on a chart, such as a patch or a roster change: `<line class="event">`, a solid 1px gray rule down the plot. It happened, so it is not dashed.
@@ -288,16 +340,22 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - A share the reader should count, such as "37 in 100": a `.waffle`. It is one element: ten squares to a row, the first `--v` filled. `--rows: 2` shows a share of 20. One colour, set with `--fill`; name the share in a `.legend.list` beside it.
 - A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
 - A single trend where the amount matters: add an `.area` under the line. One series only: areas hide each other.
-- Change over time: an inline SVG `.chart`. Lines are 2px with mitered joins and a black ring; markers are 8px squares; gridlines are `--sunken`; the baseline is ink. Label each line at its end and keep the legend.
+- Change over time: an inline SVG `.chart`. Lines are 2px with mitered joins and a black ring; markers are 8px circles; gridlines are `--sunken`; the baseline is ink. Label each line at its end and keep the legend.
 - A trend inside a stat: `.spark`.
 - An SVG chart scales as a whole, text included. Draw its `viewBox` at the width it will render.
 - For matplotlib, use the ready theme: `plt.style.use("assets/style.mplstyle")`, then `from mpl_style import finish` (in `scripts/`) and call `finish(fig)` before saving. It adds the ink ring on lines and the outlined title.
-- Charts from other tools (matplotlib, plotly) follow the same tokens: `--panel` background, 1px black edges on every mark, square markers, mitered joins, flat fills, plain Expressway labels with the outline on the title only (font files are in `assets/fonts/`).
+- For plotly and Mermaid, use the ready themes (see Outside the page).
+- Charts from other tools follow the same tokens: `--panel` background, 1px black edges on every mark, round markers, mitered joins, flat fills, plain Expressway labels with the outline on the title only (font files are in `assets/fonts/`).
 
 ## Explainers
 
 - **Diagram** (`.diagram`): a chain of `.node` boxes joined by `.link` arrows. `.diagram.down` runs top to bottom. A node holds a `<strong>` name and an optional `<span>` note. `.node.ghost` is a part not there yet, with `.link.ghost` as the arrow into it; say "Planned" or "Optional" in its note.
 - A diagram that branches or loops is an inline SVG `.chart` with `.box` rectangles, `.wire` paths, and `.arrow` heads. Wires are 2px light gray with an ink ring and mitered corners, and run only horizontally and vertically. Label a branch beside its wire. Draw it at the width it renders. Make each box at least 12px wider than its label on both sides: measure the label, never guess.
+- Four more diagram forms use the same SVG parts:
+  - **Zones**: `<rect class="zone">` groups boxes. It is a sunken well, drawn first, with its name in a `text.zone-name` on its top border.
+  - **Sequence**: a `.box` per actor, a `<line class="life">` under each, and a `.wire` per message, top to bottom in time. A reply is a solid wire back. Never dash it: a dash says it has not happened.
+  - **States**: boxes joined by wires, each wire named for what causes it. `<rect class="start">`, a small filled square, marks where it begins. A state that ends it holds a second box, 4px inside the first.
+  - **Lanes**: one zone per actor, stacked 16px apart, each named on its top border. A box sits in the lane of who does it.
 - The font has no arrows. Never type an arrow character: use `.link`, or draw the head.
 - **Timeline** (`ol.timeline`): one `<li>` per event with its date in `.timeline-when`. Set `--fill` on an `<li>` to colour its marker; state colours only for state.
 - **Steps** (`ol.steps`): a numbered list with its numbers in coloured squares, in ink bold. Each step takes the next series colour, which marks the steps as distinct and lets text point back at one. Six steps at most; `--fill` on a step overrides its colour, and on the list gives every step one colour.
@@ -328,12 +386,30 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
   - Ask before the reveal, not after. One quiz per section at most.
 - **Disclosure** (`details.more`): optional depth, closed by default, with the question it answers in its `<summary>`. Use it for a formal statement, a derivation, or a side question, so the main line stays short. Never hide a step the argument needs. It prints open.
 - **Claims** (`ul.claims`): one `<li>` per statement: the claim in `<strong>`, its verdict in a `.tag`, the reason in a `<p>`. Use it for myths and facts, or to recap what follows and what does not. The verdict is a word in a state colour: "True" green, "False" red, "Partly" yellow.
+- **Transcript** (`.chat`): one `.callout` per message, with the speaker's name in its `.callout-head`. The reader's own messages take `.me`: they stand at the right under a neutral tag. Give each other speaker a series colour with `--fill`, and keep it across the page.
+- **For and against** (`ul.pros`, `ul.cons`): each in a panel named on its border. The stylesheet draws the plus and the minus; never type them.
+- **Options** (a `.table` with one column per option): give the chosen column's cells `.pick` and put a `.tag.good` in its head. A yes, no, or partly cell is a `.state`.
+- **Status list** (`ul.claims` again): the task in `<strong>`, its state in the tag, a note in the `<p>`. "Done" green, "Doing" azure, "Blocked" red, "Planned" neutral.
+- **Board**: one panel per column, named on its border with its count in a tag, and a `.node` per card. A card not started is `.node.ghost`.
+- **Decision**: a `.callout.tip` named "Decision", glyph `checkbox-circle`. The decision in `<strong>`, then the reason.
 - **Margin note** (`aside.margin`): a note, a source, or a small figure in the room the prose measure leaves at the right of the page. Write it as a child of `.page`, before the paragraph it belongs to. Prose flows past it; anything wider than the measure starts below it. It holds what a reader may skip: never a step of the argument. On a phone it sits above its paragraph.
 - **Linked prose** (`data-link` on a section or box): inside it, a `<mark data-key="tank">` in a sentence and the part of the figure with `data-key="tank"` light up together, and the other keyed parts darken. Use it where the text names parts of a figure. Key any part: a `.node`, a `.layer`, a pin, an SVG shape, a bar.
 - **Contents rail** (`nav.rail`): for a page of five or more sections. Write it as a child of `.page`, after the lead: a `.bar.thin` and an `<ol>` of links to section ids.
   - On a window 1400px wide or more it is fixed left of the page; the script lights the section being read and fills the bar with the share scrolled.
   - On a narrower window it is a plain contents list in the flow.
   - It does not fit `.page.wide`: there it always stays in the flow.
+
+## Data states
+
+A panel says what state its data is in, in a word.
+
+- **Loading**: an `.empty` frame with a glyph (`hourglass`), a word, and a thin bar. The data is not there yet, so the frame is dashed.
+  - Length known: a plain `.bar.thin` with `--v`, and the count in the words: "Loading 5 of 8 logs".
+  - Length unknown: `.bar.thin.busy`. A short fill crosses the track at a steady pace, on a loop.
+- **Failed**: a `.tag.bad` on the panel's top border, and an `.empty` that says what failed (glyph `error-warning`) and offers a `.button` to try again.
+- **Stale**: the data shows as it is. A `.tag.warn` "Stale" sits on the border, and the `.panel-foot` gives its age and the next refresh. Never dim stale data.
+- **Partial**: a neutral tag on the border and the reason in the `.panel-foot`. The part still to come is a `.ghost` fill stacked over the measured one.
+- **Empty**: see Empty state.
 
 ## Controls
 
@@ -346,8 +422,17 @@ For pages that are used, not only read.
   - `data-bind="--healers"` writes the value to that custom property on the slider's panel, and into every `[data-show="--healers"]`. Marks read it: `style="--v: calc(var(--healers) * 20)"`. This makes a figure the reader can explore, with no page script.
   - Set the starting value on the panel too (`style="--healers:3"`), so the figure is right before the script runs.
   - `data-bind-to="#id"` binds to another element instead of the panel.
+- **Textarea** (`textarea.input`): long text. It fills its field's width and resizes downward.
+- **Wrong value**: `aria-invalid="true"` on the `.input` draws a red bar inside its left edge; the edge stays black. Under it, a `.field-note` says what is wrong, led by a `.tag.bad`. A plain `.field-note` is a hint. A `disabled` input is faint.
+- **Toggle** (`input.toggle`, a checkbox): a two-stop slider. The handle sits at the left for off and at the right for on, where the track fills. Label it with `.with-icon`.
+- **Toolbar** (`.toolbar`): a strip of filters between a panel's title and its table, as dark as the table head. `.push` sends what follows it to the right.
+- **Pages of rows**: `.tabs` in the `.panel-foot`, the current page marked `aria-current="page"`, beside "Rows 1 to 20 of 184".
+- **Menu** (`details.menu`): a `.button` summary over a `.menu-list` of `.menu-item` buttons; an `<hr>` parts groups. The list is sunken, as a tooltip is. It shuts on a pick and on a click outside.
+- **Dialog** (`<dialog class="panel" id="…">`): a panel with its title on the border and its buttons in the `.panel-foot`. A button with `data-open="#id"` opens it; `data-close` inside it shuts it, as does a click on the page behind. The page goes dark behind it, by the share a deck's other slides do. No shadow.
+- **Toast**: a button with `data-toast="id"` shows the callout inside `<template id="id">` at the window's bottom right, for four seconds or until clicked. It reports what just happened; never put a choice in it.
 - **Checkbox** (`input.check`): a sunken square that holds a smaller filled square when checked. There are no round radio buttons: use tabs to pick one of several.
 - Controls show a 1px white outline on keyboard focus. Never remove it.
+- Scrollbars and selected text are styled by the stylesheet: a sunken track with a raised square thumb, and ink on light gray. Never restyle them on a page.
 
 ## Slides and decks
 
@@ -445,10 +530,29 @@ Motion is judged by eye, slowed down.
 - Check an animation by reading computed values part-way through it, at a slowed speed. One screenshot cannot tell growth from a late pop.
 - Give a `clip-path` keyframe both its ends. A clip cannot blend from a shape to none: with only a start, the part stays hidden for half the time and then pops.
 
+## Page furniture
+
+- **Crumbs** (`nav.crumbs`): where the page sits, as links above the eyebrow. The last item is the page itself, as plain text.
+- **Byline** (`p.byline`): one note line under the lead: who, when, how long, which draft, parted by "·".
+- **Sources**: one or two go in a margin note. More than that are footnotes: `<a class="fn" href="#fn-1">1</a>` in the text and an `ol.footnotes` at the foot, each ending in a link back.
+- **Foot**: an `<hr>`, then the footnotes, then `footer.page-foot` with the data's source at the left and the date the page was made at the right. An `<hr>` has no other use: sections are parted by headings and space.
+
+## Outside the page
+
+Some places take no stylesheet. The look travels as an image, or as a mapping onto what the place offers.
+
+- An image exported for a light place (a chat, a README, another tool's slides) keeps the page gray behind it, 24px of padding, and a 1px ink frame. Never export on a clear background.
+- A README or a chat message gets plain text and Markdown tables, and each figure as an exported image. Lead a chat message with the finding in a sentence.
+- Slides for another tool are exported whole, each at 1920 by 1080.
+- A terminal's colours map to tokens: background `--sunken`, text and white `--text`, bright black `--text-faint`, red `--red`, green `--green`, yellow `--yellow`, blue `--azure`, magenta `--amethyst`, cyan `--silver`, cursor `--accent`. The palette has no cyan. Put a state word beside every state colour.
+- Mermaid: `assets/mermaid.json` is the theme. Pass it to `mermaid.initialize`, or to `mmdc` with `-c`. It gives inset boxes, sunken groups, ink edges, square corners, and solid replies. Edge labels sit on a panel-gray chip, which shows inside a group.
+- plotly: `import plotly_style; plotly_style.use()` (in `scripts/`) registers the template. plotly cannot draw the ink ring or an outlined title; a figure that needs them is an inline SVG.
+
 ## Print
 
 - Pages print with their dark surfaces. Disclosures print open; a stepper prints the state it is on. A deck prints one slide per page, edge to edge, every slide lit and every piece built: open the print dialog and save as PDF. Popups stay off paper.
 - Animations do not run on paper; every mark prints finished.
+- Dialogs and toasts stay off paper.
 
 ## Motion
 
@@ -465,7 +569,7 @@ Motion is judged by eye, slowed down.
 - `.stagger` on a parent delays each child's mark by one step.
 - With `style.js` loaded, each panel plays when a fifth of it scrolls into view, not on page load. Its marks start together.
 - A line needs `pathLength="1"` to trace. A pie slice needs `pathLength="100"`.
-- On a page everything plays once: nothing replays on scrolling back. In a deck a piece grows again each time it is built. Nothing loops or bounces.
+- On a page everything plays once: nothing replays on scrolling back. In a deck a piece grows again each time it is built. Nothing bounces, and one mark loops: the busy bar of a load of unknown length (see Data states).
 - The stylesheet already honours reduced-motion settings.
 
 ## Hover
