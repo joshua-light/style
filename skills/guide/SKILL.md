@@ -14,7 +14,7 @@ Apply these rules to every visual output. Where another design skill disagrees o
 Paths are relative to this skill's directory.
 
 1. Read `assets/showcase.html`. It holds the markup for every component.
-2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, and stepping through a deck.
+2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, the contents rail, and stepping through a deck.
 3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
 4. Open or screenshot the result and check it against the rules below.
 
@@ -87,7 +87,7 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - Text has four colours: `--text` `#d9d9d9` for content, `--text-prose` `#bcbcbc` for long prose, `--text-dim` `#a3a3a3` for labels and captions, `--text-faint` `#888888` for markers and disabled items.
 - Prose is a plain `<p>`, `<ul>`, or `<ol>` placed straight in `.page` or `.flow`. The stylesheet sets it a size above body text and a shade dimmer, so `<strong>` stands out in `--text`. Give it no class, and never set these by hand.
 - Contrast is soft on purpose. Text is never pure white and no surface is darker than `--sunken`: near-white on near-black glared in the bold face. Never raise the contrast to make text stand out; use size or `<strong>`.
-- Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline.
+- Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline. The one exception is a linked mark (`<mark data-key>`, see Explainers): it wears a dashed rule, so the reader knows the name can be hovered.
   - Mark names only. Never mark a number, a verdict, or a whole phrase, and never give a mark a state colour.
   - Mark running text only: body, leads, list items. Titles and headings stay white.
   - Keep it sparse: most sentences have no mark. When highlighting starts to compete with the content, remove marks.
@@ -106,7 +106,7 @@ Titles and key values sit across a box's top border, not inside it. They look la
 
 - A panel's title is 20px extra-bold, 12px in from the left, centred on the top border. There is no head bar.
 - A tag may sit on the same border at the right.
-- A callout names its kind in a coloured tag at the top left. The tag sets it apart from a panel.
+- A callout names its kind in a coloured tag at the top left: the kind's glyph, then its name. The tag sets it apart from a panel.
 - A stat wears its label at the top left and its delta or tag at the top right.
 - A meter bar wears its name at the top left and its value at the top right.
 - Only the top border carries text. Never hang text off the bottom or the sides.
@@ -136,7 +136,7 @@ Every gap is one of seven steps. Each has one meaning.
 - No panel shows empty space. Panels in a grid row share a height, and the content takes the spare room: table rows stretch, a sparkline grows, a chart row centres. Pick spans so the content also fills the width; a `.legend.list` takes what a pie leaves.
 - When one panel is much taller than its neighbour, give it `.rows-2` and stack two short panels beside it.
 - `.grid` has 12 columns. Children span 12 unless given `.span-3`, `-4`, `-6`, `-8`, or `-9`. Below 760px, spans collapse.
-- Fixed heights: 28px for table heads; 16px for a bar; 20px for a meter bar; 8px for a thin bar; 24px for a stacked bar; 20px for a tag.
+- Fixed heights: 28px for table heads; 16px for a bar or a slider; 20px for a meter bar, and for a slider in a meter row; 8px for a thin bar; 24px for a stacked bar; 20px for a tag.
 
 ## Colour
 
@@ -175,8 +175,8 @@ Series colours, assigned in this order: `--c1` azure, `--c2` gold, `--c3` amethy
 
 Markup for each is in `assets/showcase.html`.
 
-- **Panel** (`.panel`): an optional `.panel-head` title on the top border, body padded 16px. A `.tag` inside the head lands on the border at the right. `.panel-body.flush` lets a table run edge to edge; under a title, the strip between the panel's top border and the table head is `--head` too, and the table head keeps a black line above and below it.
-- **Callout** (`.callout.note|tip|warn|bad`): the kind's name in a tag of the kind's colour, on the top border at the left. Keep to one or two per screen.
+- **Panel** (`.panel`): an optional `.panel-head` title on the top border, body padded 16px. A `.tag` inside the head lands on the border at the right. `.panel-foot` is a strip under the body for the figure's controls or its one-line takeaway. `.panel-body.flush` lets a table run edge to edge; under a title, the strip between the panel's top border and the table head is `--head` too, and the table head keeps a black line above and below it.
+- **Callout** (`.callout.note|tip|warn|bad`): the kind's glyph and name in a tag of the kind's colour, on the top border at the left. Each kind has one glyph: note `information`, tip `lightbulb`, warn `alert`, bad `skull-2`. Put it first in the `.callout-head`, before the word. A callout with a name of its own ("Theorem") takes a glyph that fits the name, or none. Keep to one or two per screen.
 - **Stat** (`.panel.stat`): note-size label on the top border at the left, `.stat-foot` with one `.delta` or `.tag` on the same border at the right, heading-size value inside, then an optional `.stat-note` caption at the bottom left saying what the delta compares against ("vs last week"), thin bar, or sparkline. A delta never appears without its comparison.
 - **Bar** (`.bar`): the signature mark, a flat colour fill in a sunken track. It carries no plain text. `.bar.thin` is the small one. `.bar.stack` splits one bar into `.bar-seg` parts, which may hold an ink label.
 - **Meter** (`.meter`): a ranked list of `.meter-row`s, each a label, a bar, and a value. The name sits on the bar's top edge at the left and the value on the same edge at the right, as a unit frame names a health bar. This is the horizontal bar chart.
@@ -229,7 +229,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
   - A glyph has no background. This is the default for every icon.
   - A glyph takes the colour of the text it is attached to: accent beside an eyebrow, white beside a value, dim beside a caption. Never give a glyph a colour of its own.
   - A glyph is as tall as one line of that text: 16px beside a note, 24px beside body text, 36px beside a hero number. The stylesheet sizes it; never set a size by hand.
-  - A glyph wears the same black outline as a heading. Never show one without it.
+  - A glyph wears the same black outline as a heading. Never show one without it, except in a callout's tag: there it is ink on a solid chip, 16px, 4px from the word, and the stylesheet drops the outline.
   - Never use line icons, pixel icons, emoji, or a second icon set: thin strokes cannot carry the outline.
 - Attach a glyph to its text with `<span class="with-icon">GLYPH<span>Label</span></span>`, 8px apart. `.with-icon` also works as a class on the text's own element, such as `<p class="eyebrow with-icon">`.
 - An icon never carries meaning alone: pair it with a word.
@@ -247,6 +247,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - Gains and losses: `.bar.diverge`. The fill grows right from the middle for a gain and left (`.bar-fill.neg`) for a loss; `--v` is a share of one half. Gains are green, losses red, and the signed value sits beside each bar.
 - Two dimensions, such as day by hour: `.heat`. Each `.heat-cell` takes `--v` from 0 to 100. One hue only, set with `--fill`; never a rainbow. Put a `.heat-scale` key under it, and give every cell a tooltip.
 - Parts of a whole: `.bar.stack` with a legend, or a `.pie`.
+- A share the reader should count, such as "37 in 100": a `.waffle`. It is one element: ten squares to a row, the first `--v` filled. `--rows: 2` shows a share of 20. One colour, set with `--fill`; name the share in a `.legend.list` beside it.
 - A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
 - A single trend where the amount matters: add an `.area` under the line. One series only: areas hide each other.
 - Change over time: an inline SVG `.chart`. Lines are 2px with mitered joins and a black ring; markers are 8px squares; gridlines are `--sunken`; the baseline is ink. Label each line at its end and keep the legend.
@@ -262,17 +263,50 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - The font has no arrows. Never type an arrow character: use `.link`, or draw the head.
 - **Timeline** (`ol.timeline`): one `<li>` per event with its date in `.timeline-when`. Set `--fill` on an `<li>` to colour its marker; state colours only for state.
 - **Steps** (`ol.steps`): a numbered list with its numbers in coloured squares, in ink bold. Each step takes the next series colour, which marks the steps as distinct and lets text point back at one. Six steps at most; `--fill` on a step overrides its colour, and on the list gives every step one colour.
-- **Step reference** (`<span class="step-ref" data-step="2">2</span>`): the step's square inline, in the same colour. Use it to cite a step in a sentence. Never cite a step by colour name, and never use the chip for anything but a step. `.steps.across` sets three to five short steps side by side.
+- **Step reference** (`<span class="step-ref" data-step="2">2</span>`): the step's square inline, in the same colour. Use it to cite a step, a stepper's state, or a pin in a sentence. Never cite one by colour name, and never use the chip for anything else. `.steps.across` sets three to five short steps side by side.
 - **Icon list** (`ul.icon-list`): each item is a glyph and its text. Use it where each line is a different kind of thing; use plain bullets otherwise.
 - **Before and after** (`.compare`): two panels with a `.link` between them. Tag each panel on its top border.
+- **Tree** (`.tree`): a parent `.node` over its `.tree-kids`, joined by a bus. Use it for what belongs to what: a hierarchy, a family of problems.
+  - The wires are 2px ink rules with no arrowheads, as in a timeline. A tree is not a flow; for a flow use `.diagram` or an SVG.
+  - A child may be a `.tree` itself. `--span` on a child gives it more columns; give a subtree as many as it has leaves.
+  - On a phone it becomes an indented outline.
+- **Layers** (`.layers`): `.layer` blocks stacked so each row rests on the row below. Use it for what depends on what, or for a stack such as network layers.
+  - `--cols` on the stack and `--span` on a block set the widths. Rows fill left to right, top to bottom.
+  - `.base` is a slab others stand on. `.fallen` marks a block knocked out, and every block that stood on it. Say the state in a `.tag` inside the block too; the gray alone is not enough.
+- **Stepper** (`.stepper` on a panel or figure): a figure that moves through numbered states. Use it when the explanation is a change: before and after, a process, a value growing.
+  - Tabs in the head go to a state: `<button class="tab" data-go="2">`. Buttons with `data-go="prev"` and `data-go="next"` step; put them in the `.panel-foot`. A `.tag.step-count` reads "2 / 4".
+  - `data-on="2 3"` shows a part on those states. `data-vis` does the same but keeps the part's room, so the figure does not jump.
+  - Give every part of a later state the `hidden` attribute, so the page is right before the script runs.
+  - The pressed tab takes its state's step colour. Cite a state with `.step-ref`, as you would a step. Six states at most.
+  - A `.slider` with `data-go` inside the stepper scrubs through the states.
+- **Pins** (`.pins`): numbered squares on a picture, each tied to a note. Wrap the image, SVG, or code in `.pins` and add `<span class="step-ref pin" data-step="1" style="--x:12; --y:50">1</span>` for each; `--x` and `--y` place the pin's centre in percent of the picture. Write the notes as an `ol.steps` beside or below, so each pin matches its note by number and colour. Six pins at most.
+- **Quiz** (`.callout.quiz`): a callout that asks. Its glyph is `question`; name it by what it asks for ("Check", "Predict", "Sort").
+  - Put the question in a `<p>`, then `.options` holding `.button`s, one with `data-correct`, then a hidden `.feedback` holding an empty `<p class="verdict">` and the explanation.
+  - A click turns the right option green and a wrong pick red, and the script writes the result into `.verdict` in words. Never drop the verdict line: colour must not carry the result alone.
+  - For a question answered in the head, replace `.options` with one `<button class="button" data-reveal>`.
+  - For several short questions, give each its own `.quiz-item` with its own options and feedback.
+  - `data-check="id"` on the quiz opens gates once it is answered: `[data-gate="id"]` shows, `[data-gate-hide]` hides, `[data-gate-enable]` unlocks a control, `[data-gate-press]` is clicked. Use a gate to make the reader predict before a figure reveals the answer.
+  - Ask before the reveal, not after. One quiz per section at most.
+- **Disclosure** (`details.more`): optional depth, closed by default, with the question it answers in its `<summary>`. Use it for a formal statement, a derivation, or a side question, so the main line stays short. Never hide a step the argument needs. It prints open.
+- **Claims** (`ul.claims`): one `<li>` per statement: the claim in `<strong>`, its verdict in a `.tag`, the reason in a `<p>`. Use it for myths and facts, or to recap what follows and what does not. The verdict is a word in a state colour: "True" green, "False" red, "Partly" yellow.
+- **Margin note** (`aside.margin`): a note, a source, or a small figure in the room the prose measure leaves at the right of the page. Write it as a child of `.page`, before the paragraph it belongs to. Prose flows past it; anything wider than the measure starts below it. It holds what a reader may skip: never a step of the argument. On a phone it sits above its paragraph.
+- **Linked prose** (`data-link` on a section or box): inside it, a `<mark data-key="tank">` in a sentence and the part of the figure with `data-key="tank"` light up together, and the other keyed parts darken. Use it where the text names parts of a figure. Key any part: a `.node`, a `.layer`, a pin, an SVG shape, a bar.
+- **Contents rail** (`nav.rail`): for a page of five or more sections. Write it as a child of `.page`, after the lead: a `.bar.thin` and an `<ol>` of links to section ids.
+  - On a window 1400px wide or more it is fixed left of the page; the script lights the section being read and fills the bar with the share scrolled.
+  - On a narrower window it is a plain contents list in the flow.
+  - It does not fit `.page.wide`: there it always stays in the flow.
 
 ## Controls
 
 For pages that are used, not only read.
 
-- **Tabs** (`.tabs` of `.tab` buttons): a row of joined tags; the pressed one is lit. `data-tab="name"` shows the element with `data-tab-panel="name"` in the same panel. In a `.panel-head` the tabs sit on the top border at the right. Mark the first tab `aria-pressed="true"` and give the other panels `hidden`.
+- **Tabs** (`.tabs` of `.tab` buttons): a row of joined tags; the pressed one is lit. A `disabled` tab is faint. `data-tab="name"` shows the element with `data-tab-panel="name"` in the same panel. In a `.panel-head` the tabs sit on the top border at the right. Mark the first tab `aria-pressed="true"` and give the other panels `hidden`.
 - **Button** (`.button`): 28px tall, raised gray. One `.button.primary` per view: a colour fill with ink text.
 - **Input** (`.input`, also on `<select>`): 28px tall, sunken. Label it with `<label class="field">`.
+- **Slider** (`input.slider`, a range input): a status bar the reader drags, with a flat fill up to a square handle. Label it with `.field`, or put it in a `label.meter-row` with a `.meter-label` and an `<output class="meter-value">`, where it wears its name and value on its top edge.
+  - `data-bind="--healers"` writes the value to that custom property on the slider's panel, and into every `[data-show="--healers"]`. Marks read it: `style="--v: calc(var(--healers) * 20)"`. This makes a figure the reader can explore, with no page script.
+  - Set the starting value on the panel too (`style="--healers:3"`), so the figure is right before the script runs.
+  - `data-bind-to="#id"` binds to another element instead of the panel.
 - **Checkbox** (`input.check`): a sunken square that holds a smaller filled square when checked. There are no round radio buttons: use tabs to pick one of several.
 - Controls show a 1px white outline on keyboard focus. Never remove it.
 
@@ -294,7 +328,7 @@ A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one su
 
 ## Print
 
-- Pages print with their dark surfaces. A deck prints one slide per page, edge to edge: open the print dialog and save as PDF.
+- Pages print with their dark surfaces. Disclosures print open; a stepper prints the state it is on. A deck prints one slide per page, edge to edge: open the print dialog and save as PDF.
 - Animations do not run on paper; every mark prints finished.
 
 ## Motion
@@ -318,7 +352,7 @@ A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one su
 `style.js` adds a tooltip and linked highlighting to any mark.
 
 - `data-tip="Name"` shows a tooltip while the pointer is over the element. `data-tip-value` puts a value at the right of the name; `data-tip-note` puts a dim line under it. The tooltip shows a swatch in the mark's `--fill`.
-- `data-key="name"` links elements inside one panel. Hovering one lights up all of them, such as a pie slice and its legend row.
+- `data-key="name"` links elements inside one panel. Hovering one lights up all of them, such as a pie slice and its legend row. Inside `[data-link]` the link spans that whole element (see Linked prose).
 - The tooltip is a `--sunken` box with a black border: darker than any panel, no shadow, no rounding, no arrow. It follows the pointer.
 - Hovering a mark darkens its siblings. Nothing fades to transparent.
 - A tooltip adds detail. Names and values the reader needs stay visible in a label or legend.

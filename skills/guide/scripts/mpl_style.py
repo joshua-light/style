@@ -19,6 +19,7 @@ Text is Expressway Regular where that cut is installed on the machine (its
 licence forbids bundling it here), and Expressway Bold where it is not.
 """
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -58,8 +59,12 @@ def _font():
                 font_manager.fontManager.addfont(installed)
             except Exception:  # an unreadable file is not worth failing the chart for
                 pass
+    # The Regular TrueType file calls its family "Expressway Rg". matplotlib picks
+    # a weight only within one family, so file it with Bold and Extra-bold.
+    fonts = font_manager.fontManager.ttflist
+    fonts[:] = [replace(f, name="Expressway") if f.name == "Expressway Rg" else f for f in fonts]
     names = {f.name for f in font_manager.fontManager.ttflist}
-    return next((name for name in ("Expressway", "Expressway Rg", "Overpass") if name in names), None)
+    return next((name for name in ("Expressway", "Overpass") if name in names), None)
 
 
 def use():

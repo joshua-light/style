@@ -28,8 +28,10 @@ FONTS = ASSETS / "fonts"
 # weight -> file stem; the first extension found wins. 400 is the fallback for
 # text where Expressway Regular is not installed, so Bold is embedded twice.
 FACES = {400: "expressway", 700: "expressway", 800: "expressway-xb"}
-# Installed-font names tried before a face's embedded file.
-LOCAL = {400: ("Expressway Regular", "Expressway-Regular")}
+# Installed-font names tried before a face's embedded file. The TrueType file
+# ("ExpresswayRg-Regular") comes first: it is hinted, and the OpenType file's
+# round letters render a pixel taller than the rest at text sizes.
+LOCAL = {400: ("ExpresswayRg-Regular", "Expressway Regular", "Expressway-Regular")}
 FORMATS = {".woff2": ("font/woff2", "woff2"), ".ttf": ("font/ttf", "truetype"), ".otf": ("font/otf", "opentype")}
 
 LINK = re.compile(r"<link\b[^>]*href=[\"'][^\"']*style\.css[\"'][^>]*>", re.I)

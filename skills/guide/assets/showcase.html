@@ -18,7 +18,23 @@
   <h1>Raid performance report</h1>
   <p class="lead">Seven sizes, seven spacings, one border. Dark gray surfaces, black ink, a tan accent, flat fills.</p>
 
-  <h2>Text</h2>
+  <!-- Contents rail: <nav class="rail"> as a child of .page, holding a thin bar and a list of links to chapter ids.
+       On a window 1400px wide or more it is fixed left of the page; style.js lights the chapter being read and fills the bar. -->
+  <nav class="rail" aria-label="Contents">
+    <div class="bar thin"><span class="bar-fill"></span></div>
+    <ol>
+      <li><a href="#text">Text</a></li>
+      <li><a href="#callouts">Callouts</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#charts">Charts</a></li>
+      <li><a href="#more-charts">More charts</a></li>
+      <li><a href="#explainers">Explainers</a></li>
+      <li><a href="#controls">Controls</a></li>
+      <li><a href="#slides">Slides</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="text">Text</h2>
   <p>Prose runs at 18px on a 30px line, a shade dimmer than headings, and never wider than 560px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Extra-bold marks emphasis</strong>; nothing is italic.</p>
   <!-- mark: the name of a thing inside a sentence. Names only, never numbers; running text only, never titles. -->
   <p>A highlight colours the name of a thing: <mark>Tukz</mark> topped the meter, and 24 pulls went into <mark>Dimensius</mark>.</p>
@@ -102,28 +118,29 @@
   </div>
 
   <!-- ── Callouts ── -->
-  <h2>Callouts</h2>
+  <h2 id="callouts">Callouts</h2>
+  <!-- Each kind leads its tag with a fixed glyph: note information, tip lightbulb, warn alert, bad skull-2. -->
   <div class="grid">
     <aside class="callout note span-6">
-      <div class="callout-head">Note</div>
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-11v6h2v-6zm0-4v2h2V7z"/></svg></span>Note</div>
       <div class="callout-body"><p>Context the reader can skip without losing the thread.</p></div>
     </aside>
     <aside class="callout tip span-6">
-      <div class="callout-head">Tip</div>
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M11 18H7.941c-.297-1.273-1.637-2.314-2.187-3a8 8 0 1 1 12.49.002c-.55.685-1.888 1.726-2.185 2.998H13v-5h-2zm5 2v1a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-1z"/></svg></span>Tip</div>
       <div class="callout-body"><p>A shortcut or a better way to do the same thing.</p></div>
     </aside>
     <aside class="callout warn span-6">
-      <div class="callout-head">Warning</div>
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m12.866 3l9.526 16.5a1 1 0 0 1-.866 1.5H2.474a1 1 0 0 1-.866-1.5L11.134 3a1 1 0 0 1 1.732 0M11 16v2h2v-2zm0-7v5h2V9z"/></svg></span>Warning</div>
       <div class="callout-body"><p>Something that goes wrong if ignored.</p></div>
     </aside>
     <aside class="callout bad span-6">
-      <div class="callout-head">Danger</div>
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10v3.764a2 2 0 0 1-1.106 1.789L18 19v1a3 3 0 0 1-2.824 2.995L14.95 23q.033-.161.044-.33L15 22.5V22a2 2 0 0 0-1.85-1.994L13 20h-2a2 2 0 0 0-1.995 1.85L9 22v.5q0 .258.05.5H9a3 3 0 0 1-3-3v-1l-2.894-1.447A2 2 0 0 1 2 15.763V12C2 6.477 6.477 2 12 2m-4 9a2 2 0 1 0 0 4a2 2 0 0 0 0-4m8 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4"/></svg></span>Danger</div>
       <div class="callout-body"><p>Something that cannot be undone.</p></div>
     </aside>
   </div>
 
   <!-- ── Dashboard ── -->
-  <h2>Dashboard</h2>
+  <h2 id="dashboard">Dashboard</h2>
   <!-- Stat: the label sits on the top border at the left; .stat-foot holds one delta or tag on the same border at the right.
        .stat-note says what the delta compares against, at the bottom left. -->
   <div class="grid">
@@ -187,7 +204,7 @@
   </div>
 
   <!-- ── Charts ── -->
-  <h2>Charts</h2>
+  <h2 id="charts">Charts</h2>
   <div class="grid">
     <!-- Columns: values labelled directly, so there is no y-axis. --max sets the scale. -->
     <figure class="panel span-6">
@@ -322,7 +339,7 @@
   </div>
 
   <!-- ── More charts ── -->
-  <h2>More charts</h2>
+  <h2 id="more-charts">More charts</h2>
   <div class="grid">
     <!-- Stacked columns: several .col-fill in one .col, top part first. One colour per series, with a legend. -->
     <figure class="panel span-6">
@@ -436,7 +453,7 @@
   </div>
 
   <!-- ── Explainers ── -->
-  <h2>Explainers</h2>
+  <h2 id="explainers">Explainers</h2>
   <div class="grid">
     <!-- Diagram: a chain of .node boxes joined by .link arrows. .diagram.down runs it top to bottom. -->
     <figure class="panel span-12">
@@ -566,10 +583,215 @@
       <div class="panel-head">Loot this week</div>
       <div class="panel-body"><div class="empty"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 3h16l2 4v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.004zm9 11v-4h-2v4H8l4 4l4-4zm6.764-7l-1-2H5.237l-1 2z"/></svg></span><span>No drops yet. Loot appears after the first kill.</span></div></div>
     </section>
+    <!-- Stepper: .stepper on a panel holds a figure with numbered states. Tabs with data-go="2" go to a state; buttons with
+         data-go="prev" and "next" step. data-on="2 3" shows a part on those states (data-vis keeps its room). .step-count
+         reads "2 / 3". Give every part of a later state the hidden attribute, so the page is right before the script runs.
+         The pressed tab takes its step's colour, so a .step-ref can cite a state. Panel foot: .panel-foot is a strip under
+         the body for the figure's controls or its takeaway. -->
+    <figure class="panel stepper span-12" data-step="1">
+      <div class="panel-head">One pull of Dimensius
+        <span class="tabs">
+          <button class="tab" type="button" data-go="1" aria-pressed="true">Pull</button>
+          <button class="tab" type="button" data-go="2" aria-pressed="false">Phase two</button>
+          <button class="tab" type="button" data-go="3" aria-pressed="false">Enrage</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <div class="meter" data-on="1">
+          <div class="meter-row"><span class="meter-label">Boss health</span><div class="bar" style="--v:100; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">100%</span></div>
+          <div class="meter-row"><span class="meter-label">Players alive</span><div class="bar" style="--v:100; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">20 of 20</span></div>
+        </div>
+        <div class="meter" data-on="2" hidden>
+          <div class="meter-row"><span class="meter-label">Boss health</span><div class="bar" style="--v:60; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">60%</span></div>
+          <div class="meter-row"><span class="meter-label">Players alive</span><div class="bar" style="--v:85; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">17 of 20</span></div>
+        </div>
+        <div class="meter" data-on="3" hidden>
+          <div class="meter-row"><span class="meter-label">Boss health</span><div class="bar" style="--v:8; --fill:var(--c1)"><span class="bar-fill"></span></div><span class="meter-value">8%</span></div>
+          <div class="meter-row"><span class="meter-label">Players alive</span><div class="bar" style="--v:30; --fill:var(--c2)"><span class="bar-fill"></span></div><span class="meter-value">6 of 20</span></div>
+        </div>
+      </div>
+      <div class="panel-foot">
+        <p data-on="1">The tank opens with everyone alive.</p>
+        <p data-on="2" hidden>Three players die to the first fire. The boss is on schedule; the raid is not.</p>
+        <p data-on="3" hidden>Six players cannot finish the last 8%. The wipe was set up in <span class="step-ref" data-step="2">2</span>.</p>
+        <span class="tag step-count">1 / 3</span>
+        <button class="button" type="button" data-go="prev" disabled>Back</button>
+        <button class="button" type="button" data-go="next">Next</button>
+      </div>
+    </figure>
+
+    <!-- Slider with binding: input.slider with data-bind="--name" writes its value to that custom property on its panel,
+         and into every [data-show="--name"]. Marks read it: style="--v:calc(var(--healers) * 20)". Set the starting value
+         on the panel too, so the figure is right before the script runs. In a label.meter-row the slider wears its name
+         and value on its top edge. -->
+    <figure class="panel span-6" style="--healers:3">
+      <div class="panel-head">How many healers?</div>
+      <div class="panel-body">
+        <div class="meter">
+          <label class="meter-row"><span class="meter-label">Healers</span><input class="slider" type="range" min="1" max="5" value="3" data-bind="--healers"><output class="meter-value" data-show="--healers">3</output></label>
+          <div class="meter-row"><span class="meter-label">Healing</span><div class="bar" style="--v:calc(var(--healers) * 20); --fill:var(--c2)"><span class="bar-fill"></span></div></div>
+          <div class="meter-row"><span class="meter-label">Damage</span><div class="bar" style="--v:calc(100 - var(--healers) * 8); --fill:var(--c3)"><span class="bar-fill"></span></div></div>
+          <div class="meter-row"><span class="meter-label">Deaths</span><div class="bar" style="--v:calc(100 - var(--healers) * 18); --fill:var(--c4)"><span class="bar-fill"></span></div></div>
+        </div>
+      </div>
+      <div class="panel-foot"><p>Each healer adds healing, cuts deaths and costs damage. Drag to see the trade.</p></div>
+    </figure>
+
+    <!-- Tree: .tree holds a parent .node and its .tree-kids, joined by a bus of 2px ink rules. A child may be a .tree itself;
+         --span on a child gives it more columns. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Who is in the raid</div>
+      <div class="panel-body">
+        <div class="tree">
+          <div class="node"><strong>Raid</strong><span>20 players</span></div>
+          <div class="tree-kids">
+            <div class="node"><strong>Tanks</strong><span>2</span></div>
+            <div class="node"><strong>Healers</strong><span>4</span></div>
+            <div class="tree" style="--span:2">
+              <div class="node"><strong>Damage</strong><span>14</span></div>
+              <div class="tree-kids">
+                <div class="node"><strong>Melee</strong><span>6</span></div>
+                <div class="node"><strong>Ranged</strong><span>8</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Layers: .layers stacks .layer blocks; each row rests on the row below. --cols on the stack and --span on a block
+         set the widths. .base is a slab others stand on. .fallen marks a block knocked out and whatever stood on it:
+         say so in a tag too. -->
+    <figure class="panel span-6">
+      <div class="panel-head">What a kill rests on</div>
+      <div class="panel-body">
+        <div class="layers" style="--cols:3">
+          <div class="layer fallen" style="--span:3"><span class="tag bad">Wipe</span><strong>Kill</strong><span>Needs all three checks</span></div>
+          <div class="layer"><strong>Damage</strong><span>4% over the check</span></div>
+          <div class="layer"><strong>Healing</strong><span>Enough with three</span></div>
+          <div class="layer fallen"><span class="tag bad">Missed</span><strong>Interrupts</strong><span>Two casts got through</span></div>
+          <div class="layer base" style="--span:3"><strong>Twenty players online</strong><span>The floor everything stands on</span></div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Claims: ul.claims, one <li> per statement: the claim in <strong>, its verdict in a .tag, the reason in a <p>. -->
+    <section class="panel span-6">
+      <div class="panel-head">After the wipe</div>
+      <div class="panel-body">
+        <ul class="claims">
+          <li><strong>We need more damage.</strong><span class="tag bad">False</span><p>Damage was 4% over the check. Deaths ended the pull.</p></li>
+          <li><strong>A third healer costs damage.</strong><span class="tag good">True</span><p>About 4%, and the boss still died.</p></li>
+          <li><strong>The enrage timer is the problem.</strong><span class="tag warn">Partly</span><p>It ends pulls, but only after early deaths slow the kill.</p></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Pins: .pins wraps a picture; each .step-ref.pin sits on it at --x and --y (percent of the picture, the pin's centre).
+         The notes are an ol.steps, so a pin matches its note by number and colour. data-link on the box and a shared
+         data-key light a pin and its note together. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Reading a unit frame</div>
+      <div class="panel-body" data-link>
+        <div class="frame">
+          <div class="pins">
+            <svg viewBox="0 0 440 136" role="img" aria-label="A unit frame: a portrait, a health bar and a power bar">
+              <rect x="24.5" y="40.5" width="56" height="56" fill="var(--panel)" stroke="var(--ink)"/>
+              <rect x="88.5" y="40.5" width="328" height="36" fill="var(--good)" stroke="var(--ink)"/>
+              <rect x="88.5" y="80.5" width="236" height="16" fill="var(--azure)" stroke="var(--ink)"/>
+              <rect x="324.5" y="80.5" width="92" height="16" fill="var(--sunken)" stroke="var(--ink)"/>
+            </svg>
+            <span class="step-ref pin" data-step="1" data-key="portrait" style="--x:12; --y:50">1</span>
+            <span class="step-ref pin" data-step="2" data-key="health" style="--x:57; --y:43">2</span>
+            <span class="step-ref pin" data-step="3" data-key="power" style="--x:47; --y:65">3</span>
+          </div>
+        </div>
+        <ol class="steps label">
+          <li data-key="portrait"><strong>Portrait.</strong> Who the frame belongs to.</li>
+          <li data-key="health"><strong>Health.</strong> Green while safe; it empties to the left.</li>
+          <li data-key="power"><strong>Power.</strong> Mana, rage or energy, under the health bar.</li>
+        </ol>
+      </div>
+    </figure>
+
+    <!-- Waffle: one element, ten squares to a row, the first --v filled. --rows sets the rows (2 for a share of 20).
+         Name the share in a legend beside it. -->
+    <figure class="panel span-6">
+      <div class="panel-head">Deaths to fire</div>
+      <div class="panel-body">
+        <div class="chart-row">
+          <div class="waffle" style="--v:37; --fill:var(--c1)" role="img" aria-label="37 of 100 deaths were to fire" data-tip="Stood in fire" data-tip-value="37 of 100"></div>
+          <div class="legend list">
+            <span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Stood in fire<span class="legend-value">37</span></span>
+            <span class="legend-item"><span class="swatch" style="--fill:var(--sunken)"></span>Every other death<span class="legend-value">63</span></span>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Quiz: .callout.quiz asks a question. One .button in .options carries data-correct; a click marks right and wrong,
+         fills .verdict in words and shows .feedback. data-check="id" unhides every [data-gate="id"] once it is answered.
+         A button with data-reveal in place of .options shows the feedback for a question the reader answers in their head. -->
+    <aside class="callout quiz span-6" data-check="showcase-wipe">
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-7v2h2v-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.5 3.5 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2z"/></svg></span>Check</div>
+      <div class="callout-body">
+        <p>The raid wiped at 61% with damage over the check. What changes first?</p>
+        <div class="options" role="group" aria-label="Your answer">
+          <button type="button" class="button">More damage</button>
+          <button type="button" class="button" data-correct>A third healer</button>
+          <button type="button" class="button">A longer break</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>Deaths ended the pull, not the timer. A third healer keeps players alive for 4% less damage.</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Several questions in one quiz: each .quiz-item has its own .options and .feedback. -->
+    <aside class="callout quiz span-6">
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-7v2h2v-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.5 3.5 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2z"/></svg></span>Sort</div>
+      <div class="callout-body">
+        <p>With three healers, does each statement follow?</p>
+        <div class="quiz-item">
+          <p><strong>a.</strong> Fewer players die.</p>
+          <div class="options" role="group" aria-label="Statement a"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Does not follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Deaths fell from 37 to 21 a night.</p></div>
+        </div>
+        <div class="quiz-item">
+          <p><strong>b.</strong> The boss dies faster.</p>
+          <div class="options" role="group" aria-label="Statement b"><button type="button" class="button">Follows</button><button type="button" class="button" data-correct>Does not follow</button></div>
+          <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Damage fell 4%, so the kill is slower. It still beats the enrage.</p></div>
+        </div>
+      </div>
+    </aside>
   </div>
 
+  <h3>In the prose</h3>
+  <!-- Margin note: <aside class="margin"> as a child of .page, written before the paragraph it belongs to. It sits in
+       the room the prose measure leaves at the right. -->
+  <aside class="margin"><p>A margin note holds an aside, a source or a small figure. It stays out of the main line.</p></aside>
+  <p>Some parts of an explainer live in the text itself. A note beside a paragraph keeps an aside out of the reader's way, and a disclosure holds depth that only some readers want.</p>
+  <!-- Disclosure: <details class="more"> with a <summary>. Closed by default. -->
+  <details class="more">
+    <summary>Why three healers and not four?</summary>
+    <p>A fourth healer costs another 4% damage, and at that point the boss outlives the enrage timer. Three is the most the damage check allows.</p>
+  </details>
+  <!-- Linked prose: inside [data-link], a <mark data-key> in a sentence and the part of the figure with the same key
+       light up together, and the other keyed parts darken. -->
+  <section class="flow" data-link>
+    <p>Hover a name. The <mark data-key="tank">tank</mark> opens the pull, the <mark data-key="healers">healers</mark> keep the raid alive, and the <mark data-key="damage">damage dealers</mark> race the timer.</p>
+    <div class="diagram">
+      <div class="node" data-key="tank"><strong>Tank</strong><span>Holds the boss</span></div>
+      <span class="link"></span>
+      <div class="node" data-key="healers"><strong>Healers</strong><span>Refill health bars</span></div>
+      <span class="link"></span>
+      <div class="node" data-key="damage"><strong>Damage dealers</strong><span>Empty the boss's bar</span></div>
+    </div>
+  </section>
+
   <!-- ── Controls ── -->
-  <h2>Controls</h2>
+  <h2 id="controls">Controls</h2>
   <div class="grid">
     <!-- Tabs: a row of .tab buttons in .tabs; data-tab names the [data-tab-panel] to show. In a panel head they sit on the border.
          Mark the first tab aria-pressed="true" and hide the other panels, so the page is right before the script runs. -->
@@ -600,7 +822,8 @@
       </div>
     </section>
 
-    <!-- Form controls: .field labels a control; .input for text and selects; .check for a checkbox; .button, with one .primary. -->
+    <!-- Form controls: .field labels a control; .input for text and selects; .check for a checkbox; .slider for a range;
+         .button, with one .primary. -->
     <section class="panel span-6">
       <div class="panel-head">Filter</div>
       <div class="panel-body">
@@ -609,6 +832,8 @@
           <label class="field">Difficulty<select class="input"><option>Mythic</option><option>Heroic</option><option>Normal</option></select></label>
         </div>
         <label class="with-icon label"><input class="check" type="checkbox" checked><span>Kills only</span></label>
+        <!-- Slider: input.slider, a status bar the reader drags. Label it with .field, or put it in a label.meter-row. -->
+        <label class="field">Fewest pulls<input class="slider" type="range" min="0" max="30" value="12"></label>
         <div class="row">
           <button class="button primary" type="button">Apply</button>
           <button class="button" type="button">Reset</button>
@@ -642,7 +867,7 @@
   </div>
 
   <!-- ── Slide ── -->
-  <h2>Slides</h2>
+  <h2 id="slides">Slides</h2>
   <section class="slide">
     <span class="tag slide-no">1 / 5</span>
     <p class="eyebrow">Week 12 · Mythic</p>

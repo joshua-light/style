@@ -8,8 +8,8 @@
 <link rel="stylesheet" href="../skills/guide/assets/style.css">
 <script src="../skills/guide/assets/style.js" defer></script>
 <style>
-/* Page-specific parts: chapters, disclosures, quizzes, and three diagrams the
-   stylesheet has no component for. Tokens only. */
+/* Page-specific parts: chapters and three diagrams the stylesheet has no
+   component for. Steppers, disclosures and quizzes come from style.css. Tokens only. */
 
 .page > section + section { margin-top: var(--s7); }
 section[id], h3[id] { scroll-margin-top: var(--s5); }
@@ -18,49 +18,14 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
 .panel-body > * + blockquote { margin-top: var(--s5); }
 .math, .more, .quiz, .narrow { max-width: var(--measure); }
 
-/* Text the reader must read and answer is prose, not a label. */
-.quiz .callout-body, .more > p { font-size: var(--fs-body); line-height: var(--lh-body); }
 /* Prose is not tracked. The font trial's Prose tracking select sets this
    variable, to compare. */
 :root { --track-prose: 0px; }
 .flow > :is(p:not([class]), ul, ol), .quiz .callout-body, .more > p { letter-spacing: var(--track-prose); }
 :is(p, li) code:not(.math) { letter-spacing: 0; }
 
-.tab:disabled { color: var(--text-faint); cursor: default; }
-
-/* Steppers: tabs with data-go set data-step on the figure. data-on lists the
-   steps an element shows on; data-vis does the same but keeps its room, so a
-   ladder does not jump when a bracket appears. */
-[data-step="1"] [data-on]:not([data-on~="1"]),
-[data-step="2"] [data-on]:not([data-on~="2"]),
-[data-step="3"] [data-on]:not([data-on~="3"]),
-[data-step="4"] [data-on]:not([data-on~="4"]),
-[data-step="5"] [data-on]:not([data-on~="5"]),
-[data-step="6"] [data-on]:not([data-on~="6"]) { display: none; }
-[data-step="1"] [data-vis]:not([data-vis~="1"]),
-[data-step="2"] [data-vis]:not([data-vis~="2"]),
-[data-step="3"] [data-vis]:not([data-vis~="3"]) { visibility: hidden; }
-
-/* Optional depth: closed by default, so the main line stays short. */
-.more { background: var(--panel); border: var(--border); font-size: var(--fs-label); line-height: var(--lh-label); }
-.more > summary { display: flex; align-items: center; gap: var(--s2); padding: var(--s2) var(--s3); list-style: none; cursor: pointer; }
-.more > summary::-webkit-details-marker { display: none; }
-.more > summary:focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
-.more[open] > summary { border-bottom: var(--border); }
-.more > p { max-width: none; padding: var(--s3) var(--s4); }
-
-/* A quiz is a callout. The right option turns green and a wrong pick red;
-   the verdict line says which in words. */
-.button.is-right { background: var(--texture), var(--good); color: var(--ink); }
-.button.is-wrong { background: var(--texture), var(--bad); color: var(--ink); }
 /* A locked primary button drops its fill: faint text on azure does not read. */
 .button.primary:disabled { background: var(--raised); }
-.feedback > * + * { margin-top: var(--s2); }
-.sort-item + .sort-item { margin-top: var(--s3); padding-top: var(--s3); border-top: var(--border); }
-.sort-item > * + * { margin-top: var(--s2); }
-
-.panel-foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); padding: var(--s3) var(--s4); border-top: var(--border); font-size: var(--fs-label); line-height: var(--lh-label); }
-
 /* The family: 3-SAT above, a bus of wires, four problems below. */
 .family-root { width: 280px; max-width: 100%; margin: 0 auto; }
 .family .node > * + * { margin-top: var(--s1); }
@@ -111,6 +76,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
   .ladder > * { grid-column: 1 !important; grid-row: auto !important; }
   .rung { grid-template-columns: minmax(0, 1fr); }
   .rung > * { grid-column: 1; justify-self: start !important; }
+  /* A bracket that keeps its room on a desktop gives it up on a phone. */
   [data-step="1"] [data-vis]:not([data-vis~="1"]),
   [data-step="2"] [data-vis]:not([data-vis~="2"]),
   [data-step="3"] [data-vis]:not([data-vis~="3"]) { display: none; }
@@ -190,7 +156,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       <li><strong>Your goal:</strong> a setting of the switches that satisfies all four rules at once.</li>
     </ul>
     <details class="more">
-      <summary><span class="tag">More</span>How to read NOT and OR</summary>
+      <summary>How to read NOT and OR</summary>
       <p>“x OR y OR z” is satisfied when at least one of x, y, z is T. “NOT x” holds when x is F. So “NOT x OR y” is satisfied unless x is T and y is F at the same time.</p>
     </details>
 
@@ -226,7 +192,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       </section>
     </div>
 
-    <aside class="callout note quiz" data-quiz data-check="k-01">
+    <aside class="callout note quiz" data-check="k-01">
       <div class="callout-head">Predict</div>
       <div class="callout-body">
         <p>There are 2 × 2 × 2 = 8 ways to set the three switches. How many of them light all four rules?</p>
@@ -356,7 +322,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     <p>Brute force is fine for three switches. Step through the tabs and watch what each step up in n does to the table. There is no log scale here: each new bar fills its track, and the one before it is redrawn at its true size under it.</p>
 
     <!-- Wall: one tab per step. Steps 4 to 6 unlock with the question below. -->
-    <figure class="panel" data-step="1">
+    <figure class="panel stepper" data-step="1">
       <div class="panel-head">Rows to check
         <span class="tabs">
           <button class="tab" type="button" data-go="1" aria-pressed="true">n = 3</button>
@@ -426,7 +392,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       </div>
     </figure>
 
-    <aside class="callout note quiz" data-quiz data-check="k-02">
+    <aside class="callout note quiz" data-check="k-02">
       <div class="callout-head">Predict</div>
       <div class="callout-body">
         <p>Brute force on 100 switches already needs about <code class="math">10<sup>30</sup></code> checks. Add 10 more switches. How much more work is that?</p>
@@ -455,7 +421,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     <p>The figure shows four possible answers, sorted by how quickly the work grows as you add switches. Two are algorithms we have, and two are speeds nobody has found.</p>
 
     <!-- Ladder: rungs ordered by growth, fastest-growing first. Brackets mark what each bet allows. -->
-    <figure class="panel" data-step="1">
+    <figure class="panel stepper" data-step="1">
       <div class="panel-head">Where could the best possible 3-SAT algorithm sit?
         <span class="tabs">
           <button class="tab" type="button" data-go="1" aria-pressed="true">Candidates</button>
@@ -496,11 +462,11 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     </figure>
 
     <details class="more">
-      <summary><span class="tag">More</span>The formal statement</summary>
+      <summary>The formal statement</summary>
       <p>ETH: there is some constant <code class="math">s &gt; 0</code> such that every algorithm that correctly solves 3-SAT needs at least <code class="math">2<sup>s·n</sup></code> steps on some formulas with n variables. Since <code class="math">2<sup>s·n</sup> = (2<sup>s</sup>)<sup>n</sup></code>, that is an average multiplier of at least <code class="math">2<sup>s</sup> &gt; 1</code> per variable on the hardest formulas. Equivalently, there is no <code class="math">2<sup>o(n)</sup></code> algorithm for 3-SAT, where <code class="math">o(n)</code> means something that grows more slowly than any fixed fraction of n. Running times of the form <code class="math">2<sup>o(n)</sup></code> are the subexponential ones: their average multiplier per variable fades toward ×1.</p>
     </details>
 
-    <aside class="callout note quiz" data-quiz data-check="k-03">
+    <aside class="callout note quiz" data-check="k-03">
       <div class="callout-head">Apply</div>
       <div class="callout-body">
         <p>Suppose someone proved that 3-SAT can be solved in about <code class="math">2<sup>√n</sup></code> steps. Which assumption would be broken?</p>
@@ -536,7 +502,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       <div class="callout-head">Explain · think, then reveal</div>
       <div class="callout-body">
         <p>A paper proves “graph colouring has no <code class="math">2<sup>o(n)</sup></code> algorithm, unless ETH fails.” In your own words: what did it actually prove, and what would make the statement stop telling us anything about hardness?</p>
-        <div class="row"><button type="button" class="button reveal">Show a model answer</button></div>
+        <div class="row"><button type="button" class="button" data-reveal>Show a model answer</button></div>
         <div class="feedback" hidden aria-live="polite">
           <p>It proved a link, not hardness itself: any much-faster colouring algorithm could be turned into a much-faster 3-SAT algorithm. Colouring is “hard” only as long as ETH is true. If ETH fails, the statement is still true, but it no longer shows that colouring is hard.</p>
         </div>
@@ -591,11 +557,11 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     <p><strong>Hold on to SETH and edit distance.</strong> They come back in chapter 7.</p>
 
     <details class="more">
-      <summary><span class="tag">More</span>Why does SETH imply ETH?</summary>
+      <summary>Why does SETH imply ETH?</summary>
       <p>ETH only says 3-SAT needs some exponential <code class="math">c<sup>n</sup></code> with <code class="math">c &gt; 1</code>, and <code class="math">c</code> could be close to 1. SETH says that for wide enough clauses the base gets arbitrarily close to 2. If SETH is true, wide-clause SAT needs exponential time, and that in turn forces 3-SAT to need exponential time, which is ETH. So SETH implies ETH.</p>
     </details>
 
-    <aside class="callout note quiz" data-quiz data-check="k-09">
+    <aside class="callout note quiz" data-check="k-09">
       <div class="callout-head">Compare</div>
       <div class="callout-body">
         <p>ETH and SETH are both unproven bets. Which one is riskier, that is, easier to turn out wrong?</p>
@@ -653,12 +619,12 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     <p>Counting is at least as hard as deciding: if the count is above zero, the formula is satisfiable. And <code class="math">n/√log n</code> grows more slowly than any fixed fraction of n, so the 3-SAT case is a <code class="math">2<sup>o(n)</sup></code> algorithm for 3-SAT.</p>
     <p>In per-switch terms, its multiplier fades toward ×1 as n grows: very slowly, but it does fade. That is exactly what ETH bet could never happen. The repository's summary puts it in one line: “The case of 3-SAT refutes the Exponential Time Hypothesis.”</p>
     <details class="more">
-      <summary><span class="tag">More</span>What the paper actually proves</summary>
+      <summary>What the paper actually proves</summary>
       <p>The theorem covers every fixed clause width <code class="math">k ≥ 2</code>: a deterministic algorithm counts the satisfying assignments of a k-CNF formula (a k-SAT formula) with n variables and m clauses in the time above, in polynomial space. The main theorem gives <code class="math">2<sup>O<sub>k</sub>(n log log n / √log n)</sup></code> in general, improving to <code class="math">2<sup>O(n/√log n)</sup></code> when the number of clauses is at most a constant times n. The paper states that this refutes ETH, SETH, and two related hypotheses, Gap-ETH and NSETH.</p>
     </details>
 
     <p>Where does that land on the ladder?</p>
-    <figure class="panel" data-step="1">
+    <figure class="panel stepper" data-step="1">
       <div class="panel-head">Where the claim lands
         <span class="tabs">
           <button class="tab" type="button" data-go="1" aria-pressed="true">As we left it</button>
@@ -701,7 +667,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       </div>
     </figure>
 
-    <aside class="callout note quiz" data-quiz data-check="k-05">
+    <aside class="callout note quiz" data-check="k-05">
       <div class="callout-head">Predict</div>
       <div class="callout-body">
         <p>The claimed algorithm is subexponential, and the old best was exponential. When do you expect it to beat the old best (<code class="math">1.307<sup>n</sup></code>) on real formulas?</p>
@@ -818,7 +784,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     <h2>If it holds: what falls, what stands</h2>
     <p>Back to the foundation. Suppose review confirms the claim. What happens to everything that rested on ETH and SETH?</p>
 
-    <aside class="callout note quiz" data-quiz data-check="k-06">
+    <aside class="callout note quiz" data-check="k-06">
       <div class="callout-head">Predict</div>
       <div class="callout-body">
         <p>The famous result that edit distance (a close relative of what diff computes) can't be done much faster than quadratic time assumes SETH, not ETH. If OpenAI's claim holds, what happens to that result?</p>
@@ -912,7 +878,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     </section>
 
     <details class="more">
-      <summary><span class="tag">More</span>The exact formal bound</summary>
+      <summary>The exact formal bound</summary>
       <p>The Lean theorem proves a running time of <code class="math">2<sup>A · n (log log n)<sup>2</sup> / √log n</sup></code> times a polynomial, with polynomial memory, for the machine model defined in the challenge file. That's slightly weaker than the paper's headline bound, but it still grows more slowly than any <code class="math">c<sup>n</sup></code>, so it is still enough to refute ETH.</p>
     </details>
 
@@ -947,7 +913,7 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       <div class="callout-head">Explain · think, then reveal</div>
       <div class="callout-body">
         <p>Lean's checker accepted the proof. Name one way the result could still turn out to be wrong, or weaker than advertised.</p>
-        <div class="row"><button type="button" class="button reveal">Show a model answer</button></div>
+        <div class="row"><button type="button" class="button" data-reveal>Show a model answer</button></div>
         <div class="feedback" hidden aria-live="polite">
           <p>Lean only confirms that the formal theorem follows. Humans still have to confirm that the formal definitions (the machine model, how a formula is encoded, what “time” counts) mean what the paper says. A faithful-looking but subtly off definition could make the checked theorem say less than the headline. (Separately, the checked bound is already slightly weaker than the paper's headline bound, though still enough to refute ETH.)</p>
           <p>ETH's own inventors are among those reviewing it, and they say their involvement isn't a certification.</p>
@@ -973,27 +939,27 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
       <div class="callout-head">Sort · one statement at a time</div>
       <div class="callout-body">
         <p>Suppose the claim survives review. For each statement, does it follow?</p>
-        <div class="sort-item" data-quiz>
+        <div class="quiz-item">
           <p><strong>a.</strong> P = NP.</p>
           <div class="row options" role="group" aria-label="Statement a"><button type="button" class="button">Follows</button><button type="button" class="button" data-correct>Doesn't follow</button></div>
           <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Doesn't follow: the claimed bound is still far above any polynomial. See <a href="#bet">The bet</a>.</p></div>
         </div>
-        <div class="sort-item" data-quiz>
+        <div class="quiz-item">
           <p><strong>b.</strong> 3-SAT can be solved in <code class="math">2<sup>o(n)</sup></code> time.</p>
           <div class="row options" role="group" aria-label="Statement b"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Doesn't follow</button></div>
           <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Follows: that's the claim itself. See <a href="#claim">The claim</a>.</p></div>
         </div>
-        <div class="sort-item" data-quiz>
+        <div class="quiz-item">
           <p><strong>c.</strong> RSA encryption is broken.</p>
           <div class="row options" role="group" aria-label="Statement c"><button type="button" class="button">Follows</button><button type="button" class="button" data-correct>Doesn't follow</button></div>
           <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Doesn't follow: RSA never rested on ETH, and “subexponential” can still be astronomically slow. See <a href="#fallout">What falls, what stands</a>.</p></div>
         </div>
-        <div class="sort-item" data-quiz>
+        <div class="quiz-item">
           <p><strong>d.</strong> Most hardness results proved “unless ETH fails” become unproven, not false.</p>
           <div class="row options" role="group" aria-label="Statement d"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Doesn't follow</button></div>
           <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Follows: the link still holds, but it no longer shows hardness. Graph colouring is the exception, because there the paper also claims a fast algorithm outright. See <a href="#built">What was built on the bet</a> and <a href="#fallout">What falls, what stands</a>.</p></div>
         </div>
-        <div class="sort-item" data-quiz>
+        <div class="quiz-item">
           <p><strong>e.</strong> SETH is false too.</p>
           <div class="row options" role="group" aria-label="Statement e"><button type="button" class="button" data-correct>Follows</button><button type="button" class="button">Doesn't follow</button></div>
           <div class="feedback" hidden aria-live="polite"><p class="verdict"></p><p>Follows: SETH implies ETH, so if ETH falls, SETH falls with it. See <a href="#seth">A bolder bet: SETH</a> in chapter 5, and <a href="#fallout">What falls, what stands</a> in chapter 7.</p></div>
@@ -1023,8 +989,8 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
 </main>
 
 <script>
-/* Page behaviour: the switchboard, the sweep, quizzes with their gates, and
-   steppers. style.js handles tooltips, plain tabs and reveal on scroll. */
+/* Page behaviour: the switchboard and the sweep. style.js handles tooltips,
+   tabs, reveal on scroll, steppers, and quizzes with their gates. */
 (() => {
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -1092,49 +1058,12 @@ section[id], h3[id] { scroll-margin-top: var(--s5); }
     step();
   }
 
-  // ── Gates: answering a quiz reveals, hides, enables or presses other parts. ──
-  function openGate(id) {
-    if (!id) return;
-    for (const el of $$(`[data-gate="${id}"]`)) el.hidden = false;
-    for (const el of $$(`[data-gate-hide="${id}"]`)) el.hidden = true;
-    for (const el of $$(`[data-gate-enable="${id}"]`)) el.disabled = false;
-    for (const el of $$(`[data-gate-press="${id}"]`)) el.click();
-  }
-
-  function answer(option) {
-    const quiz = option.closest("[data-quiz]");
-    const right = option.hasAttribute("data-correct");
-    for (const button of $$(".options > .button", quiz)) {
-      button.disabled = true;
-      if (button.hasAttribute("data-correct")) button.classList.add("is-right");
-      else if (button === option) button.classList.add("is-wrong");
-    }
-    $(".verdict", quiz).textContent = "Your answer: " + option.textContent + ". " + (right ? "Correct." : "Not quite.");
-    $(".feedback", quiz).hidden = false;
-    openGate(quiz.dataset.check);
-  }
-
   document.addEventListener("click", (e) => {
     const flip = e.target.closest(".tab[data-var]");
     if (flip) {
       state[flip.dataset.var] = flip.dataset.val === "T";
       for (const tab of $$(".tab", flip.parentNode)) tab.setAttribute("aria-pressed", tab === flip ? "true" : "false");
       return drawBoard();
-    }
-    const go = e.target.closest(".tab[data-go]");
-    if (go) {
-      go.closest("[data-step]").dataset.step = go.dataset.go;
-      for (const tab of $$(".tab", go.parentNode)) tab.setAttribute("aria-pressed", tab === go ? "true" : "false");
-      return;
-    }
-    const option = e.target.closest("[data-quiz] .options > .button");
-    if (option) return answer(option);
-    const reveal = e.target.closest(".button.reveal");
-    if (reveal) {
-      const box = reveal.closest(".quiz");
-      reveal.disabled = true;
-      $(".feedback", box).hidden = false;
-      return openGate(box.dataset.check);
     }
     if (e.target.closest("#sweep-go")) sweep();
   });

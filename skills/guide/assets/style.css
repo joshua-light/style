@@ -8,11 +8,15 @@
    from the reader's installed fonts. Where it is not installed, text falls
    back to the Bold file, and the page looks as it did with two cuts. Chrome
    does not try a sibling weight when a face fails, so the fallback has to be
-   a second source here. */
+   a second source here.
+   The TrueType file (version 6.000) names itself "ExpresswayRg-Regular" and
+   comes first: it is hinted, so its letters keep one height at text sizes. The
+   OpenType file (6.100, "Expressway Regular") carries the Extra-bold's
+   alignment zones, and its round letters render a pixel taller than the rest. */
 @font-face {
   font-family: "Expressway";
   font-weight: 400;
-  src: local("Expressway Regular"), local("Expressway-Regular"),
+  src: local("ExpresswayRg-Regular"), local("Expressway Regular"), local("Expressway-Regular"),
        url("fonts/expressway.woff2") format("woff2"), url("fonts/expressway.ttf") format("truetype");
 }
 @font-face {
@@ -226,13 +230,6 @@ img, svg { display: block; max-width: 100%; }
   :root .slide { aspect-ratio: auto; padding: var(--s5); }
   :root .slide.split { display: flex; }
   :root .slide.split > * + * { margin-top: var(--s5); }
-  .diagram { flex-direction: column; align-items: stretch; }
-  .diagram > .node { flex: none; }
-  .compare { grid-template-columns: minmax(0, 1fr); }
-  .diagram > .link, .compare > .link { align-self: center; justify-self: center; margin: var(--s3) 0; transform: rotate(90deg); }
-  .steps.across { grid-auto-flow: row; }
-  .steps.across > li { padding: 0 0 0 calc(var(--icon) + var(--s3)); }
-  .steps.across > li::after { display: none; }
 }
 
 /* ── Text ─────────────────────────────────────────────────────────────── */
@@ -354,13 +351,14 @@ blockquote cite {
 /* Numbered steps: each number sits in a coloured square the size of an icon.
    Each step takes the next series colour, so text can point back at a step
    with the same square inline (.step-ref). --fill on a step, or on the list
-   for one colour throughout, overrides it. */
-.steps > li:nth-child(1), .step-ref[data-step="1"] { --step: var(--c1); }
-.steps > li:nth-child(2), .step-ref[data-step="2"] { --step: var(--c2); }
-.steps > li:nth-child(3), .step-ref[data-step="3"] { --step: var(--c3); }
-.steps > li:nth-child(4), .step-ref[data-step="4"] { --step: var(--c4); }
-.steps > li:nth-child(5), .step-ref[data-step="5"] { --step: var(--c5); }
-.steps > li:nth-child(6), .step-ref[data-step="6"] { --step: var(--c6); }
+   for one colour throughout, overrides it. A stepper's states take the same
+   colours, so a .step-ref can cite a state too. */
+.steps > li:nth-child(1), .step-ref[data-step="1"], .stepper .tab[data-go]:nth-child(1) { --step: var(--c1); }
+.steps > li:nth-child(2), .step-ref[data-step="2"], .stepper .tab[data-go]:nth-child(2) { --step: var(--c2); }
+.steps > li:nth-child(3), .step-ref[data-step="3"], .stepper .tab[data-go]:nth-child(3) { --step: var(--c3); }
+.steps > li:nth-child(4), .step-ref[data-step="4"], .stepper .tab[data-go]:nth-child(4) { --step: var(--c4); }
+.steps > li:nth-child(5), .step-ref[data-step="5"], .stepper .tab[data-go]:nth-child(5) { --step: var(--c5); }
+.steps > li:nth-child(6), .step-ref[data-step="6"], .stepper .tab[data-go]:nth-child(6) { --step: var(--c6); }
 .steps { display: grid; gap: var(--s4); padding: 0; list-style: none; counter-reset: step; }
 .steps > li {
   position: relative;
@@ -396,9 +394,24 @@ blockquote cite {
   background: var(--texture), var(--fill, var(--step, var(--c-other)));
   border: var(--border);
   color: var(--ink);
+  font-family: var(--font);
   font-size: var(--fs-note);
   font-weight: 700;
   line-height: 1;
+}
+/* A pin is the same chip set on a figure: .pins wraps the picture, and --x and
+   --y place the pin's centre in percent of it. The notes are an ol.steps beside
+   or below, so each pin matches its note by number and colour. Positions round
+   to whole pixels: a chip on a half pixel blurs. */
+.pins { position: relative; }
+.pin {
+  position: absolute;
+  z-index: 1;
+  left: calc(var(--x, 0) * 1%);
+  left: round(calc(var(--x, 0) * 1%), 1px);
+  top: calc(var(--y, 0) * 1%);
+  top: round(calc(var(--y, 0) * 1%), 1px);
+  margin: -10px 0 0 -10px;
 }
 /* Across: the steps stand side by side, joined by a rule through their numbers. */
 .steps.across { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
@@ -454,7 +467,7 @@ blockquote cite {
 .kv > :nth-last-child(-n + 2) { border-bottom: 0; }
 
 /* A picture or screenshot in an ink frame, with its caption below. */
-.frame > :is(img, svg, video) { width: 100%; background: var(--sunken); border: var(--border); }
+.frame > :is(img, svg, video), .frame > .pins > :is(img, svg, video) { width: 100%; background: var(--sunken); border: var(--border); }
 
 hr { height: 1px; margin: 0; border: 0; background: var(--ink); }
 
@@ -529,7 +542,7 @@ figure > * + figcaption { margin-top: var(--s2); }
 .panel, .callout { position: relative; }
 /* A box inside a box is dark, so it reads as set into the lighter one: a stat
    or a chart panel on a slide, a panel in a panel. */
-:is(.panel, .slide, .callout) :is(.panel, .callout, blockquote, .node) { background: var(--inset); }
+:is(.panel, .slide, .callout) :is(.panel, .callout, blockquote, .node, .layer, .more) { background: var(--inset); }
 /* Panels in one grid row share a height. A panel is a column so its body can
    take the spare height and fill it, never leave it empty at the bottom. */
 .panel { display: flex; flex-direction: column; }
@@ -581,8 +594,16 @@ figure > * + figcaption { margin-top: var(--s2); }
   text-transform: uppercase;
   white-space: nowrap;
 }
+/* The kind's glyph leads the tag, so the kind reads before the word does. It
+   is ink on a solid chip and drops the outline: an ink stroke on ink would
+   only thicken the shape and close its counters at 16px. */
+.callout-head:has(> .glyph) { gap: var(--s1); padding-left: var(--s1); }
+.callout-head > .glyph > svg * { stroke: none; }
 .panel-body, .callout-body { padding: var(--s4); }
 .panel-body > * + *, .callout-body > * + * { margin-top: var(--s3); }
+/* Tabs and steppers hide parts with the hidden attribute. The first part that
+   shows sits at the top, whatever hidden parts come before it. */
+:is(.panel-body, .callout-body) > :nth-child(1 of :not([hidden])) { margin-top: 0; }
 /* A list belongs to the paragraph that introduces it: it sits as close to it
    as its own items sit to each other. A full block gap cut the two apart. */
 :is(.page, .flow, .slide, .panel-body, .callout-body) > p + :is(ul, ol):not([class]) { margin-top: var(--s2); }
@@ -598,6 +619,20 @@ figure > * + figcaption { margin-top: var(--s2); }
 .panel-body:has(> .chart-row) { display: flex; flex-direction: column; justify-content: center; }
 .panel-head + .panel-body.flush { padding-top: 0; border-top: var(--s4) solid var(--head); }
 .panel-head + .panel-body.flush > .table { border-top: var(--border); }
+
+/* A strip under a panel's body: the figure's controls, or its one-line takeaway. */
+.panel-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  padding: var(--s3) var(--s4);
+  border-top: var(--border);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--text-dim);
+}
+.panel-foot > p { flex: 1; min-width: 160px; max-width: none; }
 
 .callout-body { font-size: var(--fs-label); line-height: var(--lh-label); }
 .callout.note { --fill: var(--info); }
@@ -1148,6 +1183,76 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* Before and after: two boxes with an arrow between them. */
 .compare { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--s3); }
 
+/* A tree: one parent over its children, joined by a bus. The wires are 2px ink
+   rules, as in a timeline: a tree shows what belongs to what, not a flow, so
+   it has no arrowheads. Each child draws the stub above it and its stretch of
+   the bus, which sits in the middle of the gap. A child may be a .tree itself;
+   --span on a child gives it more columns. */
+.tree { display: grid; justify-items: center; row-gap: var(--s5); font-size: var(--fs-label); line-height: var(--lh-label); }
+.tree > .node { position: relative; flex: none; min-width: min(100%, 160px); }
+.tree > .node::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: calc(var(--s3) + 2px);
+  background: var(--ink);
+}
+.tree-kids {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--s4);
+  width: 100%;
+}
+/* --edge is the child's own border, which its wires overlap; a subtree has none. */
+.tree-kids > * { --edge: 1px; position: relative; grid-column: span var(--span, 1); }
+.tree-kids > .tree { --edge: 0px; }
+.tree-kids > .node { flex: none; }
+.tree-kids > ::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: calc(var(--s3) + 1px + var(--edge));
+  background: var(--ink);
+}
+/* The bus reaches 1px past the middle of the gap, so neighbours always meet. */
+.tree-kids > ::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + var(--s3) - 1px + var(--edge));
+  left: calc(var(--s4) / -2 - 2px);
+  right: calc(var(--s4) / -2 - 2px);
+  height: 2px;
+  background: var(--ink);
+}
+.tree-kids > :first-child::after { left: calc(50% - 1px); }
+.tree-kids > :last-child::after { right: calc(50% - 1px); }
+
+/* Layers: blocks that rest on the blocks below them. --cols on the stack and
+   --span on a block set the widths; the gap is one touch, so each block sits
+   on the next. .base is a slab others stand on. .fallen is a block knocked
+   out, and whatever stood on it: say so in a tag, never by the gray alone. */
+.layers {
+  --cols: 1;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  gap: var(--s1);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+}
+.layer { grid-column: span var(--span, 1); min-width: 0; padding: var(--s2) var(--s3); background: var(--panel); border: var(--border); }
+.layer > strong { display: block; }
+.layer > span:not(.tag) { display: block; font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.layer > .tag { float: right; margin-left: var(--s2); }
+:root .layer.base { background: var(--raised); }
+:root .layer.fallen { background: var(--sunken); color: var(--text-faint); }
+.layer.fallen > span:not(.tag) { color: var(--text-faint); }
+
 /* ── Controls ─────────────────────────────────────────────────────────── */
 
 /* Tabs are a row of joined tags; the pressed one is lit. In a panel head they
@@ -1169,6 +1274,9 @@ figure > * + figcaption { margin-top: var(--s2); }
 .tab + .tab { margin-left: -1px; }
 .tab:hover { color: var(--text); }
 .tab[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+.tab:disabled { color: var(--text-faint); cursor: default; }
+/* In a stepper the pressed tab is its step's square: the step's colour, in ink. */
+.stepper .tab[data-go][aria-pressed="true"] { background: var(--texture), var(--fill, var(--step, var(--c-other))); color: var(--ink); }
 
 .button {
   display: inline-flex;
@@ -1223,9 +1331,209 @@ select.input {
   cursor: pointer;
 }
 .check:checked::before { content: ""; width: 8px; height: 8px; background: var(--texture), var(--fill, var(--c1)); box-shadow: 0 0 0 1px var(--ink); }
+/* A slider is a status bar the reader drags: a sunken track, a flat fill up to
+   the handle, and a square handle with an ink edge. The fill is the handle's
+   own shadow, thrown left and clipped by the track, so it needs no script. In
+   a .meter-row it wears its name and value on its top edge, as a meter does. */
+.slider {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: var(--bar-height);
+  margin: 0;
+  padding: 0;
+  background: var(--sunken);
+  border: var(--border);
+  overflow: hidden;
+  cursor: ew-resize;
+}
+.slider::-webkit-slider-runnable-track { height: 100%; }
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 8px;
+  height: 100%;
+  background: var(--text);
+  border: 0;
+  box-shadow: -1px 0 0 var(--ink), 1px 0 0 var(--ink), calc(-100vw - 8px) 0 0 100vw var(--fill, var(--c1));
+}
+.slider::-moz-range-track { height: 100%; background: none; }
+.slider::-moz-range-progress { height: 100%; background: var(--fill, var(--c1)); }
+.slider::-moz-range-thumb { width: 8px; height: 100%; background: var(--text); border: 0; border-radius: 0; box-shadow: -1px 0 0 var(--ink), 1px 0 0 var(--ink); }
+.meter-row > .slider { height: 20px; }
+label.meter-row { display: block; }
+/* The name and value lie over the track's top edge; a drag passes through them. */
+.meter-row:has(> .slider) > :is(.meter-label, .meter-value) { pointer-events: none; }
+
 /* A field: a note-size label above its control. */
 .field { display: grid; gap: var(--s1); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
-:is(.tab, .button, .input, .check):focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
+:is(.tab, .button, .input, .check, .slider, .more > summary):focus-visible { outline: 1px solid var(--text); outline-offset: 1px; }
+
+/* ── Explainers ───────────────────────────────────────────────────────── */
+
+/* A heading reached from a link stops a block short of the window's top. */
+:is(h2, h3, section, figure)[id] { scroll-margin-top: var(--s5); }
+
+/* Disclosure: optional depth, closed by default, so the main line stays short.
+   The marker is a drawn triangle: the font has none. Both states fill the same
+   8px square, so the label does not shift when it opens. */
+.more { background: var(--panel); border: var(--border); }
+:is(.page, .flow) > .more { max-width: var(--measure); }
+.more > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: var(--s2) var(--s3);
+  list-style: none;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  cursor: pointer;
+}
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary::before {
+  content: "";
+  flex: none;
+  margin: 0 1px;
+  border: 4px solid transparent;
+  border-right-width: 0;
+  border-left: 6px solid var(--text-dim);
+}
+.more[open] > summary::before { margin: 1px 0; border: 4px solid transparent; border-bottom-width: 0; border-top: 6px solid var(--text-dim); }
+.more[open] > summary { border-bottom: var(--border); }
+.more > :not(summary) { margin: var(--s3) var(--s4); }
+.more > p { max-width: none; }
+
+/* A quiz is a callout that asks. The reader picks an option: the right one
+   turns green, a wrong pick red, and .verdict says which in words. The
+   question is text to read and answer, so it runs at body size. */
+.callout.quiz { --fill: var(--info); }
+:is(.page, .flow) > .quiz { max-width: var(--measure); }
+.quiz > .callout-body { font-size: var(--fs-body); line-height: var(--lh-body); }
+.options { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.button.is-right { background: var(--texture), var(--good); color: var(--ink); }
+.button.is-wrong { background: var(--texture), var(--bad); color: var(--ink); }
+.feedback > * + * { margin-top: var(--s2); }
+/* Several questions in one quiz: each .quiz-item is answered on its own. */
+.quiz-item + .quiz-item { margin-top: var(--s3); padding-top: var(--s3); border-top: var(--border); }
+.quiz-item > * + * { margin-top: var(--s2); }
+
+/* Claims: a statement, its verdict in a tag at the right, and the reason
+   under it. Ruled like a legend list. */
+.claims { display: grid; padding: 0; list-style: none; font-size: var(--fs-label); line-height: var(--lh-label); }
+.claims > li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s1) var(--s4);
+  align-items: start;
+  max-width: none;
+  margin: 0;
+  padding: var(--s3) 0;
+  border-bottom: var(--border);
+}
+.claims > li:first-child { padding-top: 0; }
+.claims > li:last-child { padding-bottom: 0; border-bottom: 0; }
+.claims > li > .tag { grid-column: 2; grid-row: 1; }
+.claims > li > p { grid-column: 1; max-width: none; color: var(--text-dim); }
+
+/* Waffle: ten squares to a row, the first --v of them filled, for "37 in 100".
+   --rows is the number of rows (2 shows a share of 20). One element: the fill
+   is whole rows plus the start of the next, and the ink grid is drawn over
+   it. The gradients are solid colours and 1px lines, never a blend. */
+.waffle {
+  --v: 0;
+  --rows: 10;
+  --cell: 12px;
+  --full: round(down, var(--v) / 10, 1);
+  flex: none;
+  width: calc(10 * var(--cell) + 1px);
+  height: calc(var(--rows) * var(--cell) + 1px);
+  background:
+    repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px var(--cell)),
+    repeating-linear-gradient(var(--ink) 0 1px, transparent 1px var(--cell)),
+    linear-gradient(var(--fill, var(--c1)) 0 0) 0 calc(var(--full) * var(--cell)) / calc(mod(var(--v), 10) * var(--cell)) var(--cell) no-repeat,
+    linear-gradient(var(--fill, var(--c1)) 0 0) 0 0 / 100% calc(var(--full) * var(--cell)) no-repeat,
+    var(--sunken);
+}
+
+/* Linked prose: inside [data-link], a <mark data-key> in a sentence and the
+   part of the figure with the same key light up together (style.js). The rest
+   of the keyed parts darken. A linked mark wears a dashed rule, the one mark
+   that is underlined: it tells the reader the name can be hovered. */
+mark[data-key] { border-bottom: 1px dashed currentColor; cursor: default; transition: color var(--t-fast) var(--ease); }
+mark.is-hot { color: var(--text); }
+[data-link] [data-key]:not(mark) { transition: filter var(--t-fast) var(--ease); }
+[data-link]:has(.is-hot) [data-key]:not(.is-hot, mark) { filter: brightness(0.55); }
+
+/* A margin note sits in the room the prose measure leaves at the right of the
+   page. Write it before the paragraph it belongs to. Prose flows past it;
+   anything wider than the measure starts below it. */
+.page > .margin {
+  float: right;
+  clear: right;
+  width: calc(100% - var(--measure) - var(--s6));
+  /* Drops the note's first line to the middle of the prose line beside it. */
+  padding-top: 6px;
+  font-size: var(--fs-note);
+  line-height: var(--lh-note);
+  color: var(--text-dim);
+}
+.margin > * + * { margin-top: var(--s2); }
+.margin p { max-width: none; }
+.page > .margin ~ :not(p, ul, ol, blockquote, .more, .quiz, .formula, .margin) { clear: right; }
+/* The note must not change the gap between the blocks around it. */
+.page > p + .margin, .page > p + .margin + p,
+.page > h2 + .margin, .page > h2 + .margin + * { margin-top: var(--s4); }
+.page > h3 + .margin, .page > h3 + .margin + * { margin-top: var(--s2); }
+
+/* Contents rail: the chapters of a long page. In the flow it is a plain list.
+   On a window wide enough it is fixed left of the page: style.js lights the
+   chapter being read and fills the thin bar with the share scrolled. */
+.rail { font-size: var(--fs-label); line-height: var(--lh-label); }
+.rail > * + * { margin-top: var(--s2); }
+.rail > .bar { display: none; }
+.rail ol { padding: 0; list-style: none; border-left: 2px solid var(--ink); }
+.rail li { max-width: none; margin: 0; }
+.rail a {
+  display: block;
+  margin-left: -2px;
+  padding: var(--s1) var(--s3);
+  border: 0;
+  border-left: 2px solid transparent;
+  color: var(--text-dim);
+}
+.rail a:hover { color: var(--text); }
+.rail a[aria-current] { border-left-color: var(--text); color: var(--text); }
+@media screen and (min-width: 1400px) {
+  .page:not(.wide) > .rail {
+    position: fixed;
+    top: var(--s7);
+    left: calc(50% - var(--page-width) / 2 - var(--s6) - 176px);
+    width: 176px;
+    max-height: calc(100vh - 2 * var(--s7));
+    overflow-y: auto;
+  }
+  .page:not(.wide) > .rail > .bar { display: flex; }
+}
+
+/* Phone layouts for the components above. They sit here, after every rule they
+   override: placed with the layout rules at the top, the later component rules
+   won and a chain, a comparison and steps across kept their desktop shape. */
+@media screen and (max-width: 760px) {
+  .diagram { flex-direction: column; align-items: stretch; }
+  .diagram > .node { flex: none; }
+  .compare { grid-template-columns: minmax(0, 1fr); }
+  .diagram > .link, .compare > .link { align-self: center; justify-self: center; margin: var(--s3) 0; transform: rotate(90deg); }
+  .steps.across { grid-auto-flow: row; }
+  .steps.across > li { padding: 0 0 0 calc(var(--icon) + var(--s3)); }
+  .steps.across > li:not(:last-child)::after { display: none; }
+  /* A tree becomes an outline: children stack under the parent, behind a rule. */
+  .tree { justify-items: stretch; row-gap: var(--s2); }
+  .tree-kids { grid-auto-flow: row; gap: var(--s2); width: auto; margin-left: var(--s3); padding-left: var(--s3); border-left: 2px solid var(--ink); }
+  .tree-kids > * { grid-column: auto; }
+  .tree > .node::after, .tree-kids > ::before, .tree-kids > ::after { display: none; }
+  .layers { grid-template-columns: minmax(0, 1fr); }
+  .layer { grid-column: auto; }
+  .page > .margin { float: none; width: auto; padding-top: 0; }
+}
 
 /* ── Motion ───────────────────────────────────────────────────────────── */
 

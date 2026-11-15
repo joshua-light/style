@@ -24,6 +24,8 @@ Expressway is licensed by Typodermic and its files carry a "do not distribute" n
 
 Text is set in Expressway Regular, a free download from [DaFont](https://www.dafont.com/expressway.font) or 1001 Fonts. Its desktop licence forbids converting or embedding the file, so do not put it in this repo: install it on your machine (for example in `~/.local/share/fonts/`) and the stylesheet finds it by name. On a machine without it, text falls back to Expressway Bold.
 
+Install the TrueType file, `expressway rg.ttf` (version 6.000), not the OpenType `expressway rg.otf` (version 6.100). The OpenType file has wrong hinting zones: on Linux its round letters (`o`, `e`, `s`) render a pixel taller than `n` and `r` at text sizes.
+
 Without them, pages fall back to Overpass. Embedding the font in pages you publish may need a web licence from Typodermic.
 
 ## Layout
@@ -32,7 +34,7 @@ Without them, pages fall back to Overpass. Embedding the font in pages you publi
 | --- | --- |
 | `skills/guide/SKILL.md` | The rules. Both tools load it. |
 | `skills/guide/assets/style.css` | Tokens and components. |
-| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, deck keys. |
+| `skills/guide/assets/style.js` | Tooltips, hover highlighting, reveal on scroll, tabs, sorting, steppers, quizzes, bound sliders, the contents rail, deck keys. |
 | `skills/guide/assets/style.mplstyle` | The same look for matplotlib charts. |
 | `skills/guide/assets/showcase.html` | Reference markup for every component. |
 | `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
