@@ -6,6 +6,8 @@ Usage:
   shot.py PAGE.html --select CSS     each part that matches, framed for export
   shot.py DECK.html                  one image per slide
   shot.py DECK.html --slide 3        one slide
+  shot.py PAGE.html --select "#move" --at move:swing+0.5
+                                     a film, held part-way through a beat
 
 Options:
   -o OUT.png    where to write. Several images are numbered: OUT-1.png, OUT-2.png.
@@ -13,12 +15,15 @@ Options:
   --width PX    the window's width (1280). Use 1400 or more to see the contents rail in place.
   --scale N     device pixels per px (1). A slide at --scale 2 is 1920 by 1080.
   --tile PX     the height of one screen of a page (1500).
+  --at MOMENT   hold a film at a moment: FILM:BEAT+SHARE is that share of the way through the beat's
+                motion, and FILM:BEAT+2 is the beat at rest. Several moments are parted by commas.
 
 Prints the path of each image written.
 
 Every mark is shown finished, as print shows it: no animation is caught
 part-way, every slide is lit, every build piece is built, and popups, toasts,
-and tooltips are left out. A part shot with --select sits on the page gray with
+and tooltips are left out. A film shows its last frame, unless --at holds it
+somewhere else. A part shot with --select sits on the page gray with
 24px of padding and a 1px ink frame, the way the guide exports an image.
 
 Needs Chrome or Chromium, on Linux or macOS. Set CHROME to its path if it is
@@ -232,6 +237,7 @@ def main():
     parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--scale", type=float, default=1)
     parser.add_argument("--tile", type=int, default=1500)
+    parser.add_argument("--at", metavar="MOMENT")
     args = parser.parse_args()
     if not args.page.is_file():
         sys.exit(f"shot.py: no such page: {args.page}")
@@ -240,7 +246,7 @@ def main():
 
     browser = Browser(find_browser())
     try:
-        browser.open(args.page.resolve().as_uri(), args.width, 900, args.scale)
+        browser.open(args.page.resolve().as_uri() + (f"#at={args.at}" if args.at else ""), args.width, 900, args.scale)
         found = browser.run(MEASURE, FINISHED, args.select)
         if found.get("error"):
             sys.exit(f"shot.py: {found['error']}")

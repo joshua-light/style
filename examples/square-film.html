@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Completing the Square, as Three Films</title>
+<meta name="description" content="An animated explainer: al-Khwarizmi's picture proof of completing the square, told in three short films you can play, step, and scrub.">
+<link rel="stylesheet" href="../skills/guide/assets/style.css">
+<script src="../skills/guide/assets/style.js" defer></script>
+<style>
+/* Films come from style.css and film.js. This page adds only its speed control. Tokens only. */
+
+/* The speed control of this sample, as on the reference deck: a tool for reviewing motion. It stays off paper. */
+.film-speed { position: sticky; top: 0; z-index: 3; padding: var(--s5) 0 var(--s3); background: var(--page); border-bottom: var(--border); }
+@media print { .film-speed { display: none; } }
+</style>
+</head>
+<body>
+<!-- An animated explainer in three films that tell one argument. It is the reference for an equation whose
+     terms follow the picture (Film.equation), for a quiz that holds a film, and for sliders that replay a
+     film on the reader's numbers. The three film scripts sit at the end of the page. -->
+<main class="page">
+
+  <!-- Speed: how many times slower than real the films run, for a close look. A tool for review, as on the reference deck. -->
+  <div class="meter film-speed">
+    <label class="meter-row"><span class="meter-label">Slower by</span><input class="slider" type="range" min="1" max="10" step="1" value="1" data-speed><output class="meter-value" data-speed-show>Real speed</output></label>
+  </div>
+
+  <p class="eyebrow">Animated explainer · Algebra</p>
+  <h1>Completing the square is a move you can watch</h1>
+  <p class="lead">The quadratic formula looks like a spell. It is the record of three moves on a picture: cut a strip, swing one half, fill a corner. The films below make each move in front of you.</p>
+  <p class="byline">For anyone who met the formula before the picture · about 4 minutes · 3 films</p>
+
+  <h2 id="puzzle">A puzzle from the year 820</h2>
+  <p>Around 820, in Baghdad, <mark>al-Khwarizmi</mark> wrote the book that gave algebra its name. One of its problems:</p>
+  <blockquote>
+    <p>What must be the square which, when increased by ten of its own roots, amounts to thirty-nine?</p>
+    <cite>Al-Khwarizmi, about 820, in Frederic Rosen's translation of 1831</cite>
+  </blockquote>
+  <aside class="margin"><p><strong>How to watch.</strong> Play shows one beat and stops. Press it again for the next. Replay repeats a beat. Drag the bar to scrub, backwards too.</p></aside>
+  <p>A root is the side of the square. Today we write the puzzle as <code class="math">x<sup>2</sup> + 10x = 39</code>. Al-Khwarizmi had no symbols. He drew it.</p>
+  <p>Start by drawing each term. A dashed box is a part not drawn yet.</p>
+
+  <!-- Film 1. The poster frame holds every part as a dashed promise; each beat inks one. -->
+  <figure class="panel film" id="shapes" data-film data-link>
+    <div class="panel-head">Each term is a shape <span class="tag" data-film-count>1 / 4</span></div>
+    <div class="panel-body">
+      <svg class="chart stage" viewBox="0 0 926 290" role="img" aria-label="The equation x squared plus 10x equals 39 over its picture: a square with side x, and beside it a strip x tall and 10 wide.">
+        <rect class="zone" x="0.5" y="0.5" width="925" height="72"/>
+        <g data-part="eq"></g>
+        <g data-part="sq" data-key="sq" data-tip="The square" data-tip-note="x wide, x tall" style="--fill:var(--c1)"></g>
+        <g data-part="strip" data-key="strip" data-tip="The strip" data-tip-note="10 wide, x tall" style="--fill:var(--c2)"></g>
+        <g data-part="m-x"></g>
+        <g data-part="m-xl"></g>
+        <g data-part="m-b"></g>
+      </svg>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="The puzzle">A square plus ten of its sides makes 39. The dashed boxes are not drawn yet.</li>
+        <li data-beat="sq" data-name="The square"><code class="math">x<sup>2</sup></code> is the <mark data-key="sq">square</mark> itself: x wide and x tall.</li>
+        <li data-beat="strip" data-name="The strip"><code class="math">10x</code> is a <mark data-key="strip">strip</mark>: just as tall, and 10 wide.</li>
+        <li data-beat="total" data-name="The total">Together they cover 39. Find the side x and the puzzle is solved.</li>
+      </ol>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+  </figure>
+
+  <p>The colour of a term is the colour of its shape, so a piece can be followed from the equation into the picture. Hover one to light both.</p>
+
+  <h2 id="moves">Three moves</h2>
+  <p>A lone square is easy to solve: if <code class="math">x<sup>2</sup> = 49</code>, the side is 7. The strip is what makes the puzzle hard. So reshape the strip until the whole figure is a square again.</p>
+  <p>The film stops before the third move and asks you to predict it.</p>
+
+  <!-- Film 2. It opens on the frame film 1 ended on. It holds before the beat "fill" until the quiz below is
+       answered: the quiz presses the hidden release button. The second foot holds the film's two numbers:
+       the film replays the same moves on whatever they are set to. -->
+  <figure class="panel film" id="move" data-film data-link>
+    <div class="panel-head">Cut, swing, fill <span class="tag" data-film-count>1 / 8</span></div>
+    <div class="panel-body">
+      <svg class="chart stage" viewBox="0 0 926 430" role="img" aria-label="The strip is cut into two halves, one half swings under the square, and a 5 by 5 corner completes a square of side 8. So x is 3.">
+        <rect class="zone" x="0.5" y="0.5" width="925" height="72"/>
+        <g data-part="eq"></g>
+        <g data-part="sq" data-key="sq" data-tip="The square" data-tip-note="x wide, x tall" style="--fill:var(--c1)"></g>
+        <g data-part="corner" data-key="corner" data-tip="The corner" data-tip-note="Half the strip's width, squared" style="--fill:var(--c3)"></g>
+        <g data-part="h1" data-key="h1" data-tip="Half the strip" data-tip-note="Stays beside the square" style="--fill:var(--c2)"></g>
+        <g data-part="strip" data-key="strip" data-tip="The strip" data-tip-note="Before the cut" style="--fill:var(--c2)"></g>
+        <line class="axis" data-part="cut"/>
+        <g data-part="m-x"></g>
+        <g data-part="m-xl"></g>
+        <g data-part="m-b"></g>
+        <g data-part="m-h"></g>
+        <g data-part="m-hl"></g>
+        <g data-part="m-side"></g>
+        <g data-part="h2" data-key="h2" data-tip="Half the strip" data-tip-note="Swings under the square" style="--fill:var(--c2)"></g>
+      </svg>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="The pieces">The same pieces. A lone square would be easy to solve. The strip is in the way.</li>
+        <li data-beat="cut" data-name="Cut">Cut the <mark data-key="strip">strip</mark> down the middle. Each half is <span data-say="h">5</span> wide.</li>
+        <li data-beat="swing" data-name="Swing">Swing one half under the <mark data-key="sq">square</mark>. Nothing was added: the area is still <span data-say="c">39</span>.</li>
+        <li data-beat="hole" data-name="The gap" data-focus="corner">Now it is nearly a square. One corner is missing.</li>
+        <li data-beat="fill" data-name="Fill" data-hold="corner" data-focus="corner">Fill the <mark data-key="corner">corner</mark>: <span data-say="h">5</span> by <span data-say="h">5</span> is <span data-say="hh">25</span>. Add <span data-say="hh">25</span> to the other side too, to keep the balance.</li>
+        <li data-beat="whole" data-name="One square">The left side is now one square, <code class="math">x + <span data-say="h">5</span></code> on a side. Its area is <span data-say="c">39</span> + <span data-say="hh">25</span> = <span data-say="tot">64</span>.</li>
+        <li data-beat="root" data-name="The side">A square of area <span data-say="tot">64</span> has side <span data-say="side">8</span>. So <code class="math">x + <span data-say="h">5</span> = <span data-say="side">8</span></code>.</li>
+        <li data-beat="scale" data-name="To scale">That leaves <code class="math">x = <span data-say="x">3</span></code>. Now slide the inner lines to their true places.</li>
+      </ol>
+      <button type="button" hidden data-gate-press="corner" data-film-release="corner">Go on</button>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+    <div class="panel-foot">
+      <label class="meter-row film-bar"><span class="meter-label">Strip width</span><input class="slider" type="range" min="2" max="12" step="2" value="10" style="--fill:var(--c2)" data-film-param="b"><output class="meter-value">10</output></label>
+      <label class="meter-row film-bar"><span class="meter-label">Total area</span><input class="slider" type="range" min="1" max="100" step="1" value="39" style="--fill:var(--c-other)" data-film-param="c"><output class="meter-value">39</output></label>
+      <button type="button" class="button" data-film-reset>Reset</button>
+    </div>
+  </figure>
+
+  <aside class="callout note quiz" data-check="corner">
+    <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-7v2h2v-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.5 3.5 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2z"/></svg></span>Predict</div>
+    <div class="callout-body">
+      <p>The film holds at the missing corner. With a strip 10 wide, how much area does the corner need?</p>
+      <div class="row options" role="group" aria-label="Your prediction">
+        <button type="button" class="button">10</button>
+        <button type="button" class="button" data-correct>25</button>
+        <button type="button" class="button">50</button>
+      </div>
+      <div class="feedback" hidden aria-live="polite">
+        <p class="verdict"></p>
+        <p>Each half of the strip is 5 wide, so the gap is 5 by 5: 25. Half the strip's width, squared. The film goes on.</p>
+      </div>
+    </div>
+  </aside>
+
+  <p>Nothing in the moves depends on 10 and 39. Set the two sliders under the film to other numbers and play it again: the same cut, swing, and fill solve every puzzle of this kind.</p>
+
+  <h2 id="graph">What the picture cannot show</h2>
+  <p>A length cannot be negative, so the picture finds one answer. The equation has two.</p>
+
+  <!-- Film 3. Plot area x 60.5 to 896.5, y 30.5 to 366.5. x = 668.5 + 38x; y = 268.5 − 2.8y. -->
+  <figure class="panel film" id="curve" data-film>
+    <div class="panel-head">The curve finds two answers <span class="tag" data-film-count>1 / 6</span></div>
+    <div class="panel-body">
+      <svg class="chart stage" viewBox="0 0 926 400" role="img" aria-label="The curve x squared plus 10x, a parabola. It reaches 39 at x = 3 and at x = -13. Its lowest point is -25, at x = -5.">
+        <line class="gridline" x1="60.5" x2="896.5" y1="58.5" y2="58.5"/>
+        <line class="gridline" x1="60.5" x2="896.5" y1="128.5" y2="128.5"/>
+        <line class="gridline" x1="60.5" x2="896.5" y1="198.5" y2="198.5"/>
+        <line class="gridline" x1="60.5" x2="896.5" y1="338.5" y2="338.5"/>
+        <line class="axis" x1="60.5" x2="896.5" y1="268.5" y2="268.5"/>
+        <line class="axis" x1="668.5" x2="668.5" y1="30.5" y2="366.5"/>
+        <text class="end" x="52" y="62">75</text>
+        <text class="end" x="52" y="132">50</text>
+        <text class="end" x="52" y="202">25</text>
+        <text class="end" x="52" y="272">0</text>
+        <text class="end" x="52" y="342">-25</text>
+        <text class="mid" x="98" y="386">-15</text>
+        <text class="mid" x="288" y="386">-10</text>
+        <text class="mid" x="478" y="386">-5</text>
+        <text class="mid" x="668" y="386">0</text>
+        <text class="mid" x="858" y="386">5</text>
+        <text class="end" x="896" y="386">x</text>
+        <path class="line ghost" data-part="promise" style="--fill:var(--c1)"/>
+        <line class="target" data-part="goal" x1="60.5" x2="60.5" y1="159.5" y2="159.5"/>
+        <text data-part="goal-name"></text>
+        <line class="event" data-part="mid"/>
+        <line class="leader" data-part="drop-a"/>
+        <line class="leader" data-part="drop-b"/>
+        <path class="line" data-part="curve" style="--fill:var(--c1)"/>
+        <text class="series end" data-part="curve-name"></text>
+        <g data-part="m-across"></g>
+        <g data-part="m-up"></g>
+        <circle class="dot" data-part="tip" r="4" style="--fill:var(--c1)"/>
+        <circle class="dot" data-part="root-a" style="--fill:var(--c1)" data-tip="x = 3" data-tip-note="The side the picture found"/>
+        <circle class="dot" data-part="root-b" style="--fill:var(--c1)" data-tip="x = -13" data-tip-note="No square has this side"/>
+        <text class="series end" data-part="name-a"></text>
+        <text class="series" data-part="name-b"></text>
+        <circle class="dot" data-part="low" style="--fill:var(--c1)" data-tip="Lowest point" data-tip-value="-25" data-tip-note="At x = -5"/>
+        <text class="series mid" data-part="low-name"></text>
+        <circle class="dot" data-part="climb-a" r="4" style="--fill:var(--c1)"/>
+        <circle class="dot" data-part="climb-b" r="4" style="--fill:var(--c1)"/>
+      </svg>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="Every x">The picture could only show lengths. A graph shows every x, negative ones too.</li>
+        <li data-beat="trace" data-name="The curve">Feed each x into <code class="math">x<sup>2</sup> + 10x</code> and plot what comes out.</li>
+        <li data-beat="goal" data-name="The goal">The puzzle asks where the curve reaches 39.</li>
+        <li data-beat="roots" data-name="Two answers">It gets there twice: at 3, the side we found, and at -13, a side no square can have.</li>
+        <li data-beat="low" data-name="The bottom">Half-way between lies the lowest point: at -5 the curve dips to -25. That 25 is the corner.</li>
+        <li data-beat="climb" data-name="The climb">From the bottom the curve must climb 25 + 39 = 64. Stepping 8 to either side does it.</li>
+      </ol>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+  </figure>
+
+  <p>Read the graph from its lowest point. The answers sit 8 to either side of -5: 3 and -13. The -5 is half the strip, turned negative. The 8 is the side of the completed square.</p>
+
+  <h2 id="formula">The formula is the film, written down</h2>
+  <p>Put letters where the numbers were: a strip <code class="math">b</code> wide and a total of <code class="math">c</code>. Every part of the formula is one beat.</p>
+  <p class="formula" role="math" aria-label="x equals plus or minus the square root of c plus the square of b over 2, minus b over 2"><span>x</span><span>=</span><span>±√(c + (b / 2)<sup>2</sup>)</span><span>-</span><span>b / 2</span></p>
+  <ol class="steps">
+    <li><strong>b / 2.</strong> Cut the strip in half.</li>
+    <li><strong>(b / 2)<sup>2</sup>.</strong> The corner the two halves leave open.</li>
+    <li><strong>c + (b / 2)<sup>2</sup>.</strong> Fill it, and the whole square has this area.</li>
+    <li><strong>The root.</strong> The side of that square.</li>
+    <li><strong>Minus b / 2.</strong> Take the half strip off the side, and x is left.</li>
+    <li><strong>Plus or minus.</strong> The curve reaches the total twice.</li>
+  </ol>
+
+  <hr>
+  <footer class="page-foot"><span>Problem and method: al-Khwarizmi, about 820</span><span>Made 16 Nov 2026</span></footer>
+
+</main>
+<script src="../skills/guide/assets/film.js"></script>
+<script>
+// The three films of this page. The engine is film.js.
+(() => {
+  const { span, lerp, fmt, len, show, set, say, swap, slot, measure, equation } = Film;
+
+  // Films 1 and 2 share a picture. One unit is U px. The square's corner sits at (OX, OY). Until x is
+  // known the square is drawn XS units wide: a sketch, set to scale once the film has solved it.
+  const U = 22, OX = 330, OY = 124, XS = 6, EQ = [463, 36];
+  const op = (id, text) => ({ id, text, kind: "op" });
+  const TILE = { cls: "tile", rise: 6 };
+
+  const shapes = {
+    params: { b: 10, c: 39 },
+    values: { sq: 0, strip: 0, mx: 0, mb: 0, eq: 0 },
+    beats: {
+      sq: [{ v: "sq", to: 1, dur: 1.5 }, { v: "eq", to: 1, dur: 1.5 }, { v: "mx", to: 1, at: 1, dur: 1 }],
+      strip: [{ v: "strip", to: 1, dur: 2 }, { v: "eq", to: 2, dur: 2 }, { v: "mb", to: 1, at: 1.5, dur: 1 }],
+      total: [{ v: "eq", to: 3, dur: 1.5 }],
+    },
+    draw(v, { stage, part }) {
+      const S = XS * U;
+      const W = v.b * U;
+      slot(stage, part("sq"), { ...TILE, x: OX, y: OY, w: S, h: S, frame: 1, fill: v.sq, text: "x^2" });
+      slot(stage, part("strip"), { ...TILE, x: OX + S, y: OY, w: W, h: S, frame: 1, fill: v.strip, text: v.b + "x" });
+      measure(part("m-x"), { x1: OX, x2: OX + S, y1: OY, y2: OY, off: -10, text: "x", p: v.mx });
+      measure(part("m-xl"), { x1: OX, x2: OX, y1: OY, y2: OY + S, off: -10, text: "x", p: v.mx });
+      measure(part("m-b"), { x1: OX + S, x2: OX + S + W, y1: OY, y2: OY, off: -10, text: String(v.b), p: v.mb });
+      const row = (inked) => [
+        { id: "sq", text: "x^2", kind: inked >= 1 ? "chip" : "ghost", fill: "var(--c1)", key: "sq" },
+        op("p1", "+"),
+        { id: "bx", text: v.b + "x", kind: inked >= 2 ? "chip" : "ghost", fill: "var(--c2)", key: "strip" },
+        op("eq", "="),
+        { id: "c", text: String(v.c), kind: inked >= 3 ? "neutral" : "ghost" },
+      ];
+      const at = Math.min(2, Math.floor(v.eq));
+      equation(stage, part("eq"), ...EQ, row(at), row(at + 1), v.eq - at);
+    },
+  };
+
+  const solve = (v) => {
+    const h = v.b / 2;
+    const side = Math.sqrt(v.c + h * h);
+    return { h, hh: h * h, tot: v.c + h * h, side, x: side - h };
+  };
+  const move = {
+    params: { b: 10, c: 39 },
+    values: { x: XS, cut: 0, gap: 0, swing: 0, hole: 0, corner: 0, side: 0, root: 0, num: 0, eq: 0 },
+    beats: {
+      cut: [{ v: "cut", to: 1, dur: 2.5, ease: "linear" }, { v: "gap", to: 1, at: 2.5, dur: 1 }, { v: "eq", to: 1, at: 0.5, dur: 2.5, ease: "linear" }],
+      swing: [{ v: "swing", to: 1, dur: 3.5 }],
+      hole: [{ v: "hole", to: 1, dur: 1.5 }],
+      fill: [{ v: "corner", to: 1, dur: 1.5 }, { v: "eq", to: 2, at: 1, dur: 2.5, ease: "linear" }],
+      whole: [{ v: "eq", to: 3, dur: 3, ease: "linear" }, { v: "side", to: 1, at: 2, dur: 1.5 }],
+      root: [{ v: "root", to: 1, dur: 1.5 }, { v: "eq", to: 4, at: 0.5, dur: 2.5, ease: "linear" }],
+      scale: [{ v: "eq", to: 5, dur: 2.5, ease: "linear" }, { v: "x", to: (v) => solve(v).x, at: 2.5, dur: 3 }, { v: "num", to: 1, at: 5, dur: 1.5 }],
+    },
+    say(v) {
+      const s = solve(v);
+      return { b: fmt(v.b), c: fmt(v.c), h: fmt(s.h), hh: fmt(s.hh), tot: fmt(s.tot), side: fmt(s.side), x: fmt(s.x) };
+    },
+    draw(v, { stage, part }) {
+      const s = solve(v);
+      const [h, hh] = [fmt(s.h), fmt(s.hh)];
+      const hx = (s.h === 1 ? "" : h) + "x";  // a coefficient of 1 is not written
+      // The whole square keeps its size on the stage. Once x is known, the unit changes and the inner
+      // lines slide to their true places.
+      const unit = ((XS + s.h) * U) / (v.x + s.h);
+      const S = v.x * unit;   // the square's side as drawn
+      const H = s.h * unit;   // half the strip's width
+      const cutLine = span(v.cut, 0, 0.6);
+      const halves = span(v.cut, 0.6, 1);
+
+      slot(stage, part("sq"), { ...TILE, x: OX, y: OY, w: S, h: S, fill: 1, ...swap("x^2", fmt(s.x * s.x), v.num) });
+      // The whole strip covers its two halves until the cut is through.
+      const strip = part("strip");
+      if (show(strip, cutLine < 1)) slot(stage, strip, { ...TILE, x: OX + S, y: OY, w: 2 * H, h: S, fill: 1, text: v.b + "x", n: len(v.b + "x") * (1 - span(v.cut, 0, 0.3)) });
+      if (show(part("cut"), cutLine > 0 && cutLine < 1)) set(part("cut"), { x1: Math.round(OX + S + H) + 0.5, x2: Math.round(OX + S + H) + 0.5, y1: OY, y2: OY + S * cutLine });
+      const half = swap(hx, fmt(s.h * s.x), v.num);
+      if (halves < 1) half.n = len(hx) * halves;
+      if (show(part("h1"), cutLine >= 1)) slot(stage, part("h1"), { ...TILE, x: OX + S, y: OY, w: H, h: S, fill: 1, ...half });
+      // The other half swings round the open corner and lands under the square, a quarter turn on.
+      if (show(part("h2"), cutLine >= 1)) {
+        const from = [OX + S + 1.5 * H + v.gap * 12, OY + S / 2];
+        const to = [OX + S / 2, OY + S + H / 2];
+        const via = [from[0] + 40, to[1] + 50];
+        const q = v.swing;
+        const at = (k) => (1 - q) ** 2 * from[k] + 2 * (1 - q) * q * via[k] + q * q * to[k];
+        if (q >= 1) slot(stage, part("h2"), { ...TILE, x: OX, y: OY + S, w: S, h: H, fill: 1, ...half });
+        else slot(stage, part("h2"), { ...TILE, x: at(0) - H / 2, y: at(1) - S / 2, w: H, h: S, fill: 1, turn: q > 0 ? 90 * q : 0, ...half });
+      }
+      slot(stage, part("corner"), { ...TILE, x: OX + S, y: OY + S, w: H, h: H, frame: v.hole, fill: v.corner, text: "Missing", n: 7 * v.hole, over: hh });
+
+      const known = swap("x", fmt(s.x), v.num);
+      measure(part("m-x"), { x1: OX, x2: OX + S, y1: OY, y2: OY, off: -10, p: 1, ...known });
+      measure(part("m-xl"), { x1: OX, x2: OX, y1: OY, y2: OY + S, off: -10, p: 1, ...known });
+      measure(part("m-b"), { x1: OX + S, x2: OX + S + 2 * H, y1: OY, y2: OY, off: -10, text: String(v.b), p: 1 - span(v.cut, 0, 0.5) });
+      measure(part("m-h"), { x1: OX + S, x2: OX + S + H, y1: OY, y2: OY, off: -10, text: h, p: span(v.cut, 0.5, 1) });
+      measure(part("m-hl"), { x1: OX, x2: OX, y1: OY + S, y2: OY + S + H, off: -10, text: h, p: span(v.swing, 0.8, 1) });
+      const whole = swap("x + " + h, fmt(s.side), v.root);
+      measure(part("m-side"), { x1: OX, x2: OX + S + H, y1: OY + S + H, y2: OY + S + H, off: 10, p: v.side, ...whole, n: v.side < 1 ? len(whole.text) * v.side : whole.n });
+
+      const gold = "var(--c2)";
+      const sq = { id: "sq", text: "x^2", kind: "chip", fill: "var(--c1)", key: "sq" };
+      const h1 = { id: "h1", text: hx, kind: "chip", fill: gold, key: "h1" };
+      const h2 = { id: "h2", text: hx, kind: "chip", fill: gold, key: "h2" };
+      const total = (text, count) => ({ id: "c", text, kind: "neutral", count });
+      const rows = [
+        [sq, op("p1", "+"), { id: "bx", text: v.b + "x", kind: "chip", fill: gold, key: "strip" }, op("eq", "="), total(fmt(v.c))],
+        [sq, op("p1", "+"), h1, op("p2", "+"), h2, op("eq", "="), total(fmt(v.c))],
+        [sq, op("p1", "+"), h1, op("p2", "+"), h2, op("p3", "+"), { id: "corner", text: hh, kind: "chip", fill: "var(--c3)", key: "corner" },
+          op("eq", "="), total(fmt(v.c)), op("p4", "+"), { id: "add", text: hh, kind: "chip", fill: "var(--c3)", key: "corner" }],
+        [{ id: "whole", text: `(x + ${h})^2`, kind: "neutral" }, op("eq", "="), total(fmt(s.tot), true)],
+        [{ id: "whole", text: "x + " + h, kind: "neutral" }, op("eq", "="), total(fmt(s.side))],
+        [{ id: "whole", text: "x", kind: "neutral" }, op("eq", "="), total(fmt(s.x), true)],
+      ];
+      const at = Math.min(rows.length - 2, Math.floor(v.eq));
+      equation(stage, part("eq"), ...EQ, rows[at], rows[at + 1], v.eq - at);
+    },
+  };
+
+  // Film 3: the curve y = x² + 10x. One unit of x is 38px; one of y is 2.8px.
+  const px = (x) => 668.5 + 38 * x;
+  const py = (y) => 268.5 - 2.8 * y;
+  const f = (x) => x * x + 10 * x;
+  const GOAL = 159.5;  // y = 39, on a whole pixel
+  const figure3 = document.getElementById("curve");
+  {
+    // The curve's path is set before style.js copies each line for its ink ring.
+    let d = "";
+    for (let x = -15.6; x <= 5.61; x += 0.2) d += (d ? "L" : "M") + px(x).toFixed(1) + " " + py(f(x)).toFixed(1);
+    for (const line of figure3.querySelectorAll(".line")) line.setAttribute("d", d);
+  }
+  const curve = {
+    params: {},
+    values: { trace: 0, goal: 0, ra: 0, rb: 0, low: 0, s: 0 },
+    beats: {
+      trace: [{ v: "trace", to: 1, dur: 4, ease: "linear" }],
+      goal: [{ v: "goal", to: 1, dur: 1.5 }],
+      roots: [{ v: "ra", to: 1, dur: 1.5 }, { v: "rb", to: 1, at: 2.5, dur: 1.5 }],
+      low: [{ v: "low", to: 1, dur: 1.5 }],
+      climb: [{ v: "s", to: 8, dur: 5, ease: "linear" }],
+    },
+    draw(v, { stage, part }) {
+      // A line and its ink copy are drawn, and hidden, together.
+      const both = (node) => [node.previousElementSibling, node].filter((n) => n && (n === node || n.classList.contains("ink")));
+      const line = part("curve");
+      const length = line.getTotalLength();
+      for (const node of both(part("promise"))) show(node, v.trace < 1);
+      for (const node of both(line)) {
+        show(node, v.trace > 0);
+        node.style.strokeDasharray = `${length} ${length}`;
+        node.style.strokeDashoffset = length * (1 - v.trace);
+      }
+      // A marker rides the end of the line as it is traced, and stays there.
+      const tip = line.getPointAtLength(length * v.trace);
+      if (show(part("tip"), v.trace > 0)) set(part("tip"), { cx: tip.x, cy: tip.y });
+      say(part("curve-name"), "x^2 + 10x", span(v.trace, 0.9, 1), 866, 30);
+
+      set(part("goal"), { x2: lerp(60.5, 896.5, v.goal) });
+      show(part("goal"), v.goal > 0);
+      say(part("goal-name"), "Goal: 39", v.goal, 68, GOAL - 8);
+
+      // A marker grows from a point; its rule drops to the axis; its name is written under it.
+      const root = (name, x, p) => {
+        if (show(part("root-" + name), p > 0)) set(part("root-" + name), { cx: px(x), cy: GOAL, r: 4 * span(p, 0, 0.4) });
+        if (show(part("drop-" + name), p > 0.3)) set(part("drop-" + name), { x1: px(x), x2: px(x), y1: GOAL, y2: lerp(GOAL, py(0), span(p, 0.3, 0.8)) });
+        say(part("name-" + name), String(x), span(p, 0.7, 1), px(x) + (x > 0 ? -8 : 8), py(0) + 18);
+      };
+      root("a", 3, v.ra);
+      root("b", -13, v.rb);
+
+      if (show(part("low"), v.low > 0)) set(part("low"), { cx: px(-5), cy: py(-25), r: 4 * span(v.low, 0, 0.4) });
+      if (show(part("mid"), v.low > 0.3)) set(part("mid"), { x1: px(-5), x2: px(-5), y1: py(-25), y2: lerp(py(-25), GOAL, span(v.low, 0.3, 1)) });
+      say(part("low-name"), "Lowest: -25", span(v.low, 0.5, 1), px(-5), py(-25) + 20);
+
+      // The climb, to scale: s steps across lift the curve by s squared.
+      const going = v.s > 0;
+      const moving = going && v.s < 8;
+      for (const [name, side] of [["a", 1], ["b", -1]]) {
+        if (show(part("climb-" + name), moving)) set(part("climb-" + name), { cx: px(-5 + side * v.s), cy: py(-25 + v.s * v.s) });
+      }
+      const number = (n) => (moving ? n.toFixed(1) : fmt(n));
+      measure(part("m-across"), { x1: px(-5), x2: px(-5 + v.s), y1: py(-25), y2: py(-25), off: 0, text: number(v.s) + " across", p: going ? 1 : 0, n: Infinity });
+      measure(part("m-up"), { x1: px(-5 + v.s), x2: px(-5 + v.s), y1: py(-25), y2: py(-25 + v.s * v.s), off: 0, text: number(v.s * v.s) + " up", p: going ? 1 : 0, n: Infinity });
+    },
+  };
+
+
+  Film.add({ shapes, move, curve });
+})();
+</script>
+</body>
+</html>

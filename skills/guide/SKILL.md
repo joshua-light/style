@@ -1,6 +1,6 @@
 ---
 name: guide
-description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look). Use before creating or restyling anything meant to be looked at — reports, explainers, dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
+description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look). Use before creating or restyling anything meant to be looked at — reports, explainers, animated explainers (films), dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
 ---
 
 # Visual style guide
@@ -13,11 +13,11 @@ Apply these rules to every visual output. Where another design skill disagrees o
 
 Paths are relative to this skill's directory.
 
-1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck.
-2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups.
-3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css` and `assets/style.js` and embeds the fonts, so the page stands alone.
+1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck. For an animated explainer, read `../../examples/gc-film.html` too: the reference for films.
+2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups. A page with a film also loads `film.js`, at the end of its body (see Films).
+3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css`, `assets/style.js`, and `assets/film.js` where the page loads it, and embeds the fonts, so the page stands alone.
 4. Run `python3 scripts/lint.py page.html`. It reads the page's own CSS, markup, and text, and names each breach of these rules by line. Fix every error. A warning is a rule with exceptions: check each by eye.
-5. Run `python3 scripts/shot.py page.html` and read the images it writes. A page comes as screens 1500px tall and a deck as one image per slide, every mark finished as on paper. `--select CSS` shoots one part. Check them against the rules below: the linter reads the source, and only the picture shows spacing, overlap, and empty room.
+5. Run `python3 scripts/shot.py page.html` and read the images it writes. A page comes as screens 1500px tall and a deck as one image per slide, every mark finished as on paper. `--select CSS` shoots one part. A film shows its last frame; `--at` holds it at another (see Films). Check them against the rules below: the linter reads the source, and only the picture shows spacing, overlap, and empty room.
 
 Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. Never silence the linter to pass. A `lint-ok: RULE` comment on a line exempts it, and is only for an exception this guide names: write the reason beside it. Where Expressway's files are absent, `build.py` sets the page in Fira Sans, the bundled fallback, and says so. That is the intended look on such a machine.
 
@@ -120,7 +120,7 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
   - A name from a domain palette takes that colour: an item's name in its quality colour (see Domain palettes).
   - Mark running text only: body, leads, list items. Titles and headings stay white.
   - Keep it sparse: most sentences have no mark. When highlighting starts to compete with the content, remove marks.
-- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour. The exceptions are a mark in a domain colour, and a state word in terminal output (see Code).
+- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour. The exceptions are a mark in a domain colour, a state word in terminal output (see Code), and a name in a film's sentence (see Films).
 - A short form the reader may not know is `<abbr data-tip="DPS" data-tip-note="Damage per second">`. It wears the dotted rule, as a linked mark does: hover for more.
 - Uppercase with extra tracking appears only at note size: eyebrows, tags, stat labels.
 - Table heads are uppercase too, at 11px on a 16px line. That is the one size below the scale: a row of capitals at note size read larger than the cells under it. Nothing else uses it.
@@ -379,6 +379,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
   - Give every part of a later state the `hidden` attribute, so the page is right before the script runs.
   - The pressed tab takes its state's step colour. Cite a state with `.step-ref`, as you would a step. Six states at most.
   - A `.slider` with `data-go` inside the stepper scrubs through the states.
+  - A stepper swaps one fixed state for the next. Where the way one state becomes the next is the explanation, use a film (see Films).
 - **Pins** (`.pins`): numbered squares on a picture, each tied to a note. Wrap the image, SVG, or code in `.pins` and add `<span class="step-ref pin" data-step="1" style="--x:12; --y:50">1</span>` for each; `--x` and `--y` place the pin's centre in percent of the picture. Write the notes as an `ol.steps` beside or below, so each pin matches its note by number and colour. Six pins at most.
 - **Quiz** (`.callout.quiz`): a callout that asks. Its glyph is `question`; name it by what it asks for ("Check", "Predict", "Sort").
   - Put the question in a `<p>`, then `.options` holding `.button`s, one with `data-correct`, then a hidden `.feedback` holding an empty `<p class="verdict">` and the explanation.
@@ -533,6 +534,123 @@ Motion is judged by eye, slowed down.
 - Check an animation by reading computed values part-way through it, at a slowed speed. One screenshot cannot tell growth from a late pop.
 - Give a `clip-path` keyframe both its ends. A clip cannot blend from a shape to none: with only a start, the part stays hidden for half the time and then pops.
 
+## Films
+
+A film is a figure that plays: an animated explainer. Use one when the explanation is a change: a thing that moves, grows, spreads, or is taken away, and the way it does so is the point.
+
+Three pages are the reference. Read `../../examples/gc-film.html` before writing a film.
+
+| Page | Shows |
+| --- | --- |
+| `gc-film.html` | One subject at length: seven films with prose between them, two quizzes, a recap. Its script opens with a kit of stage parts to copy from. |
+| `film-reel.html` | Three subjects and three kinds of motion. One stage is the style's own meter, in HTML. |
+| `square-film.html` | Maths: an equation whose terms follow the picture, and sliders that replay a film on the reader's numbers. |
+
+- A long subject is several short films, one idea each, with prose between them. Never make one long film.
+- A film is not decoration. Where a still figure or a stepper says it, use that.
+
+### Parts
+
+```html
+<figure class="panel film" id="swap" data-film data-link>
+  <div class="panel-head">Title <span class="tag" data-film-count>1 / 5</span></div>
+  <div class="panel-body">
+    <svg class="chart stage" viewBox="0 0 926 300" role="img" aria-label="…"> … </svg>
+    <p class="film-caption" aria-live="polite"></p>
+    <ol class="film-script">
+      <li data-beat="start" data-name="The pieces">The first sentence, shown before any press.</li>
+      <li data-beat="cut" data-name="Cut">Cut the <mark data-key="strip">strip</mark> down the middle.</li>
+    </ol>
+  </div>
+  <div class="panel-foot" data-film-transport></div>
+</figure>
+```
+
+- The figure needs an id: its script is registered by it. `film.js` fills the empty `data-film-transport` foot with the transport and keeps the `data-film-count` tag.
+- The stage is an SVG `.chart.stage` drawn 926px wide, the width of a panel's body on the 960px page. Its parts carry `data-part` names. A stage may instead be any box of the style's own components: the reel's threat table is a `.meter`.
+- The beats are the `ol.film-script`. Each `<li>` has `data-beat`, the name its motion goes by, and `data-name`, a word or two the bar shows. The caption is filled from the current beat.
+- The page ends with `<script src="film.js"></script>` and then its own script, which registers each film: `Film.add({ swap: { values, beats, draw } })`. The header of `assets/film.js` documents the script.
+- A legend sits between the stage and the caption when the stage uses a state colour.
+
+### Beats
+
+A film is told in beats. A beat is one sentence and one change.
+
+- Four to eight beats to a film. A film that needs more wants to be two.
+- The sentence and its motion start together: the sentence is written while the picture moves. A pause to read the sentence first was tried and dropped: text and picture looked out of step.
+- The reader sets the pace. The main button plays the next beat and stops; Replay plays the beat again; Back returns to the beat before; the bar scrubs both ways. A film that ran from start to end on one press was tried and dropped: it could not be followed.
+- The first beat is the poster. It shows before any press, so its sentence needs no motion. Never leave the stage empty on the poster: draw the parts still to come as dashed boxes.
+- A sentence says what happens, in the present tense, in at most two lines: about 130 characters. The caption keeps two lines of room so the stage never jumps.
+- A beat may have no motion when it only points. `data-focus="draft line"` on its `<li>` keeps the parts with those keys lit and darkens the rest, for as long as the film rests on the beat.
+- Films that share one scene open on the frame the film before ended on.
+
+### A function of time
+
+A film is a function of time. Its script names values and, beat by beat, the tweens that move them; its `draw` function turns the values into the picture.
+
+- Every frame is drawn from the first values. `draw` keeps no state, and no part of a stage has a timer, a CSS animation, or a transition of its own. That is what lets the bar scrub backwards and a screenshot hold any moment.
+- A tween moves one value: `{ v: "cut", to: 1, at: 0.5, dur: 2, ease: "linear" }`. `at` and `dur` are in units of `--t-slow`. A draw takes 1 to 2 units; a part that travels takes 3 to 4.
+- Derive, do not tween, what follows from something else: a boat's height from the water under it, a wire's ends from the boxes it joins.
+- Pick the easing by what the motion is:
+
+| Easing | Motion |
+| --- | --- |
+| `ease` | A draw: a fill, a trace, a part being inked. The style's own curve. |
+| `linear` | A steady pace: a cursor, a clock, a race, anything shown to scale. |
+| `inout` | From rest to rest: a part that sets off and arrives. |
+| `in` | Gathering speed: a fall. |
+| `settle` | Losing speed evenly: a level nearing its goal. |
+
+### Moves
+
+Each move has one meaning. Use the move that fits what happens.
+
+| Move | Means | Example |
+| --- | --- | --- |
+| Ink | A part comes to be. A dashed box fills from its left edge, as a bar does. | A term's shape; a new object. |
+| Write, count | Text arrives a character at a time; a number runs from its old value to its new one. | A label; 39 becoming 64. |
+| Slide, turn | A part moves as a rigid piece. | Half a strip swung under a square. |
+| Trace, draw back | A line is drawn from its start; a line let go draws back to its holder. | A reference; a dropped local. |
+| Ride | A part sits on another and moves with it. | A boat on rising water; a tick on a bar's value. |
+| Pour | A stream of small squares, thinner as the flow slows. | Water through a sluice. |
+| Spread | A mark travels along the wires, wave by wave. | A collector marking live objects. |
+| Wipe | A cursor crosses a row and takes what it passes. | A sweep freeing memory. |
+| Close ranks | What is left slides together, and its wires follow. | Compaction. |
+| Race, swap | Bars grow at a steady pace; rows pass each other to change places. | A threat table. |
+| To scale | A real duration or proportion, kept (see Motion to scale). | A 3-second taunt drained in 3 seconds. |
+
+- Nothing fades, nothing bounces, and nothing blurs. A part that leaves is drawn back or wiped; it never just goes.
+- Text on a stage never turns and never scales. A label rides its part upright, on whole pixels.
+- A dashed part is not there yet, here as everywhere: a promise on the poster, an object not made, free space.
+
+### Colour and names
+
+- A part's series colour is which part it is. It follows the part across every film on the page.
+- A state colour says what state a part is in, and comes with a word: green for marked, with "Marked" in a legend under the stage. A part with no colour is an inset gray box.
+- Where an equation stands over a picture, each term is a chip in its shape's colour (`Film.equation`).
+- A sentence names a part with `<mark data-key="strip">`, the key that part carries on the stage. The name takes the part's own colour: a gold strip is named in gold. This is the one place running text wears a series colour.
+- A state colour never colours a name. A part with no colour of its own is named in the accent, as any mark is.
+- Hovering a name dims everything on the stage but the part it names. The name keeps its colour.
+- Name a part where a sentence first speaks of it. Most sentences name one part or none.
+
+### Asking and handing over
+
+- Ask before the reveal. `data-hold="id"` on a beat makes the film wait before it; a quiz with `data-check="id"` lets it go on through a hidden `<button data-gate-press="id" data-film-release="id">` inside the figure. Put the quiz right under the film. One hold to a film at most.
+- Hand the numbers over. An `input.slider[data-film-param="b"]` in a second foot sets a number of the script's `params`, and `data-say` spans in the sentences follow it. The whole film then replays on the reader's numbers.
+
+### Without motion
+
+- Where the reader has turned motion down, a film rests on its last frame, and the buttons step from beat to beat with no motion between.
+- On paper a film is its last frame over its beats as a numbered list.
+- Without `film.js` a film shows only that list. Write each sentence so it stands without the picture.
+
+### Checking a film
+
+- `lint.py` checks the markup: an id, `data-beat` and `data-name` on every beat, `film.js` loaded, eight beats at most.
+- `shot.py` shows each film on its last frame. Hold another with `--at`: `shot.py page.html --select "#swap" --at swap:cut+0.5` is half-way through the motion of the beat `cut`, and `swap:cut+2` is that beat at rest.
+- Look at every beat at rest, and at one frame part-way through each motion that travels. Check that labels fit their boxes, that nothing overlaps, and that no part is left hanging.
+- A still cannot judge pace. Give the page a speed slider (`input[data-speed]`, as the reference pages have) and say that the motion needs the user's eye.
+
 ## Page furniture
 
 - **Crumbs** (`nav.crumbs`): where the page sits, as links above the eyebrow. The last item is the page itself, as plain text.
@@ -556,6 +674,7 @@ Some places take no stylesheet. The look travels as an image, or as a mapping on
 - Pages print with their dark surfaces. Disclosures print open; a stepper prints the state it is on. A deck prints one slide per page, edge to edge, every slide lit and every piece built: open the print dialog and save as PDF. Popups stay off paper.
 - Animations do not run on paper; every mark prints finished.
 - Dialogs and toasts stay off paper.
+- A film prints its last frame, over its beats as a numbered list.
 
 ## Motion
 
@@ -567,7 +686,8 @@ Some places take no stylesheet. The look travels as an image, or as a mapping on
 
 - Motion is for data marks: bars fill, columns rise, lines trace, pies sweep. Add `.anim` to a container to turn it on.
 - On a page, panels, text, and boxes never animate in. A fade and rise held text between pixels, so it looked blurred until it settled.
-- The one exception is a build piece in a deck (see Growth). It grows in over `--t-slow` with the same easing as a bar. The piece never fades, moves, or scales, so its text stays sharp. Never animate a piece any other way.
+- One exception is a build piece in a deck (see Growth). It grows in over `--t-slow` with the same easing as a bar. The piece never fades, moves, or scales, so its text stays sharp. Never animate a piece any other way.
+- The other is a film's stage (see Films). Its parts move under the film's script, and nothing outside the stage moves with them.
 - In a deck, a mark waits for its slide to be the current one and for its piece to be built.
 - `.stagger` on a parent delays each child's mark by one step.
 - With `style.js` loaded, each panel plays when a fifth of it scrolls into view, not on page load. Its marks start together.
@@ -588,4 +708,4 @@ Some places take no stylesheet. The look travels as an image, or as a mapping on
 
 ## Recording preferences
 
-When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour) and `../../examples/showcase.html`, then the matching rule here. Write each rule as a concrete instruction. Where a page's source can show a breach of the new rule, add the check to `scripts/lint.py`.
+When the user states a visual preference or corrects how something looks, offer to record it. Edit the plugin's source repo (a clone of `joshua-light/style`), not the installed copy: change `assets/style.css` (and `assets/style.js` for behaviour, or `assets/film.js` for films) and `../../examples/showcase.html`, then the matching rule here. Write each rule as a concrete instruction. Where a page's source can show a breach of the new rule, add the check to `scripts/lint.py`.

@@ -4,7 +4,7 @@
 Usage: lint.py PAGE.html... [--strict] [--ignore RULE,RULE]
 
 Reads the page's own CSS (its <style> blocks and style attributes), its markup,
-and its text. The stylesheet and script that build.py inlines are skipped: they
+and its text. The stylesheet and scripts that build.py inlines are skipped: they
 are the style. Works on a page before or after build.py.
 
 Prints one finding per line: PAGE:LINE: LEVEL RULE: what is wrong and what to
@@ -67,6 +67,8 @@ PLAIN_CLASSES = {"span-12"}
 SCRIPTED = {"data-tip", "data-key", "data-tab", "data-go", "data-bind", "data-build", "data-check",
             "data-reveal", "data-open", "data-toast", "data-link"}
 SCRIPTED_CLASSES = {"deck", "stepper", "sortable", "rail", "quiz", "menu"}
+# Driven by film.js: a page with a film needs that script too.
+FILMED = {"data-film", "data-film-transport"}
 
 LIMITS = [
     # (container class, counted class or tag, most allowed, rule, message)
@@ -75,15 +77,19 @@ LIMITS = [
     ("pins", ".pin", 6, "six-pins", "six pins at most"),
     ("slide", ".popup", 1, "one-popup", "one popup per slide: a slide that needs two wants to be two slides"),
     ("slide", "h1", 1, "one-title", "one title per slide"),
+    ("film-script", "li", 8, "film-beats", "eight beats at most in a film: split it into two films"),
 ]
 
 
 def the_style():
     """Return (classes, tokens): the class names the stylesheet styles or the script handles, and the custom properties either one names."""
     css = re.sub(r"/\*.*?\*/", "", (ASSETS / "style.css").read_text(encoding="utf-8"), flags=re.S)
-    js = (ASSETS / "style.js").read_text(encoding="utf-8")
+    js = (ASSETS / "style.js").read_text(encoding="utf-8") + (ASSETS / "film.js").read_text(encoding="utf-8")
     classes = set(re.findall(r"\.(-?[A-Za-z_][\w-]*)", css)) | PLAIN_CLASSES
     classes |= set(re.findall(r"\.(-?[A-Za-z_][\w-]*)", js))
+    # film.js names the classes of the parts it makes in make("rect", "box piece", …).
+    for group in re.findall(r"make\(\s*\"\w+\",\s*\"([\w -]+)\"", js):
+        classes |= set(group.split())
     for group in re.findall(r"classList\.\w+\(([^)]*)\)", js):
         classes |= set(re.findall(r"[\"']([\w-]+)[\"']", group))
     tokens = set(re.findall(r"(--[A-Za-z_][\w-]*)\s*:", css)) | set(TOKEN_NAME.findall(js))
@@ -135,6 +141,8 @@ class Page(HTMLParser):
         self.has_sheet = False
         self.has_script = False
         self.needs_script = None  # line of the first part style.js drives
+        self.has_film = False
+        self.needs_film = None    # line of the first film
         self.is_deck = False
         self.titles = []
         self.used = []         # (class, line)
@@ -285,6 +293,9 @@ class Page(HTMLParser):
             self.skip_data = True
             self.has_sheet |= tag == "style"
             self.has_script |= tag == "script"
+        if tag == "script" and (re.search(r"film\.js$", attr.get("src") or "") or "data-film-script" in attr):
+            self.has_film = True
+            self.skip_data |= "data-film-script" in attr
         remote = attr.get("href") if tag == "link" else attr.get("src") if tag == "script" else None
         if remote and re.match(r"(https?:)?//", remote) and attr.get("rel") != "canonical":
             self.add(ERROR, "stands-alone", f"a page stands alone: no remote <{tag}> ({remote})", line)
@@ -297,6 +308,13 @@ class Page(HTMLParser):
             self.needs_script = self.needs_script or line
         if "deck" in classes:
             self.is_deck = True
+        # Films.
+        if FILMED & set(attr):
+            self.needs_film = self.needs_film or line
+        if "data-film" in attr and not attr.get("id"):
+            self.add(ERROR, "film-id", "a film needs an id: its script is registered by it", line)
+        if tag == "li" and self.stack and "film-script" in self.stack[-1][1] and not (attr.get("data-beat") and attr.get("data-name")):
+            self.add(ERROR, "film-beat", "a beat needs data-beat, the name its tweens go by, and data-name, the name the bar shows", line)
         if tag == "h1" and not self.inside("slide"):
             self.titles.append(line)
         for scope in self.scopes:
@@ -410,6 +428,8 @@ class Page(HTMLParser):
             self.add(ERROR, "stylesheet", 'the page does not load the style: add <link rel="stylesheet" href="style.css">', 1)
         if self.needs_script and not self.has_script:
             self.add(ERROR, "script", 'a part here is driven by style.js: add <script src="style.js" defer></script>', self.needs_script)
+        if self.needs_film and not self.has_film:
+            self.add(ERROR, "film-script", 'a film is driven by film.js: add <script src="film.js"></script> at the end of the body, before the film\'s own script', self.needs_film)
         if not self.is_deck:
             for line in self.titles[1:]:
                 self.add(WARN, "one-title", "the title appears once per page: make this an <h2>", line)

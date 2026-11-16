@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Garbage Collector, in Seven Films</title>
+<meta name="description" content="An animated explainer of the .NET garbage collector: allocation, reachability, marking, compaction, generations, the card table, and finalizers, in seven short films.">
+<link rel="stylesheet" href="../skills/guide/assets/style.css">
+<script src="../skills/guide/assets/style.js" defer></script>
+<style>
+/* Films come from style.css and film.js. This page adds its chapters' spacing and its speed control.
+   Tokens only. */
+
+/* The speed control of this sample, as on the reference deck: a tool for reviewing motion. It stays off paper. */
+.film-speed { position: sticky; top: 0; z-index: 3; padding: var(--s5) 0 var(--s3); background: var(--page); border-bottom: var(--border); }
+@media print { .film-speed { display: none; } }
+
+.page > section + section { margin-top: var(--s7); }
+section[id] { scroll-margin-top: var(--s7); }
+</style>
+</head>
+<body>
+<!-- The reference for films: one subject told at length, in seven films with prose between them. Each
+     film is a function of time: the main button plays one beat and stops, and the bar scrubs it both ways.
+     Films 2 to 4 share one heap and each opens on the frame the one before ended on. The film scripts sit
+     at the end of the page, after a kit of stage parts they share. -->
+<main class="page">
+
+  <!-- Speed: how many times slower than real the films run, for a close look. A tool for review, as on the reference deck. -->
+  <div class="meter film-speed">
+    <label class="meter-row"><span class="meter-label">Slower by</span><input class="slider" type="range" min="1" max="10" step="1" value="1" data-speed><output class="meter-value" data-speed-show>Real speed</output></label>
+  </div>
+
+  <p class="eyebrow">Animated explainer · The .NET runtime</p>
+  <h1>The garbage collector never looks for garbage</h1>
+  <p class="lead">It finds what is still in use and takes back everything else. Seven short films follow one small heap through the whole job: making objects, losing them, marking, compacting, growing old, and two of the runtime's stranger corners.</p>
+  <p class="byline">For C# developers who have never opened the runtime · about 8 minutes · 7 films</p>
+
+  <nav class="rail" aria-label="Contents">
+    <div class="bar thin"><span class="bar-fill"></span></div>
+    <ol>
+      <li><a href="#alloc">One pointer bump</a></li>
+      <li><a href="#forget">Made by forgetting</a></li>
+      <li><a href="#mark">Marking the living</a></li>
+      <li><a href="#compact">Closing the holes</a></li>
+      <li><a href="#gens">Dying young</a></li>
+      <li><a href="#cards">Old points at young</a></li>
+      <li><a href="#final">One more life</a></li>
+      <li><a href="#recap">Six statements</a></li>
+    </ol>
+  </nav>
+
+  <!-- ── 1. Allocation ── -->
+  <section id="alloc" class="flow">
+    <p class="eyebrow">Film 1 / 7</p>
+    <h2>A new object costs one pointer bump</h2>
+    <p>C# never asks you to free memory, so it had better be cheap to take. It is. The managed heap keeps one pointer to the start of its free space, and <code class="math">new</code> does little more than move it.</p>
+
+    <figure class="panel film" id="alloc-film" data-film>
+      <div class="panel-head">Allocation <span class="tag" data-film-count>1 / 4</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 176" role="img" aria-label="A heap of 15 cells. Eight objects are placed one after another, each where the last one ended, until 14 cells are used and the next object does not fit.">
+          <rect class="zone" x="40.5" y="24.5" width="704" height="112"/>
+          <text class="zone-name" x="52" y="28">Gen 0: new objects</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="Empty">The young heap starts as one free block. A pointer marks where the next object goes.</li>
+          <li data-beat="one" data-name="One object"><code class="math">new Order()</code> needs 2 cells. The object goes in at the pointer, and the pointer moves past it. That is the whole cost.</li>
+          <li data-beat="many" data-name="Seven more">So programs allocate freely. Each object lands right behind the last, in the order it was made.</li>
+          <li data-beat="full" data-name="Budget spent">No one frees anything. The young heap has a budget, and the next object would break it. Only now does the collector run.</li>
+        </ol>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <p>The budget is not fixed. The runtime tunes it as the program runs, from how much survived the last collections.</p>
+  </section>
+
+  <!-- ── 2. Forgetting ── -->
+  <section id="forget" class="flow">
+    <p class="eyebrow">Film 2 / 7</p>
+    <h2>Garbage is made by forgetting</h2>
+    <p>An object is in use while the program can still get to it. The places a program can start from are called <mark>roots</mark>: the locals of every running method, and every static field. From a root it can follow references to other objects, and from those to more.</p>
+
+    <!-- Films 2 to 4 draw one scene. Wells at the top hold the roots; the heap row runs from x 62 to x 722,
+         15 cells of 44px. Root wires turn in lanes at y 104, 118 and 132; references above the row at
+         y 154 and 166; below it at y 264, 280 and 296. -->
+    <figure class="panel film" id="forget-film" data-film data-link>
+      <div class="panel-head">Losing hold <span class="tag" data-film-count>1 / 4</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 336" role="img" aria-label="Eight objects in the heap, held by four roots. A method returns and takes two locals with it, and a field is set to null. Four objects can no longer be reached.">
+          <rect class="zone" x="40.5" y="176.5" width="704" height="136"/>
+          <text class="zone-name" x="52" y="180">Gen 0</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="Held">Every object here is held by something: a local on the stack, a static field, or another object.</li>
+          <li data-beat="return" data-name="A return"><code class="math">Checkout()</code> returns. Its frame leaves the stack, and its two locals go with it.</li>
+          <li data-beat="lost" data-name="Out of reach" data-focus="tmp draft line">Nothing in the heap moved. But no path leads to <mark data-key="tmp">Tmp</mark>, <mark data-key="draft">Draft</mark>, or <mark data-key="line">Line</mark> any more. That is all garbage is.</li>
+          <li data-beat="null" data-name="Let go"><code class="math">cache.Buffer = null</code> does the same to <mark data-key="buf">Buf</mark>: one reference dropped, one more object out of reach.</li>
+        </ol>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <p>Four objects are now garbage, and the heap looks exactly as it did. No counter ticked, no flag was set. The objects themselves hold no sign that they are dead.</p>
+    <details class="more">
+      <summary>What else counts as a root?</summary>
+      <p>Handles the runtime gives out, such as pinned objects and references held by native code. The queue of objects waiting for their finalizers, which the last film covers. And in an optimised build a local stops being a root after its last use, which can be well before its method returns.</p>
+    </details>
+  </section>
+
+  <!-- ── 3. Marking ── -->
+  <section id="mark" class="flow">
+    <p class="eyebrow">Film 3 / 7</p>
+    <h2>The collector marks the living</h2>
+    <p>The dead carry no sign, so the collector cannot search for them. It does the reverse: it walks everything the program can reach, and marks it.</p>
+
+    <figure class="panel film" id="mark-film" data-film data-link>
+      <div class="panel-head">Mark <span class="tag" data-film-count>1 / 6</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 336" role="img" aria-label="Marking starts at two roots and reaches four of the eight objects. Two unreached objects still reference each other.">
+          <rect class="zone" x="40.5" y="176.5" width="704" height="136"/>
+          <text class="zone-name" x="52" y="180">Gen 0</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <div class="legend"><span class="legend-item"><span class="swatch" style="--fill:var(--good)"></span>Marked: a root can reach it</span></div>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="Paused">The budget is spent, so the collector pauses the program's threads. It does not go looking for the dead.</li>
+          <li data-beat="roots" data-name="Roots">It starts at the roots: every local and every static the program can still name.</li>
+          <li data-beat="spread" data-name="Follow">Then it follows each reference and marks what it finds. Marked means alive.</li>
+          <li data-beat="island" data-name="The island" data-hold="island" data-focus="draft line"><mark data-key="draft">Draft</mark> and <mark data-key="line">Line</mark> still hold each other. No root reaches them, so no code can touch them again. They are garbage.</li>
+          <li data-beat="count" data-name="Counting" data-focus="draft line">A collector that counted references would keep them for ever: each still has one. Tracing from the roots has no such blind spot.</li>
+          <li data-beat="cost" data-name="The cost">Marking visited 4 objects of 8. Its work follows what lives, not what died.</li>
+        </ol>
+        <button type="button" hidden data-gate-press="island" data-film-release="island">Go on</button>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <aside class="callout note quiz" data-check="island">
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-7v2h2v-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.5 3.5 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2z"/></svg></span>Predict</div>
+      <div class="callout-body">
+        <p>The film holds after the marking. Draft and Line were not reached, but each still references the other. Will the collector keep them?</p>
+        <div class="row options" role="group" aria-label="Your prediction">
+          <button type="button" class="button">Yes: each is still referenced</button>
+          <button type="button" class="button" data-correct>No: no root reaches them</button>
+          <button type="button" class="button">Only one of them</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>Being referenced is not the test. Being reachable from a root is. A pair, or a whole ring, of objects that only hold each other is as dead as an object nothing holds. The film goes on.</p>
+        </div>
+      </div>
+    </aside>
+
+    <p>The last beat is why allocation-heavy .NET code can still run fast. A wave of ten thousand short-lived objects costs the mark phase nothing if none of them survives.</p>
+  </section>
+
+  <!-- ── 4. Compacting ── -->
+  <section id="compact" class="flow">
+    <p class="eyebrow">Film 4 / 7</p>
+    <h2>Sweeping leaves holes, and compacting closes them</h2>
+    <p>Whatever is not marked can be taken back. The easy way is to sweep: walk the heap once and call every unmarked stretch free. It works, and it leaves a problem behind.</p>
+
+    <figure class="panel film" id="compact-film" data-film data-link>
+      <div class="panel-head">Sweep, then compact <span class="tag" data-film-count>1 / 5</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 336" role="img" aria-label="A sweep frees four objects and leaves four gaps of 1 or 2 cells. A new object of 3 cells fits none of them. The four survivors are moved together, the gaps join into one block of 7 cells, and the new object fits.">
+          <rect class="zone" x="40.5" y="176.5" width="704" height="136"/>
+          <text class="zone-name" x="52" y="180">Gen 0</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <div class="legend"><span class="legend-item"><span class="swatch" style="--fill:var(--good)"></span>Marked: a root can reach it</span></div>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="Marked">Four objects are marked. The other four are garbage, and so is nothing else.</li>
+          <li data-beat="sweep" data-name="Sweep">Sweep: one pass along the heap. Every unmarked stretch becomes free space.</li>
+          <li data-beat="arrive" data-name="No room">The object that started all this needs 3 cells. 7 are free. No gap is wider than 2.</li>
+          <li data-beat="compact" data-name="Compact">Compact: the survivors slide down to close the gaps, and every reference to them is rewritten.</li>
+          <li data-beat="fit" data-name="Room">The free space is one block again. The newcomer goes in at the pointer, and allocation is a bump once more.</li>
+        </ol>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <p>Compacting is what keeps allocation a pointer bump. It is also the costly part: every survivor is copied, and every reference to it fixed. So the runtime compacts the young heap freely and the old heap only when the holes are worth the work.</p>
+    <details class="more">
+      <summary>What about very large objects?</summary>
+      <p>An object of 85,000 bytes or more goes to a separate large object heap. Copying such objects costs too much, so that heap is swept and not compacted by default. It can fragment in exactly the way the film shows. That is the case for reusing big buffers and not making new ones.</p>
+    </details>
+  </section>
+
+  <!-- ── 5. Generations ── -->
+  <section id="gens" class="flow">
+    <p class="eyebrow">Film 5 / 7</p>
+    <h2>Most objects die young, so the young are collected most</h2>
+    <p>Marking the whole heap on every collection would waste the collector's best fact about programs: an object that has just been made will probably be dead in a moment, and one that has lasted a while will probably last longer. So the heap is split by age into three <mark>generations</mark>.</p>
+
+    <!-- Objects here are 28px squares with no names. Gen 0 holds 24, Gen 1 holds 12, Gen 2 holds 24. -->
+    <figure class="panel film" id="gens-film" data-film>
+      <div class="panel-head">Three ages <span class="tag" data-film-count>1 / 6</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 300" role="img" aria-label="Three rows: generation 0, 1 and 2. Waves of 20 new objects fill generation 0. Each collection keeps 2 or 3 of them and moves those to generation 1. A later collection of generation 1 moves 2 of its 9 objects to generation 2.">
+          <rect class="zone" x="40.5" y="24.5" width="704" height="60"/>
+          <text class="zone-name" x="52" y="28">Gen 0: just made</text>
+          <rect class="zone" x="40.5" y="124.5" width="704" height="60"/>
+          <text class="zone-name" x="52" y="128">Gen 1: survived once</text>
+          <rect class="zone" x="40.5" y="224.5" width="704" height="60"/>
+          <text class="zone-name" x="52" y="228">Gen 2: long-lived</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <div class="legend"><span class="legend-item"><span class="swatch" style="--fill:var(--good)"></span>Marked: a root can reach it</span></div>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="Three ages">New objects start in Gen 0. Gen 2 holds what has lived long: here, 14 objects.</li>
+          <li data-beat="wave" data-name="A wave">Gen 0 fills in moments.</li>
+          <li data-beat="gc0" data-name="Gen 0 collection">A Gen 0 collection marks only inside Gen 0. Three objects are still in use and move up to Gen 1. The rest goes at a stroke.</li>
+          <li data-beat="again" data-name="Twice more">Two more waves, two more collections. Each touches only the newest objects, and finds most of them dead.</li>
+          <li data-beat="gc1" data-name="Gen 1 collection">Now Gen 1 is due too, and a Gen 1 collection takes Gen 0 with it. Of nine that survived once, two survive again and move to Gen 2.</li>
+          <li data-beat="old" data-name="Gen 2">Gen 2 is collected rarely: that means marking the whole heap, most of it alive. So far, never.</li>
+        </ol>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <p>The costly object is the one in between: it lives just long enough to reach Gen 2 and dies there, where only a full collection can take it back.</p>
+  </section>
+
+  <!-- ── 6. The card table ── -->
+  <section id="cards" class="flow">
+    <p class="eyebrow">Film 6 / 7</p>
+    <h2>An old object can point at a young one</h2>
+    <p>A Gen 0 collection is fast because it never walks Gen 2. That shortcut has a hole in it, and the runtime pays a small tax on every assignment to close it.</p>
+
+    <!-- The card row under Gen 2 has one card per cell of the row above it. -->
+    <figure class="panel film" id="cards-film" data-film data-link>
+      <div class="panel-head">The card table <span class="tag" data-film-count>1 / 6</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 364" role="img" aria-label="An object in generation 2 is given a reference to an object in generation 0. A collection that marked only from the stack would free the young object. The write marks a card for that part of generation 2, the collection reads the marked card, and the young object is marked.">
+          <rect class="zone" x="40.5" y="124.5" width="704" height="88"/>
+          <text class="zone-name" x="52" y="128">Gen 0</text>
+          <rect class="zone" x="40.5" y="240.5" width="704" height="100"/>
+          <text class="zone-name" x="52" y="244">Gen 2</text>
+          <text x="756" y="328">Card table</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <div class="legend">
+          <span class="legend-item"><span class="swatch" style="--fill:var(--good)"></span>Marked: a root can reach it</span>
+          <span class="legend-item"><span class="swatch" style="--fill:var(--warn)"></span>Dirty card: this stretch of Gen 2 was written to</span>
+        </div>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="The border">A Gen 0 collection must stay out of Gen 2. That is the whole saving.</li>
+          <li data-beat="store" data-name="A store">Then the program runs <code class="math">cache.Latest = entry</code>. An object in Gen 2 now holds one in Gen 0.</li>
+          <li data-beat="naive" data-name="The danger" data-hold="cards">Marking from the stack alone never sees that reference. The collection would free <mark data-key="entry">Entry</mark> while <mark data-key="cache">Cache</mark> still points at it.</li>
+          <li data-beat="barrier" data-name="Write barrier">So the store itself leaves a note. Every write of a reference passes a write barrier, which flips the card for that stretch of old memory.</li>
+          <li data-beat="scan" data-name="Extra roots">The collection treats each dirty card as a root. It reads only that stretch of Gen 2, finds the reference, and marks <mark data-key="entry">Entry</mark>.</li>
+          <li data-beat="price" data-name="The price">The saving is a collection that skips the old heap. The price is a few instructions on every reference store, for ever.</li>
+        </ol>
+        <button type="button" hidden data-gate-press="cards" data-film-release="cards">Go on</button>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <aside class="callout note quiz" data-check="cards">
+      <div class="callout-head"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-1-7v2h2v-2zm2-1.645A3.502 3.502 0 0 0 12 6.5a3.5 3.5 0 0 0-3.433 2.813l1.962.393A1.5 1.5 0 1 1 12 11.5a1 1 0 0 0-1 1V14h2z"/></svg></span>Predict</div>
+      <div class="callout-body">
+        <p>The film holds after the store. Suppose a Gen 0 collection now marks from the stack and never enters Gen 2. What happens to Entry?</p>
+        <div class="row options" role="group" aria-label="Your prediction">
+          <button type="button" class="button">It is marked through Cache</button>
+          <button type="button" class="button" data-correct>It is freed while Cache still points at it</button>
+          <button type="button" class="button">It moves to Gen 2</button>
+        </div>
+        <div class="feedback" hidden aria-live="polite">
+          <p class="verdict"></p>
+          <p>Nothing on the stack leads to Entry. Its only holder sits in Gen 2, where this collection does not look. Freeing it would leave Cache pointing into free space. The runtime cannot allow that, and cannot afford to walk Gen 2 to prevent it. The film shows its way out.</p>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ── 7. Finalizers ── -->
+  <section id="final" class="flow">
+    <p class="eyebrow">Film 7 / 7</p>
+    <h2>A finalizer buys an object one more life</h2>
+    <p>A <mark>finalizer</mark> is code the runtime promises to run before an object's memory is taken back. The promise is kept in the least convenient way.</p>
+
+    <figure class="panel film" id="final-film" data-film data-link>
+      <div class="panel-head">Finalization <span class="tag" data-film-count>1 / 6</span></div>
+      <div class="panel-body">
+        <svg class="chart stage" viewBox="0 0 926 340" role="img" aria-label="An object with a finalizer loses its last reference. The collection moves its queue entry to the f-reachable queue, which keeps the object alive and promotes it to generation 1. The finalizer runs later, and only the next collection of generation 1 frees the object.">
+          <rect class="zone" x="40.5" y="124.5" width="704" height="88"/>
+          <text class="zone-name" x="52" y="128">Gen 0</text>
+          <rect class="zone" x="40.5" y="236.5" width="704" height="88"/>
+          <text class="zone-name" x="52" y="240">Gen 1</text>
+          <g data-part="wells"></g><g data-part="free"></g><g data-part="roots"></g><g data-part="objs"></g><g data-part="refs"></g><g data-part="top"></g>
+        </svg>
+        <div class="legend"><span class="legend-item"><span class="swatch" style="--fill:var(--good)"></span>Marked: a root can reach it</span></div>
+        <p class="film-caption" aria-live="polite"></p>
+        <ol class="film-script">
+          <li data-beat="start" data-name="Listed"><mark data-key="file">File</mark> has a finalizer. At its birth the runtime listed it in the finalization queue. That list does not keep it alive.</li>
+          <li data-beat="drop" data-name="Dropped">The last real reference goes. A collection marks from the roots and never reaches File.</li>
+          <li data-beat="saved" data-name="Reprieve">It cannot be freed: its finalizer has not run. Its entry moves to the f-reachable queue, which is a root, so File is marked after all.</li>
+          <li data-beat="promote" data-name="Promoted">Marked objects survive. File moves up to Gen 1, and the <mark data-key="handle">Handle</mark> it holds goes with it.</li>
+          <li data-beat="run" data-name="Cleanup">Some time later the finalizer thread runs File's cleanup and drops the entry.</li>
+          <li data-beat="free" data-name="At last">Only the next Gen 1 collection frees them. One finalizer: two collections, and a trip to an older generation.</li>
+        </ol>
+      </div>
+      <div class="panel-foot" data-film-transport></div>
+    </figure>
+
+    <p>This is what <code class="math">Dispose()</code> is for. It does the cleanup at once, and <code class="math">GC.SuppressFinalize(this)</code> takes the object off the list, so it dies like any other.</p>
+  </section>
+
+  <!-- ── Recap ── -->
+  <section id="recap" class="flow">
+    <p class="eyebrow">Recap</p>
+    <h2>Six statements, checked against the films</h2>
+    <ul class="claims">
+      <li><strong>The collector searches the heap for garbage.</strong><span class="tag bad">False</span><p>It marks what the roots can reach. Garbage is whatever is left.</p></li>
+      <li><strong>Allocating is cheap.</strong><span class="tag good">True</span><p>A pointer bump, as long as the free space is one block.</p></li>
+      <li><strong>Setting a variable to null frees the object.</strong><span class="tag bad">False</span><p>It removes one path. The memory comes back at a later collection, and only if no other path is left.</p></li>
+      <li><strong>Two objects that reference each other can never be collected.</strong><span class="tag bad">False</span><p>True of reference counting. A tracing collector asks only whether a root reaches them.</p></li>
+      <li><strong>More garbage makes a collection slower.</strong><span class="tag bad">False</span><p>Marking and compacting follow the survivors. Dead objects cost almost nothing.</p></li>
+      <li><strong>A finalizer runs when its object goes out of scope.</strong><span class="tag bad">False</span><p>It runs some time after a collection finds the object dead, on another thread, and delays the memory by one more collection.</p></li>
+    </ul>
+
+    <h3>What it means for code</h3>
+    <ul>
+      <li><strong>Short-lived objects are cheap.</strong> They die in Gen 0 and cost the collector nothing.</li>
+      <li><strong>Middle-aged objects are not.</strong> Avoid keeping things just long enough to reach Gen 2.</li>
+      <li><strong>A leak is a forgotten root.</strong> A static list, a cache, an event still subscribed: whatever they reach, lives.</li>
+      <li><strong>Dispose; do not finalize.</strong> Keep finalizers for the rare type that owns a native resource directly.</li>
+      <li><strong>Reuse big buffers.</strong> At 85,000 bytes they leave the compacted heaps.</li>
+    </ul>
+  </section>
+
+  <hr>
+  <footer class="page-foot"><span>Subject: the .NET garbage collector, simplified. Real heaps hold millions of objects, and Gen 2 is marked in the background.</span><span>Made 16 Nov 2026</span></footer>
+
+</main>
+<script src="../skills/guide/assets/film.js"></script>
+<script>
+// The seven films of this page. The engine is film.js.
+(() => {
+  const { span, lerp, len, make, show, set, say, slot, both, EASE, widthOf } = Film;
+  const CELL = 44;   // one cell of the heap, in px
+  const ROW = 48;    // the height of an object
+  const TILE = { cls: "tile", rise: 6 };
+  const R = Math.round;
+
+  // ── The scene kit ──────────────────────────────────────────────────────────────
+  // Every stage has the same six layers, and each part is made once, by name, the first time it is drawn.
+  const once = (stage, layer, id, build) => {
+    const made = stage._made || (stage._made = {});
+    return made[layer + "/" + id] || (made[layer + "/" + id] = build(stage.querySelector(`[data-part="${layer}"]`)));
+  };
+
+  // An object: an inset box with its name.
+  //   grow   the share of the box that is there yet       mark   the share marked, in green
+  //   wiped  the share wiped away from its left            ghost  a dashed box: an object not made yet
+  function object(stage, id, o) {
+    const g = once(stage, o.layer || "objs", id, (layer) => make("g", "", layer, { "data-key": id, style: "--fill:var(--good)" }));
+    const grow = o.grow === undefined ? 1 : o.grow;
+    const wiped = o.wiped || 0;
+    if (!show(g, grow > 0 && wiped < 1)) return;
+    g.classList.toggle("neutral", !!o.neutral);
+    const label = o.label || "";
+    slot(stage, g, { ...TILE, x: o.x, y: o.y, w: o.w, h: o.h || ROW, base: !o.ghost, frame: grow, fill: o.mark || 0, from: wiped, text: label,
+      n: wiped ? len(label) * (1 - wiped) : grow < 1 ? len(label) * grow : undefined });
+  }
+
+  // Free space: whatever stretch of a row no object takes, as dashed boxes. taken is a list of [from, to].
+  function gaps(stage, row, taken, x0, x1, y, name, h = ROW) {
+    const pool = once(stage, "free", row, (layer) => Array.from({ length: 8 }, () => make("g", "", layer)));
+    const found = [];
+    let edge = x0;
+    for (const [from, to] of [...taken.sort((a, b) => a[0] - b[0]), [x1, x1]]) {
+      if (from - edge >= 2) found.push([edge, from]);
+      edge = Math.max(edge, to);
+    }
+    pool.forEach((g, i) => {
+      if (show(g, i < found.length)) slot(stage, g, { ...TILE, x: found[i][0], y, w: found[i][1] - found[i][0], h, frame: 1, text: name(found[i][1] - found[i][0]) });
+    });
+  }
+  const cells = (width) => (width >= 2 * CELL - 2 ? R(width / CELL) + " free" : width >= CELL - 2 ? String(R(width / CELL)) : "");
+
+  // A reference: a gray wire from its holder to an arrowhead on its target, in horizontal and vertical
+  // runs. drawn is the share of the wire that is there, from its start; mark is the share traced in green.
+  // Each line has an ink copy under it, as style.js gives the lines it finds in the markup.
+  function wire(stage, id, o) {
+    const w = once(stage, "refs", id, (layer) => {
+      const g = make("g", "", layer);
+      make("path", "wire ink", g);
+      const gray = make("path", "wire inked", g);
+      make("path", "line ink", g);
+      const green = make("path", "line inked", g, { style: "--fill:var(--good)" });
+      return { g, gray, green, head: make("polygon", "arrow", g) };
+    });
+    const drawn = o.drawn === undefined ? 1 : o.drawn;
+    if (!show(w.g, drawn > 0)) return;
+    if (o.key) w.g.dataset.key = o.key;
+    const mark = o.mark || 0;
+    for (const path of both(w.gray)) {
+      path.setAttribute("d", o.d);
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = drawn < 1 ? `${length} ${length}` : "";
+      path.style.strokeDashoffset = drawn < 1 ? length * (1 - drawn) : "";
+    }
+    for (const path of both(w.green)) {
+      if (!show(path, mark > 0)) continue;
+      path.setAttribute("d", o.d);
+      const length = path.getTotalLength();
+      path.style.strokeDasharray = `${length} ${length}`;
+      path.style.strokeDashoffset = length * (1 - mark);
+    }
+    const [x, y] = o.tip;
+    show(w.head, drawn >= 1);
+    w.head.setAttribute("points", o.up ? `${x - 5},${y + 9} ${x + 5},${y + 9} ${x},${y}` : `${x - 5},${y - 9} ${x + 5},${y - 9} ${x},${y}`);
+    w.head.classList.toggle("live", mark >= 1);
+  }
+  // A wire down into the top of a box at y, straight or by way of a lane; and one up into its bottom.
+  const down = (sx, sy, tx, y, lane) => ({ d: R(sx) === R(tx) || lane === undefined ? `M${R(tx)} ${sy}V${y - 8}` : `M${R(sx)} ${sy}V${lane}H${R(tx)}V${y - 8}`, tip: [R(tx), y] });
+  const up = (sx, sy, tx, y, lane) => ({ d: `M${R(sx)} ${sy}V${lane}H${R(tx)}V${y + 8}`, tip: [R(tx), y], up: true });
+
+  // A well: a sunken box with its name on its top border. drawn is the share of it that is there.
+  function well(stage, id, o) {
+    const w = once(stage, "wells", id, (layer) => ({ box: make("rect", "zone", layer), name: make("text", "zone-name", layer) }));
+    const drawn = o.drawn === undefined ? 1 : o.drawn;
+    if (show(w.box, drawn > 0)) set(w.box, { x: o.x + 0.5, y: o.y + 0.5, width: Math.max(1, R(o.w * drawn)), height: o.h });
+    say(w.name, o.name, drawn, o.x + 12, o.y + 4);
+  }
+  // A root: a named box in a well. It is marked first.
+  function root(stage, id, o) {
+    const g = once(stage, "roots", id, (layer) => make("g", "", layer, { style: "--fill:var(--good)" }));
+    const drawn = o.drawn === undefined ? 1 : o.drawn;
+    if (!show(g, drawn > 0)) return;
+    slot(stage, g, { ...TILE, x: o.x, y: o.y, w: o.w || 88, h: 32, base: true, frame: drawn, fill: o.mark || 0, text: o.label, n: drawn < 1 ? len(o.label) * drawn : undefined });
+  }
+  // A cursor: a light rule that crosses a row, with its name riding above it.
+  function cursor(stage, id, x, y1, y2, name, on) {
+    const c = once(stage, "top", "cursor-" + id, (layer) => {
+      make("path", "wire ink", layer);
+      return { line: make("path", "wire inked", layer), name: make("text", "series mid", layer) };
+    });
+    for (const path of both(c.line)) {
+      show(path, on);
+      path.setAttribute("d", `M${R(x)} ${y1}V${y2}`);
+    }
+    say(c.name, name, on ? 1 : 0, x, y1 - 6);
+  }
+  // The pointer: a white tick where the next object goes, named below the row.
+  function pointer(stage, x, y, shown = 1) {
+    const p = once(stage, "top", "pointer", (layer) => ({ tick: make("rect", "tick", layer, { width: 2, height: ROW + 12 }), name: make("text", "series", layer) }));
+    if (show(p.tick, shown > 0)) set(p.tick, { x: R(x) - 0.5, y: y - 5.5 });
+    say(p.name, "Next object goes here", shown, x + 8, y + ROW + 22);
+  }
+  // A chip: a state word on its colour, grown from its left. A plain label: text written up to p.
+  function chip(stage, id, o) {
+    const g = once(stage, "top", "chip-" + id, (layer) => make("g", "", layer));
+    if (!show(g, o.p > 0)) return;
+    g.classList.toggle("neutral", !o.fill);
+    if (o.fill) g.style.setProperty("--fill", o.fill);
+    const width = o.w || R(widthOf(stage, "chip", o.text)) + 16;
+    slot(stage, g, { cls: "chip", rise: 4, x: o.x, y: o.y, w: width, h: 20, fill: o.p, text: o.text, n: len(o.text) * o.p });
+  }
+  function label(stage, id, text, p, x, y, cls = "series") {
+    say(once(stage, "top", "label-" + id, (layer) => make("text", cls, layer)), text, p, x, y);
+  }
+
+  // ── The heap of films 1 to 4 ───────────────────────────────────────────────────
+  // An object is [id, name, cells, the wave of marking that reaches it]. Wave 0 is never reached.
+  const X0 = 62, END = X0 + 15 * CELL, TOP = 200, BOTTOM = TOP + ROW;
+  const CAST = [["order", "Order", 2, 1], ["tmp", "Tmp", 1, 0], ["item", "Item", 2, 2], ["draft", "Draft", 2, 0],
+    ["cache", "Cache", 2, 1], ["line", "Line", 2, 0], ["entry", "Entry", 2, 2], ["buf", "Buf", 1, 0]];
+  const home = {}, packed = {};
+  let [MADE, KEPT] = [X0, X0];
+  for (const [id, , size, wave] of CAST) {
+    home[id] = MADE;
+    MADE += size * CELL;
+    if (!wave) continue;
+    packed[id] = KEPT;
+    KEPT += size * CELL;
+  }
+  // How many references each object has: what a reference counter would see once the roots let go.
+  const HOLDERS = { order: 1, tmp: 0, item: 2, draft: 1, cache: 1, line: 1, entry: 1, buf: 0 };
+
+  // Film 1: objects arrive one after another, each where the last ended.
+  const alloc = {
+    values: { made: 0, over: 0 },
+    beats: {
+      one: [{ v: "made", to: 1, dur: 1.5 }],
+      many: [{ v: "made", to: 8, dur: 6, ease: "linear" }],
+      full: [{ v: "over", to: 1, dur: 1.5 }],
+    },
+    draw(v, { stage }) {
+      const top = 56;
+      const taken = [];
+      let end = X0;
+      CAST.forEach(([id, name, size], i) => {
+        const grow = span(v.made, i, i + 1);
+        object(stage, id, { x: home[id], y: top, w: size * CELL, label: name, grow });
+        if (grow > 0) taken.push([home[id], end = home[id] + size * CELL * grow]);
+      });
+      gaps(stage, "gen0", taken, X0, END, top, cells);
+      pointer(stage, end, top);
+      label(stage, "used", `Used: ${R((end - X0) / CELL)} of 15 cells`, 1, X0, 160);
+      // The object that does not fit: a dashed box that runs past the end of the heap.
+      object(stage, "report", { layer: "top", x: MADE, y: top, w: 3 * CELL, label: "Report", ghost: true, grow: v.over });
+      chip(stage, "spent", { x: 220, y: 146, text: "Budget spent", fill: "var(--warn)", p: v.over });
+    },
+  };
+
+  // Films 2 to 4: one scene, drawn from one state.
+  //   left     Checkout() has returned               nulled   cache.Buffer is null
+  //   mark     the marking, in three waves           holders  the reference counts show
+  //   sweep    the sweep's pass                      compact  the survivors have moved
+  //   arrive   the newcomer waits at the door        fit      it has gone in
+  const NOW = { left: 0, nulled: 0, mark: 0, holders: 0, sweep: 0, compact: 0, arrive: 0, fit: 0 };
+  function scene(v, { stage }) {
+    const sweepAt = lerp(X0, END, v.sweep);
+    const at = {};
+    const taken = [];
+    for (const [id, name, size, wave] of CAST) {
+      const width = size * CELL;
+      const x = at[id] = wave ? lerp(home[id], packed[id], v.compact) : home[id];
+      const wiped = wave ? 0 : span(sweepAt, x, x + width);
+      if (wiped < 1) taken.push([wave ? x : Math.max(x, sweepAt), x + width]);
+      object(stage, id, { x, y: TOP, w: width, label: name, wiped, mark: wave === 1 ? span(v.mark, 0.6, 1) : wave === 2 ? span(v.mark, 1.5, 2) : 0 });
+      // The count sits on the object's top border.
+      chip(stage, "n-" + id, { x: x + 6, y: TOP - 10, w: 20, text: String(HOLDERS[id]), p: wiped ? 0 : v.holders });
+    }
+    const gone = (id, size = 2) => span(sweepAt, home[id], home[id] + size * CELL);
+
+    // The roots: two frames of the stack and the statics.
+    const leaving = 1 - span(v.left, 0.6, 1);
+    well(stage, "main", { x: 40, y: 24, w: 176, h: 64, name: "Stack: Main()" });
+    well(stage, "checkout", { x: 232, y: 24, w: 236, h: 64, name: "Stack: Checkout()", drawn: leaving });
+    well(stage, "statics", { x: 516, y: 24, w: 176, h: 64, name: "Statics" });
+    const rooted = span(v.mark, 0, 0.3);
+    const followed = span(v.mark, 0.2, 0.7);
+    root(stage, "order", { x: 62, y: 40, label: "order", mark: rooted });
+    root(stage, "tmp", { x: 254, y: 40, label: "tmp", drawn: 1 - span(v.left, 0.3, 0.7) });
+    root(stage, "draft", { x: 358, y: 40, label: "draft", drawn: 1 - span(v.left, 0.3, 0.7) });
+    root(stage, "cache", { x: 538, y: 40, label: "cache", mark: rooted });
+    wire(stage, "r-order", { ...down(106, 72, at.order + 44, TOP), mark: followed, key: "order" });
+    wire(stage, "r-tmp", { ...down(298, 72, at.tmp + 22, TOP, 104), drawn: 1 - span(v.left, 0, 0.45), key: "tmp" });
+    wire(stage, "r-draft", { ...down(402, 72, at.draft + 44, TOP, 118), drawn: 1 - span(v.left, 0, 0.45), key: "draft" });
+    wire(stage, "r-cache", { ...down(582, 72, at.cache + 44, TOP, 132), mark: followed, key: "cache" });
+
+    // References between objects.
+    wire(stage, "order-item", { ...up(at.order + 66, BOTTOM, at.item + 20, BOTTOM, 264), mark: span(v.mark, 1, 1.6), key: "order" });
+    wire(stage, "cache-entry", { ...down(at.cache + 66, TOP, at.entry + 44, TOP, 166), mark: span(v.mark, 1, 1.6), key: "cache" });
+    wire(stage, "cache-buf", { ...down(at.cache + 78, TOP, at.buf + 22, TOP, 154), drawn: 1 - v.nulled, key: "buf" });
+    wire(stage, "entry-item", { ...up(at.entry + 58, BOTTOM, at.item + 44, BOTTOM, 296), mark: span(v.mark, 2, 2.7), key: "entry" });
+    wire(stage, "draft-line", { ...up(at.draft + 30, BOTTOM, at.line + 30, BOTTOM, 264), drawn: 1 - gone("draft"), key: "draft" });
+    wire(stage, "line-draft", { ...up(at.line + 58, BOTTOM, at.draft + 58, BOTTOM, 280), drawn: 1 - gone("line"), key: "line" });
+
+    const sweeping = v.sweep > 0 && v.sweep < 1;
+    cursor(stage, "sweep", sweepAt, TOP - 10, BOTTOM + 10, "Sweep", sweeping);
+
+    // The newcomer waits past the end of the heap, then goes in where the survivors end.
+    const landed = EASE.inout(span(v.fit, 0, 0.6));
+    const report = lerp(748, KEPT, landed);
+    if (v.arrive > 0) {
+      const g = once(stage, "top", "report", (layer) => make("g", "neutral", layer));
+      slot(stage, g, { ...TILE, x: report, y: TOP, w: 3 * CELL, h: ROW, frame: v.arrive, fill: span(v.fit, 0.6, 1), text: "Report", n: 6 * v.arrive });
+      if (v.fit >= 0.6) taken.push([KEPT, KEPT + 3 * CELL]);
+    }
+    show(once(stage, "top", "report", (layer) => make("g", "neutral", layer)), v.arrive > 0);
+    chip(stage, "no-room", { x: 748, y: TOP - 30, text: "No room", fill: "var(--bad)", p: span(v.arrive, 0.5, 1) * (1 - span(v.compact, 0, 0.3)) });
+
+    gaps(stage, "gen0", taken, X0, END, TOP, v.fit > 0 && v.fit < 0.6 ? () => "" : cells);
+    // Swept but not compacted, the free space is in pieces and a pointer is no use: it leaves as the
+    // sweep passes it, and comes back with the compaction.
+    pointer(stage, lerp(MADE, KEPT, v.compact) + 3 * CELL * span(v.fit, 0.6, 1), TOP, Math.max(1 - gone("buf", 1), span(v.compact, 0, 0.2)));
+
+    const visited = (v.mark >= 1 ? 2 : 0) + (v.mark >= 2 ? 2 : 0);
+    label(stage, "visited", `Visited: ${visited} of 8`, v.mark > 0 && v.sweep === 0 ? 1 : 0, 752, 228);
+  }
+  const forget = {
+    values: { ...NOW },
+    beats: {
+      return: [{ v: "left", to: 1, dur: 3, ease: "linear" }],
+      null: [{ v: "nulled", to: 1, dur: 1.5, ease: "linear" }],
+    },
+    draw: scene,
+  };
+  const mark = {
+    values: { ...NOW, left: 1, nulled: 1 },
+    beats: {
+      roots: [{ v: "mark", to: 1, dur: 3, ease: "linear" }],
+      spread: [{ v: "mark", to: 3, dur: 5, ease: "linear" }],
+      count: [{ v: "holders", to: 1, dur: 1.5 }],
+      cost: [{ v: "holders", to: 0, dur: 1 }],
+    },
+    draw: scene,
+  };
+  const compact = {
+    values: { ...NOW, left: 1, nulled: 1, mark: 3 },
+    beats: {
+      sweep: [{ v: "sweep", to: 1, dur: 6, ease: "linear" }],
+      arrive: [{ v: "arrive", to: 1, dur: 2 }],
+      compact: [{ v: "compact", to: 1, dur: 4, ease: "inout" }],
+      fit: [{ v: "fit", to: 1, dur: 3, ease: "linear" }],
+    },
+    draw: scene,
+  };
+
+  // ── Film 5: generations ────────────────────────────────────────────────────────
+  // Objects are squares of S px. A wave is 20 new objects; SURVIVE names the ones each collection keeps.
+  // A collection runs from 0 to 3: marking, then the sweep, then the move up.
+  const S = 28, ROWS = [40, 140, 240], SIZE = [24, 12, 24];
+  const SURVIVE = [[2, 9, 15], [5, 6, 17], [0, 11, 12], [7, 13]];
+  // Where each survivor stands in Gen 1, and which two of the first nine go on to Gen 2.
+  const SLOT = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 2]];
+  const ELDER = { "0-9": 14, "2-0": 15 };
+  const gens = {
+    values: { a0: 0, g0: 0, a1: 0, g1: 0, a2: 0, g2: 0, a3: 0, g3: 0, old: 0 },
+    beats: {
+      wave: [{ v: "a0", to: 1, dur: 3, ease: "linear" }],
+      gc0: [{ v: "g0", to: 3, dur: 6, ease: "linear" }],
+      again: [{ v: "a1", to: 1, dur: 1.5, ease: "linear" }, { v: "g1", to: 3, at: 1.5, dur: 3, ease: "linear" },
+        { v: "a2", to: 1, at: 4.5, dur: 1.5, ease: "linear" }, { v: "g2", to: 3, at: 6, dur: 3, ease: "linear" }],
+      gc1: [{ v: "a3", to: 1, dur: 1.5, ease: "linear" }, { v: "g3", to: 3, at: 1.5, dur: 6, ease: "linear" }, { v: "old", to: 3, at: 1.5, dur: 6, ease: "linear" }],
+    },
+    draw(v, { stage }) {
+      const taken = [[], [], []];
+      const sweep = (row, g) => lerp(X0, X0 + SIZE[row] * S, span(g, 1, 2));
+      const oldSweep = sweep(1, v.old);
+      SURVIVE.forEach((kept, k) => {
+        const [made, g] = [v["a" + k], v["g" + k]];
+        const sweepAt = sweep(0, g);
+        for (let i = 0; i < 20; i++) {
+          const id = k + "-" + i;
+          const x = X0 + i * S;
+          const grow = span(made * 20, i, i + 1);
+          const j = kept.indexOf(i);
+          if (j < 0) {
+            // Not in use: wiped where it stands.
+            const wiped = span(sweepAt, x, x + S);
+            object(stage, id, { x, y: ROWS[0], w: S, h: S, grow, wiped });
+            if (grow > 0 && wiped < 1) taken[0].push([Math.max(x, sweepAt), x + S * grow]);
+            continue;
+          }
+          // In use: marked, then moved up to Gen 1. The mark is cleared as it lands.
+          const moved = EASE.inout(span(g, 2, 3));
+          const x1 = X0 + SLOT[k][j] * S;
+          let [px, py, marked, wiped] = [lerp(x, x1, moved), lerp(ROWS[0], ROWS[1], moved), span(g, 0, 1) * (1 - span(g, 2.7, 3)), 0];
+          let row = moved <= 0 ? 0 : moved >= 1 ? 1 : -1;
+          if (k < 3 && v.old > 0) {
+            // The Gen 1 collection: two of the nine go on to Gen 2, the rest are wiped.
+            if (id in ELDER) {
+              const on = EASE.inout(span(v.old, 2, 3));
+              [px, py, marked] = [lerp(x1, X0 + ELDER[id] * S, on), lerp(ROWS[1], ROWS[2], on), span(v.old, 0, 1) * (1 - span(v.old, 2.7, 3))];
+              row = on <= 0 ? 1 : on >= 1 ? 2 : -1;
+            } else wiped = span(oldSweep, x1, x1 + S);
+          }
+          object(stage, id, { x: px, y: py, w: S, h: S, grow, mark: marked, wiped });
+          if (grow > 0 && wiped < 1 && row >= 0) taken[row].push([row === 1 && wiped ? Math.max(px, oldSweep) : px, px + S * grow]);
+        }
+        cursor(stage, "g0-" + k, sweepAt, ROWS[0] - 8, ROWS[0] + S + 8, "", g > 1 && g < 2);
+      });
+      cursor(stage, "g1", oldSweep, ROWS[1] - 8, ROWS[1] + S + 8, "", v.old > 1 && v.old < 2);
+      // What already lives in Gen 2.
+      for (let i = 0; i < 14; i++) {
+        object(stage, "elder-" + i, { x: X0 + i * S, y: ROWS[2], w: S, h: S });
+        taken[2].push([X0 + i * S, X0 + (i + 1) * S]);
+      }
+      const free = (width) => (width >= 60 ? "Free" : "");
+      taken.forEach((row, n) => gaps(stage, "gen" + n, row, X0, X0 + SIZE[n] * S, ROWS[n], free, S));
+      const done = [0, 1, 2, 3].filter((k) => v["g" + k] >= 3).length;
+      label(stage, "n0", `Collections: ${done}`, 1, 756, ROWS[0] + 19);
+      label(stage, "n1", `Collections: ${v.old >= 3 ? 1 : 0}`, 1, 756, ROWS[1] + 19);
+      label(stage, "n2", "Collections: 0", 1, 756, ROWS[2] + 19);
+    },
+  };
+
+  // ── Film 6: the card table ─────────────────────────────────────────────────────
+  // Gen 0's row stands at y 148 and Gen 2's at y 264. Cache, in Gen 2, comes to hold Entry, in Gen 0.
+  const YOUNG = 148, OLD = 264, CARDS = 318;
+  const NEW = [["view", "View", 2, 62, 1], ["tmp", "Tmp", 1, 150, 0], ["entry", "Entry", 2, 194, 0], ["row", "Row", 2, 282, 2], ["log", "Log", 1, 370, 0]];
+  const AGED = [["settings", "Settings"], ["cache", "Cache"], ["index", "Index"], ["font", "Font"], ["theme", "Theme"], ["menu", "Menu"]];
+  const cards = {
+    values: { store: 0, mark: 0, naive: 0, dirty: 0, scan: 0, found: 0 },
+    beats: {
+      store: [{ v: "store", to: 1, dur: 2, ease: "linear" }],
+      naive: [{ v: "mark", to: 2, dur: 3, ease: "linear" }, { v: "naive", to: 1, at: 3, dur: 2.5, ease: "linear" }],
+      barrier: [{ v: "naive", to: 0, dur: 1, ease: "linear" }, { v: "mark", to: 0, dur: 1, ease: "linear" }, { v: "dirty", to: 1, at: 1, dur: 1 }],
+      // The scan reaches the dirty card a fifth of the way along, and the reference is found there.
+      scan: [{ v: "mark", to: 2, dur: 2.5, ease: "linear" }, { v: "scan", to: 1, at: 2.5, dur: 3, ease: "linear" }, { v: "found", to: 1, at: 3.2, dur: 2, ease: "linear" }],
+    },
+    draw(v, { stage }) {
+      const sweepAt = lerp(X0, 414, v.naive);
+      const taken = [];
+      for (const [id, name, size, x, wave] of NEW) {
+        const width = size * CELL;
+        const saved = id === "entry" ? span(v.found, 0.5, 1) : 0;
+        const wiped = wave ? 0 : span(sweepAt, x, x + width);
+        if (wiped < 1) taken.push([wave ? x : Math.max(x, sweepAt), x + width]);
+        object(stage, id, { x, y: YOUNG, w: width, label: name, wiped, mark: saved || (wave === 1 ? span(v.mark, 0.6, 1) : wave === 2 ? span(v.mark, 1.5, 2) : 0) });
+      }
+      gaps(stage, "gen0", taken, X0, END, YOUNG, cells);
+      cursor(stage, "naive", sweepAt, YOUNG - 10, YOUNG + ROW + 10, "Sweep", v.naive > 0 && v.naive < 1);
+      chip(stage, "lost", { x: 194, y: 98, text: "Freed by mistake", fill: "var(--bad)", p: span(v.naive, 0.6, 1) });
+
+      AGED.forEach(([id, name], i) => object(stage, id, { x: X0 + i * 2 * CELL, y: OLD, w: 2 * CELL, label: name }));
+      gaps(stage, "gen2", [[X0, X0 + 12 * CELL]], X0, END, OLD, cells);
+      // The card table: one card for each cell of Gen 2. The store into Cache dirties the card over it.
+      const table = once(stage, "roots", "cards", (layer) => ({
+        cards: Array.from({ length: 15 }, (_, i) => make("rect", "box", layer, { x: X0 + i * CELL + 0.5, y: CARDS + 0.5, width: CELL, height: 12 })),
+        dirty: make("rect", "box piece", layer, { x: X0 + 3 * CELL + 0.5, y: CARDS + 0.5, height: 12, style: "--fill:var(--warn)" }),
+      }));
+      if (show(table.dirty, v.dirty > 0)) table.dirty.setAttribute("width", Math.max(1, R(CELL * v.dirty)));
+      cursor(stage, "cards", lerp(X0, END, v.scan), CARDS - 4, CARDS + 16, "", v.scan > 0 && v.scan < 1);
+
+      well(stage, "main", { x: 40, y: 24, w: 176, h: 64, name: "Stack: Main()" });
+      root(stage, "view", { x: 62, y: 40, label: "view", mark: span(v.mark, 0, 0.3) });
+      wire(stage, "r-view", { ...down(106, 72, 106, YOUNG), mark: span(v.mark, 0.2, 0.7) });
+      wire(stage, "view-row", { d: `M128 ${YOUNG}V136H312V${YOUNG - 8}`, tip: [312, YOUNG], mark: span(v.mark, 1, 1.6) });
+      wire(stage, "cache-entry", { ...up(216, OLD, 238, YOUNG + ROW, 226), drawn: v.store, mark: span(v.found, 0, 0.6) });
+    },
+  };
+
+  // ── Film 7: finalization ───────────────────────────────────────────────────────
+  // Gen 0's row stands at y 148 and Gen 1's at y 260. The queue entry for File travels between two wells.
+  const BORN = 148, GROWN = 260;
+  const final = {
+    values: { drop: 0, mark: 0, move: 0, save: 0, up: 0, run: 0, end: 0 },
+    beats: {
+      drop: [{ v: "drop", to: 1, dur: 2, ease: "linear" }, { v: "mark", to: 1, at: 2, dur: 2.5, ease: "linear" }],
+      saved: [{ v: "move", to: 1, dur: 3, ease: "inout" }, { v: "save", to: 1, at: 3, dur: 4, ease: "linear" }],
+      promote: [{ v: "up", to: 1, dur: 4, ease: "linear" }],
+      run: [{ v: "run", to: 1, dur: 4, ease: "linear" }],
+      free: [{ v: "end", to: 1, dur: 5, ease: "linear" }],
+    },
+    draw(v, { stage }) {
+      const rise = EASE.inout(span(v.up, 0.3, 1));
+      const y = lerp(BORN, GROWN, rise);
+      const settled = 1 - span(v.up, 0.9, 1);  // marks are cleared as the survivors land
+      const sweepAt = lerp(X0, 370, span(v.end, 0.3, 1));
+      const wipe = (x, width) => span(sweepAt, x, x + width);
+      const young = [], grown = [];
+      const stand = (x, width, wiped) => {
+        if (wiped >= 1) return;
+        if (rise <= 0) young.push([x, x + width]);
+        if (rise >= 1) grown.push([Math.max(x, wiped ? sweepAt : x), x + width]);
+      };
+      object(stage, "file", { x: 62, y, w: 88, label: "File", mark: span(v.save, 0.4, 0.7) * settled, wiped: wipe(62, 88) });
+      object(stage, "handle", { x: 150, y, w: 88, label: "Handle", mark: span(v.save, 0.8, 1) * settled, wiped: wipe(150, 88) });
+      object(stage, "tmp", { x: 238, y: BORN, w: 44, label: "Tmp", wiped: span(v.up, 0, 0.3) });
+      object(stage, "job", { x: 282, y, w: 88, label: "Job", mark: Math.max(span(v.mark, 0.6, 1) * settled, span(v.end, 0.1, 0.3)) });
+      stand(62, 88, wipe(62, 88));
+      stand(150, 88, wipe(150, 88));
+      stand(282, 88, 0);
+      if (v.up < 0.3) young.push([238 + 44 * span(v.up, 0, 0.3), 282]);
+      gaps(stage, "gen0", young, X0, END, BORN, cells);
+      gaps(stage, "gen1", grown, X0, END, GROWN, cells);
+      cursor(stage, "end", sweepAt, GROWN - 10, GROWN + ROW + 10, "Sweep", v.end > 0.3 && v.end < 1);
+
+      well(stage, "main", { x: 40, y: 24, w: 236, h: 64, name: "Stack: Main()" });
+      well(stage, "listed", { x: 316, y: 24, w: 220, h: 64, name: "Finalization queue" });
+      well(stage, "reachable", { x: 600, y: 24, w: 220, h: 64, name: "F-reachable queue" });
+      root(stage, "file", { x: 62, y: 40, label: "file", drawn: 1 - span(v.drop, 0, 0.6) });
+      root(stage, "job", { x: 166, y: 40, label: "job", mark: Math.max(span(v.mark, 0, 0.3), span(v.end, 0, 0.1)) });
+      // The entry travels from one queue to the other, and its wire with it. Once there it is a root.
+      const entry = lerp(338, 622, v.move);
+      const kept = 1 - span(v.run, 0.6, 1);
+      root(stage, "entry", { x: entry, y: 40, label: "File", mark: span(v.save, 0, 0.2), drawn: kept });
+      chip(stage, "cleanup", { x: 722, y: 46, text: "Cleanup", fill: "var(--info)", p: span(v.run, 0, 0.5) * kept });
+      wire(stage, "r-file", { ...down(106, 72, 106, y), drawn: 1 - span(v.drop, 0.2, 1) });
+      wire(stage, "r-job", { ...down(210, 72, 326, y, 118), mark: Math.max(span(v.mark, 0.2, 0.7), span(v.end, 0.05, 0.25)) });
+      wire(stage, "r-entry", { ...down(entry + 44, 72, 84, y, 104), mark: span(v.save, 0.1, 0.5), drawn: 1 - span(v.run, 0.5, 0.9) });
+      wire(stage, "file-handle", { d: `M128 ${R(y)}V${R(y) - 12}H194V${R(y) - 8}`, tip: [194, R(y)], mark: span(v.save, 0.6, 0.85), drawn: 1 - wipe(62, 88) });
+    },
+  };
+
+  Film.add({ "alloc-film": alloc, "forget-film": forget, "mark-film": mark, "compact-film": compact, "gens-film": gens, "cards-film": cards, "final-film": final });
+})();
+</script>
+</body>
+</html>

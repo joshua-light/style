@@ -2,6 +2,7 @@
    Rules live in ../SKILL.md; markup for every component in
    ../../../examples/showcase.html.
    style.js adds hover tooltips and linked highlighting.
+   film.js runs films.
    scripts/build.py inlines both files and embeds the fonts as data URIs.
    Fira Sans stands in where Expressway is absent. */
 
@@ -2119,6 +2120,76 @@ a.fn { padding: 0 1px; border: 0; font-size: 0.75em; line-height: 0; vertical-al
   .layer { grid-column: auto; }
   .page > .margin { float: none; width: auto; padding-top: 0; }
   .multiples { --cols: 2; }
+}
+
+/* ── Films (needs film.js) ────────────────────────────────────────────── */
+
+/* A film is a figure that plays one beat at a time: a stage, a caption that is
+   the current beat's sentence, the beats as a list, and a transport in the
+   foot. film.js marks a film it runs .is-live. Without the script the list of
+   beats stands in for the stage. */
+.film .stage { display: block; cursor: pointer; }
+/* The caption keeps two lines of room, so the stage never jumps as sentences change. */
+.film-caption {
+  min-height: calc(2 * var(--lh-body));
+  margin-inline: auto;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-align: center;
+  color: var(--text);
+}
+.film-script { font-size: var(--fs-label); line-height: var(--lh-label); }
+.film.is-live .film-script { display: none; }
+.film:not(.is-live) :is(.stage, .film-caption, .panel-foot) { display: none; }
+/* The bar: a slider that wears the beat's name and the time, as a cast bar
+   does. Ink ticks part the beats. */
+.film-bar { flex: 1; min-width: 240px; }
+.film-tick {
+  position: absolute;
+  top: calc(var(--lh-label) / 2 + 1px);
+  bottom: 1px;
+  left: calc(var(--at, 0) * (100% - 8px));
+  width: 1px;
+  background: var(--ink);
+  pointer-events: none;
+}
+/* A locked primary button drops its fill: faint text on azure does not read. */
+.film .button.primary:disabled { background: var(--raised); }
+
+/* Stage parts. A piece is a box filled with its colour; one that stands for no
+   shape of its own (.neutral) is a neutral tag's gray. */
+.stage .piece { fill: var(--fill, var(--c1)); }
+.stage .neutral .piece { fill: var(--raised); }
+/* A label inside a piece is body size; a term of an equation is heading size;
+   a chip is a tag drawn on the stage. A raised digit steps down the scale. */
+.stage text.tile { fill: var(--text); font-size: var(--fs-body); }
+.stage text.term { fill: var(--text); font-size: var(--fs-heading); }
+.stage text.term.op { fill: var(--text-dim); }
+.stage text.chip { font-size: var(--fs-note); font-weight: 700; text-transform: uppercase; }
+.stage text .sup { font-size: var(--fs-note); }
+.stage text.term .sup { font-size: var(--fs-subheading); }
+/* Text on a colour fill is ink, as on a coloured tag. These come after the
+   sizes above, which set the colour of text on an empty box. */
+.stage text.on-fill { fill: var(--ink); }
+.stage .neutral text.on-fill { fill: var(--text); }
+/* A measure: a thin gray rule with end ticks, beside the edge it sizes. */
+.stage .measure { fill: none; stroke: var(--text-faint); stroke-width: 1px; shape-rendering: crispEdges; }
+/* A tick: a white mark with an ink edge at one place on a row, as a bar's mark. */
+.stage .tick { fill: var(--text); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+/* An arrowhead whose wire has been followed takes the state's green. */
+.stage .arrow.live { fill: var(--good); }
+
+/* A name in a sentence keeps its colour under the pointer, where a linked mark
+   turns white: the stage answers the hover. It dims every part but the one
+   named, by the share a deck's other slides go dark. */
+.film-caption mark.is-hot { color: var(--fill, var(--accent)); }
+:where(.film .stage) * { transition: filter var(--t-fast) var(--ease); }
+.film .stage .is-dim { filter: brightness(0.55); }
+
+/* Paper has no buttons: a film prints its last frame over its beats as a list. */
+@media print {
+  .film .panel-foot, .film-caption { display: none; }
+  .film.is-live .film-script { display: block; }
 }
 
 /* ── Motion ───────────────────────────────────────────────────────────── */

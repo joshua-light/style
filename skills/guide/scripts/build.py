@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Make an HTML page self-contained: inline style.css and style.js, embed the fonts.
+"""Make an HTML page self-contained: inline style.css, style.js and film.js, embed the fonts.
 
 Usage: build.py PAGE.html [-o OUT.html]
 
@@ -7,7 +7,9 @@ Replaces the page's <link rel="stylesheet" href="…style.css"> (or the
 <style data-style> block left by an earlier run) with the stylesheet, fonts
 embedded as data URIs. Replaces <script src="…style.js"> (or an earlier
 <script data-style> block) with the script; a page without it is left
-without. Without -o the page is rewritten in place.
+without. Replaces <script src="…film.js"> (or an earlier
+<script data-film-script> block) with the film engine, where it stands: the
+page's own film script comes after it. Without -o the page is rewritten in place.
 
 Expressway is not redistributable, so its files may be absent. The page is
 then set in Fira Sans, the bundled fallback, and this script says so on stderr.
@@ -33,6 +35,8 @@ LINK = re.compile(r"<link\b[^>]*href=[\"'][^\"']*style\.css[\"'][^>]*>", re.I)
 BLOCK = re.compile(r"<style data-style>.*?</style>", re.S)
 SCRIPT = re.compile(r"<script\b[^>]*src=[\"'][^\"']*style\.js[\"'][^>]*>\s*</script>", re.I)
 SCRIPT_BLOCK = re.compile(r"<script data-style>.*?</script>", re.S)
+FILM = re.compile(r"<script\b[^>]*src=[\"'][^\"']*film\.js[\"'][^>]*>\s*</script>", re.I)
+FILM_BLOCK = re.compile(r"<script data-film-script>.*?</script>", re.S)
 # Pages built before Fira Sans was bundled fell back to Overpass over the network.
 OLD_FALLBACK = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;700;800&display=swap">'
 
@@ -127,6 +131,11 @@ def main():
         if "</body>" not in html:
             sys.exit("build.py: no </body> to put the script before")
         html = html.replace("</body>", tag + "</body>", 1)
+
+    # The film engine stays where the page put it: before the page's own film script.
+    if FILM.search(html) or FILM_BLOCK.search(html):
+        film = "<script data-film-script>\n" + (ASSETS / "film.js").read_text(encoding="utf-8") + "</script>"
+        html = (FILM_BLOCK if FILM_BLOCK.search(html) else FILM).sub(lambda _: film, html, count=1)
 
     out = args.out or args.page
     out.write_text(html, encoding="utf-8")

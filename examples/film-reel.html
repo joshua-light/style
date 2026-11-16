@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Films: a Lock, a Heap, a Boss</title>
+<meta name="description" content="Three short animated explainers on a canal lock, a garbage collector, and a raid boss's threat table, each built on a different kind of motion.">
+<link rel="stylesheet" href="../skills/guide/assets/style.css">
+<script src="../skills/guide/assets/style.js" defer></script>
+<style>
+/* Films come from style.css and film.js. This page adds the parts its three stages draw with, and its
+   speed control. Tokens only. */
+
+/* The speed control of this sample, as on the reference deck: a tool for reviewing motion. It stays off paper. */
+.film-speed { position: sticky; top: 0; z-index: 3; padding: var(--s5) 0 var(--s3); background: var(--page); border-bottom: var(--border); }
+@media print { .film-speed { display: none; } }
+
+/* ── The lock: water is a flat fill under an ink surface line; a gate is a gray slab on an ink rail. ── */
+.stage .water { fill: var(--c1); }
+.stage .gate, .stage .drop { stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+.stage .gate { fill: var(--c-other); }
+.stage .drop { fill: var(--c1); }
+.stage .hull { fill: var(--fill); stroke: var(--ink); stroke-width: 1px; }
+.stage .porthole { fill: var(--sunken); stroke: var(--ink); stroke-width: 1px; shape-rendering: crispEdges; }
+
+/* ── The threat table: the style's own meter. The boss's tag stands in the gutter beside the row it
+   attacks; rows change places by whole pixels. ── */
+.threat { position: relative; padding-left: calc(var(--s7) + var(--s6)); }
+.threat > .meter + .meter { margin-top: var(--s5); }
+.threat .boss { position: absolute; left: 0; gap: var(--s1); padding-left: var(--s1); }
+</style>
+</head>
+<body>
+<!-- Three films on three subjects, each built on a different kind of motion. The third film's stage is
+     HTML: the style's own meter. The film scripts sit at the end of the page. -->
+<main class="page">
+
+  <!-- Speed: how many times slower than real the films run, for a close look. A tool for review, as on the reference deck. -->
+  <div class="meter film-speed">
+    <label class="meter-row"><span class="meter-label">Slower by</span><input class="slider" type="range" min="1" max="10" step="1" value="1" data-speed><output class="meter-value" data-speed-show>Real speed</output></label>
+  </div>
+
+  <p class="eyebrow">Animated explainers · Reel</p>
+  <h1>Three films: a lock, a heap, a boss</h1>
+  <p class="lead">Each film explains one mechanism, and each is built on a different kind of motion: parts that ride, pour, spread, sweep, close ranks, race, and swap places.</p>
+  <p class="byline">A canal, a garbage collector, a raid · about 3 minutes · 3 films</p>
+
+  <!-- ── 1. The lock ── -->
+  <h2 id="lock">A lock lifts a boat with gates and gravity</h2>
+  <aside class="margin"><p><strong>Moves.</strong> One part rides another: the boat sits on the water. A stream thins as the flow slows. The level loses speed as it nears its goal, as real water does.</p></aside>
+  <p>A canal cannot climb a hill, so it climbs in steps. At each step sits a <mark>lock</mark>: a chamber of water with a gate at either end.</p>
+
+  <!-- Side view. The lower pound and the chamber share a bed at y 300; the upper pound's bed, and the cill
+       under the upper gate, sit at y 200. Water stands at y 250 below and y 150 above: a 3 m rise.
+       Most locks swing their gates like doors; a side view cannot show that, so these lift. -->
+  <figure class="panel film" id="lock-film" data-film>
+    <div class="panel-head">Uphill, by water <span class="tag" data-film-count>1 / 6</span></div>
+    <div class="panel-body">
+      <svg class="chart stage" viewBox="0 0 926 370" role="img" aria-label="A lock in side view. A boat enters the chamber at the lower level, the gate shuts behind it, water from the upper pound fills the chamber and lifts the boat 3 m, and it leaves at the upper level.">
+        <!-- The boat is drawn before the water, so the water covers its hull up to the waterline. -->
+        <g data-part="boat" data-key="boat" style="--fill:var(--c2)">
+          <rect class="box piece" x="18.5" y="-12.5" width="40" height="13"/>
+          <rect class="porthole" x="25.5" y="-8.5" width="6" height="5"/>
+          <rect class="porthole" x="45.5" y="-8.5" width="6" height="5"/>
+          <polygon class="hull" points="0.5,0.5 78.5,0.5 70.5,16.5 6.5,16.5"/>
+        </g>
+        <rect class="water" data-part="w-low"/>
+        <rect class="water" data-part="w-mid"/>
+        <rect class="water" data-part="w-high"/>
+        <line class="axis" data-part="s-low"/>
+        <line class="axis" data-part="s-mid"/>
+        <line class="axis" data-part="s-high"/>
+        <g data-part="drops"></g>
+        <rect class="zone" x="0.5" y="300.5" width="620" height="69"/>
+        <rect class="zone" x="620.5" y="200.5" width="305" height="169"/>
+        <text class="mid" x="150" y="340">Lower pound</text>
+        <text class="mid" x="460" y="340">Chamber</text>
+        <text class="mid" x="773" y="340">Upper pound, 3 m higher</text>
+        <line class="life" x1="300" x2="300" y1="36" y2="131"/>
+        <line class="life" x1="620" x2="620" y1="36" y2="131"/>
+        <rect class="gate" data-part="gate-low" x="296.5" y="130.5" width="8" height="170"/>
+        <rect class="gate" data-part="gate-high" x="616.5" y="130.5" width="8" height="70"/>
+        <text class="series mid" data-part="lift"></text>
+      </svg>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="The climb">A <mark data-key="boat">boat</mark> must climb 3 m. The chamber between the two gates is its lift.</li>
+        <li data-beat="enter" data-name="In">It sails in. The chamber stands level with the water it came from.</li>
+        <li data-beat="shut" data-name="Shut">The lower gate drops behind it. The chamber is now a sealed box.</li>
+        <li data-beat="fill" data-name="Fill">The upper gate lifts a crack. Water pours downhill into the box, and the boat rides it up.</li>
+        <li data-beat="open" data-name="Level">The two levels meet and the flow stops. Nothing presses on the upper gate now, so it opens.</li>
+        <li data-beat="leave" data-name="Out">The boat sails out 3 m higher. No pump, no engine: only water that wanted to fall.</li>
+      </ol>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+  </figure>
+
+  <p>On a real canal the fill takes a few minutes. The lift is paid for in water: emptying the chamber for the next boat sends one chamberful downhill for good.</p>
+
+  <!-- ── 2. The heap ── -->
+  <h2 id="heap">A garbage collector looks for the living</h2>
+  <aside class="margin"><p><strong>Moves.</strong> A mark spreads along the wires, wave by wave. A cursor wipes what it passes. The survivors close ranks, and their wires follow them.</p></aside>
+  <p>A program makes objects all day and never says when it is done with one. The <mark>collector</mark> has to work that out. The natural guess is that it hunts for garbage. It does the opposite.</p>
+
+  <!-- The heap is a row of cells 44px wide from x 62 to x 854; objects sit in it in the order they were made.
+       References above the row run in a lane at y 156; below it, in lanes at y 264, 280 and 296. -->
+  <figure class="panel film" id="heap-film" data-film data-link>
+    <div class="panel-head">Mark, sweep, compact <span class="tag" data-film-count>1 / 7</span></div>
+    <div class="panel-body">
+      <svg class="chart stage" viewBox="0 0 926 336" role="img" aria-label="Eight objects in a heap. Marking from two roots reaches four of them. The sweep frees the other four, two of which only pointed at each other. The four survivors are then moved together, leaving one free block.">
+        <rect class="zone" x="40.5" y="24.5" width="846" height="64"/>
+        <text class="zone-name" x="52" y="28">Roots</text>
+        <rect class="zone" x="40.5" y="176.5" width="846" height="136"/>
+        <text class="zone-name" x="52" y="180">Heap</text>
+        <g data-part="root-order" style="--fill:var(--good)"></g>
+        <g data-part="root-cache" style="--fill:var(--good)"></g>
+        <g data-part="free"></g>
+        <g data-part="o-order" data-key="order" style="--fill:var(--good)"></g>
+        <g data-part="o-tmp" data-key="tmp" style="--fill:var(--good)"></g>
+        <g data-part="o-item" data-key="item" style="--fill:var(--good)"></g>
+        <g data-part="o-parent" data-key="parent" style="--fill:var(--good)"></g>
+        <g data-part="o-cache" data-key="cache" style="--fill:var(--good)"></g>
+        <g data-part="o-child" data-key="child" style="--fill:var(--good)"></g>
+        <g data-part="o-entry" data-key="entry" style="--fill:var(--good)"></g>
+        <g data-part="o-buf" data-key="buf" style="--fill:var(--good)"></g>
+        <g class="neutral" data-part="o-new"></g>
+        <g data-part="ref-r1" data-key="order"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <g data-part="ref-r2" data-key="cache"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <g data-part="ref-oi" data-key="order"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <g data-part="ref-ce" data-key="cache"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <g data-part="ref-ei" data-key="entry"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <g data-part="ref-pc" data-key="parent"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <g data-part="ref-cp" data-key="child"><path class="wire"/><path class="line" style="--fill:var(--good)"/><polygon class="arrow"/></g>
+        <path class="wire" data-part="scan"/>
+        <text class="series mid" data-part="scan-name"></text>
+        <rect class="tick" data-part="next" y="194.5" width="2" height="60"/>
+        <text class="series" data-part="next-name"></text>
+      </svg>
+      <div class="legend"><span class="legend-item"><span class="swatch" style="--fill:var(--good)"></span>Marked: a root can reach it</span></div>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="The heap">Eight objects lie in the heap, in the order they were made. Some are garbage. Which?</li>
+        <li data-beat="roots" data-name="Roots">The collector does not look for garbage. It starts at the roots: every variable the program can still name.</li>
+        <li data-beat="spread" data-name="Mark">Then it follows each reference and marks what it reaches. Marked means alive.</li>
+        <li data-beat="island" data-name="The island" data-focus="parent child">Two objects still point at each other. No root reaches them, so nothing can ever use them again.</li>
+        <li data-beat="sweep" data-name="Sweep">Sweep: one pass along the heap. Whatever is unmarked becomes free space.</li>
+        <li data-beat="compact" data-name="Compact">Compact: the survivors slide down to close the gaps, and every reference is rewritten to follow.</li>
+        <li data-beat="alloc" data-name="Allocate">The free space is one block again. The next object costs one pointer bump.</li>
+      </ol>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+  </figure>
+
+  <p>The scheme is called mark and compact, and the collectors in .NET and Java are built on it. They add generations and work in the background, but the test stays the same: can a root still reach it?</p>
+
+  <!-- ── 3. The threat table ── -->
+  <h2 id="threat">A boss turns only when a margin is beaten</h2>
+  <aside class="margin"><p><strong>Moves.</strong> Bars race at a steady pace. Rows swap places. A tick rides another bar's value. A 3-second timer drains in 3 seconds. The stage is the style's own meter, not a drawing.</p></aside>
+  <p>In World of Warcraft a boss keeps a score for every player in the fight: <mark>threat</mark>. A raid lives by one rule about that score, and the rule has a catch.</p>
+
+  <!-- The stage is HTML: a .meter whose rows are moved by whole pixels. Threat is in thousands on a scale
+       of 100. Rows sit 38px apart: a 30px row and the meter's 8px gap. -->
+  <figure class="panel film" id="threat-film" data-film>
+    <div class="panel-head">Threat <span class="tag" data-film-count>1 / 6</span></div>
+    <div class="panel-body">
+      <div class="stage threat">
+        <div class="meter">
+          <div class="meter-row" data-part="row-tank" data-key="tank" style="--fill:var(--class-druid)"><span class="icon" style="--fill:var(--class-druid)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.783 2.826L12 1l8.217 1.826a1 1 0 0 1 .783.976v9.987a6 6 0 0 1-2.672 4.992L12 23l-6.328-4.219A6 6 0 0 1 3 13.79V3.802a1 1 0 0 1 .783-.976"/></svg></span><span class="meter-label">Tank, a Druid</span><div class="bar" data-part="bar-tank" style="--fill:var(--class-druid)"><span class="bar-fill"></span><span class="bar-mark" data-part="mark-tank" hidden></span></div><span class="meter-value" data-part="val-tank">20.0K</span></div>
+          <div class="meter-row" data-part="row-mage" data-key="mage" style="--fill:var(--class-mage)"><span class="icon" style="--fill:var(--class-mage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 23a7.5 7.5 0 0 1-5.138-12.963C8.204 8.774 11.5 6.5 11 1.5c6 4 9 8 3 14c1 0 2.5 0 5-2.47c.27.773.5 1.604.5 2.47A7.5 7.5 0 0 1 12 23"/></svg></span><span class="meter-label">Mage, at range</span><div class="bar" data-part="bar-mage" style="--fill:var(--class-mage)"><span class="bar-fill"></span><span class="bar-mark" data-part="mark-mage"></span></div><span class="meter-value" data-part="val-mage">8.0K</span></div>
+          <div class="meter-row" data-part="row-rogue" data-key="rogue" style="--fill:var(--class-rogue)"><span class="icon" style="--fill:var(--class-rogue)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><span class="meter-label">Rogue, in melee</span><div class="bar" data-part="bar-rogue" style="--fill:var(--class-rogue)"><span class="bar-fill"></span><span class="bar-mark" data-part="mark-rogue"></span></div><span class="meter-value" data-part="val-rogue">6.0K</span></div>
+        </div>
+        <div class="meter">
+          <div class="meter-row"><span class="icon" style="--fill:var(--class-druid)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.783 2.826L12 1l8.217 1.826a1 1 0 0 1 .783.976v9.987a6 6 0 0 1-2.672 4.992L12 23l-6.328-4.219A6 6 0 0 1 3 13.79V3.802a1 1 0 0 1 .783-.976"/></svg></span><span class="meter-label">The tank's taunt</span><div class="bar" data-part="bar-taunt" style="--fill:var(--class-druid)"><span class="bar-fill"></span></div><span class="meter-value" data-part="val-taunt">Ready</span></div>
+        </div>
+        <span class="tag bad boss" data-part="boss"><span class="glyph"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10v3.764a2 2 0 0 1-1.106 1.789L18 19v1a3 3 0 0 1-2.824 2.995L14.95 23q.033-.161.044-.33L15 22.5V22a2 2 0 0 0-1.85-1.994L13 20h-2a2 2 0 0 0-1.995 1.85L9 22v.5q0 .258.05.5H9a3 3 0 0 1-3-3v-1l-2.894-1.447A2 2 0 0 1 2 15.763V12C2 6.477 6.477 2 12 2m-4 9a2 2 0 1 0 0 4a2 2 0 0 0 0-4m8 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4"/></svg></span>Boss</span>
+      </div>
+      <figcaption>Threat, in thousands. A white tick is the threat a row needs to pull the boss: 110% of its target's in melee, 130% at range.</figcaption>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="The pull">A boss attacks whoever it hates most. Threat is the score it keeps.</li>
+        <li data-beat="race" data-name="Threat">Every hit adds threat. A <mark data-key="tank">tank</mark>'s hits add far more, so she stays on top.</li>
+        <li data-beat="pass" data-name="Passed">The <mark data-key="mage">mage</mark>'s burst carries her past the <mark data-key="tank">tank</mark>. The boss does not turn: passing is not enough.</li>
+        <li data-beat="pull" data-name="Aggro">She needs 130% of the tank's threat: the tick on her bar. She reaches it, and the boss turns.</li>
+        <li data-beat="taunt" data-name="Taunt">The <mark data-key="tank">tank</mark> taunts. Her threat jumps level with the mage's, and for 3 seconds the boss must attack her.</li>
+        <li data-beat="after" data-name="The margin">The <mark data-key="mage">mage</mark> holds her fire. Her tick now stands 130% up a taller bar.</li>
+      </ol>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+  </figure>
+
+  <p>The margin is the catch, and it is a kindness. A damage dealer who edges past the tank gets a warning, not a death. A tank who loses the boss gets one button that buys 3 seconds.</p>
+
+  <hr>
+  <footer class="page-foot"><span>Threat rules: World of Warcraft</span><span>Made 16 Nov 2026</span></footer>
+
+</main>
+<script src="../skills/guide/assets/film.js"></script>
+<script>
+// The three films of this page. The engine is film.js.
+(() => {
+  const { span, lerp, len, make, show, set, say, slot, both } = Film;
+
+  // ── 1. The lock ──
+  // Heights in px: water stands at LOW below and HIGH above; the chamber's level runs between them.
+  const LOW = 250, HIGH = 150, BED = 300, CILL = 200, GATE_LOW = 300, GATE_HIGH = 620, LIFT = 90;
+  const lock = {
+    values: { boat: 150, low: 1, high: 0, level: 0, flow: 0 },
+    beats: {
+      enter: [{ v: "boat", to: 460, dur: 4, ease: "inout" }],
+      shut: [{ v: "low", to: 0, dur: 2, ease: "inout" }],
+      // The level settles: the less head is left, the slower the water comes. flow is the clock the
+      // drops run on.
+      fill: [{ v: "high", to: 0.155, dur: 1 }, { v: "level", to: 1, at: 1, dur: 7, ease: "settle" }, { v: "flow", to: 1, at: 1, dur: 7, ease: "linear" }],
+      open: [{ v: "high", to: 1, dur: 2, ease: "inout" }],
+      leave: [{ v: "boat", to: 790, dur: 4, ease: "inout" }],
+    },
+    draw(v, { stage, part }) {
+      const level = Math.round(lerp(LOW, HIGH, v.level));
+      const water = (name, x1, x2, top, bed) => {
+        set(part("w-" + name), { x: x1, y: top, width: x2 - x1, height: bed - top });
+        set(part("s-" + name), { x1, x2, y1: top + 0.5, y2: top + 0.5 });
+      };
+      water("low", 1, GATE_LOW, LOW, BED);
+      water("mid", GATE_LOW, GATE_HIGH + 1, level, BED);
+      water("high", GATE_HIGH + 1, 925, HIGH, CILL);
+      set(part("gate-low"), { y: 130.5 - Math.round(v.low * LIFT) });
+      set(part("gate-high"), { y: 130.5 - Math.round(v.high * LIFT) });
+
+      // The stream through the crack under the upper gate: drops that fall to the chamber's surface.
+      // Fewer fall as the levels near each other, and none once the surface covers the crack.
+      const drops = stage._drops || (stage._drops = Array.from({ length: 10 }, () => make("rect", "drop", part("drops"), { width: 6, height: 6 })));
+      const pouring = v.flow > 0 && v.flow < 1 && level > 197;
+      const falling = Math.ceil(drops.length * (1 - v.level));
+      drops.forEach((drop, i) => {
+        if (!show(drop, pouring && i < falling)) return;
+        const fall = (v.flow * 9 + i / drops.length) % 1;
+        set(drop, { x: Math.round(608 - 36 * fall) + 0.5, y: Math.round(189 + (level - 195) * fall * fall) + 0.5 });
+      });
+
+      // The boat rides whatever water it is on.
+      const sea = v.boat < GATE_LOW ? LOW : v.boat > GATE_HIGH ? HIGH : level;
+      part("boat").setAttribute("transform", `translate(${Math.round(v.boat) - 39} ${sea - 10})`);
+      say(part("lift"), `Lifted ${(3 * v.level).toFixed(1)} m`, 1 - v.low, 460, 112);
+    },
+  };
+
+  // ── 2. The heap ──
+  // An object is [name, label, cells, the wave of marking that reaches it]. Wave 0 is never reached.
+  const CELL = 44, X0 = 62, END = X0 + 18 * CELL, TOP = 200, BOTTOM = 248;
+  const OBJECTS = [["order", "Order", 2, 1], ["tmp", "Tmp", 1, 0], ["item", "Item", 2, 2], ["parent", "Parent", 2, 0],
+    ["cache", "Cache", 2, 1], ["child", "Child", 2, 0], ["entry", "Entry", 2, 2], ["buf", "Buf", 1, 0]];
+  const home = {}, packed = {};
+  let [made, kept] = [X0, X0];
+  for (const [name, , cells, wave] of OBJECTS) {
+    home[name] = made;
+    made += cells * CELL;
+    if (!wave) continue;
+    packed[name] = kept;
+    kept += cells * CELL;
+  }
+  const TILE = { cls: "tile", rise: 6 };
+  const heap = {
+    values: { mark: 0, sweep: 0, compact: 0, alloc: 0 },
+    beats: {
+      roots: [{ v: "mark", to: 1, dur: 3, ease: "linear" }],
+      spread: [{ v: "mark", to: 3, dur: 5, ease: "linear" }],
+      sweep: [{ v: "sweep", to: 1, dur: 6, ease: "linear" }],
+      compact: [{ v: "compact", to: 1, dur: 4, ease: "inout" }],
+      alloc: [{ v: "alloc", to: 1, dur: 1.5 }],
+    },
+    draw(v, { stage, part }) {
+      const cursor = lerp(X0, END, v.sweep);
+      const at = {};
+      const taken = [];  // the stretches of the heap that hold something
+      for (const [name, label, cells, wave] of OBJECTS) {
+        const width = cells * CELL;
+        const x = at[name] = wave ? lerp(home[name], packed[name], v.compact) : home[name];
+        const marked = wave === 1 ? span(v.mark, 0.6, 1) : wave === 2 ? span(v.mark, 1.5, 2) : 0;
+        // The cursor wipes an unmarked object as it crosses it.
+        const wiped = wave ? 0 : span(cursor, x, x + width);
+        if (wiped < 1) taken.push([wave ? x : Math.max(x, cursor), x + width]);
+        if (show(part("o-" + name), wiped < 1)) {
+          slot(stage, part("o-" + name), { ...TILE, x, y: TOP, w: width, h: BOTTOM - TOP, base: true, fill: marked, from: wiped, text: label, n: wiped ? len(label) * (1 - wiped) : undefined });
+        }
+      }
+      // The next object goes where the last one ends. Compacting moves that point back.
+      const next = lerp(made, kept, v.compact);
+      if (show(part("o-new"), v.alloc > 0)) {
+        slot(stage, part("o-new"), { ...TILE, x: kept, y: TOP, w: 2 * CELL, h: BOTTOM - TOP, fill: v.alloc, text: "Invoice", n: 7 * v.alloc });
+        taken.push([kept, kept + 2 * CELL * v.alloc]);
+      }
+      set(part("next"), { x: Math.round(next + 2 * CELL * v.alloc) - 0.5 });
+      say(part("next-name"), "Next object goes here", 1, next + 2 * CELL * v.alloc + 8, 270);
+
+      // Whatever is not taken is free: the gaps the sweep leaves, and the block they become.
+      const free = stage._free || (stage._free = Array.from({ length: 6 }, () => make("g", "", part("free"))));
+      const gaps = [];
+      let edge = X0;
+      for (const [from, to] of [...taken.sort((a, b) => a[0] - b[0]), [END, END]]) {
+        if (from - edge >= 2) gaps.push([edge, from]);
+        edge = Math.max(edge, to);
+      }
+      free.forEach((g, i) => {
+        if (show(g, i < gaps.length)) slot(stage, g, { ...TILE, x: gaps[i][0], y: TOP, w: gaps[i][1] - gaps[i][0], h: BOTTOM - TOP, frame: 1, text: "Free" });
+      });
+
+      // References. A wire runs from its source to an arrowhead on its target, in horizontal and
+      // vertical runs. Marking traces it in green; the sweep draws a dead one back.
+      const ref = (name, d, [tx, ty], up, marked, wiped = 0) => {
+        const g = part("ref-" + name);
+        for (const wire of both(g.querySelector(".wire:not(.ink)"))) {
+          wire.setAttribute("d", d);
+          const length = wire.getTotalLength();
+          wire.style.strokeDasharray = wiped ? `${length} ${length}` : "";
+          wire.style.strokeDashoffset = wiped ? length * wiped : "";
+          show(wire, wiped < 1);
+        }
+        for (const line of both(g.querySelector(".line:not(.ink)"))) {
+          if (!show(line, marked > 0)) continue;
+          line.setAttribute("d", d);
+          const length = line.getTotalLength();
+          line.style.strokeDasharray = `${length} ${length}`;
+          line.style.strokeDashoffset = length * (1 - marked);
+        }
+        const head = g.querySelector(".arrow");
+        show(head, wiped <= 0);
+        head.setAttribute("points", up ? `${tx - 5},${ty + 9} ${tx + 5},${ty + 9} ${tx},${ty}` : `${tx - 5},${ty - 9} ${tx + 5},${ty - 9} ${tx},${ty}`);
+        head.classList.toggle("live", marked >= 1);
+      };
+      const R = (n) => Math.round(n);
+      const fromRoot = (rx, tx) => (R(tx) === rx ? `M${rx} 72V${TOP - 8}` : `M${rx} 72V112H${R(tx)}V${TOP - 8}`);
+      const above = (sx, tx, lane) => `M${R(sx)} ${TOP}V${lane}H${R(tx)}V${TOP - 8}`;
+      const below = (sx, tx, lane) => `M${R(sx)} ${BOTTOM}V${lane}H${R(tx)}V${BOTTOM + 8}`;
+      const gone = (name) => span(cursor, at[name], at[name] + 2 * CELL);
+      ref("r1", fromRoot(106, at.order + 44), [R(at.order + 44), TOP], false, span(v.mark, 0.2, 0.7));
+      ref("r2", fromRoot(414, at.cache + 44), [R(at.cache + 44), TOP], false, span(v.mark, 0.2, 0.7));
+      ref("oi", above(at.order + 66, at.item + 30, 156), [R(at.item + 30), TOP], false, span(v.mark, 1, 1.6));
+      ref("ce", above(at.cache + 70, at.entry + 30, 156), [R(at.entry + 30), TOP], false, span(v.mark, 1, 1.6));
+      ref("ei", below(at.entry + 58, at.item + 44, 296), [R(at.item + 44), BOTTOM], true, span(v.mark, 2, 2.7));
+      ref("pc", below(at.parent + 30, at.child + 30, 264), [R(at.child + 30), BOTTOM], true, 0, gone("parent"));
+      ref("cp", below(at.child + 58, at.parent + 58, 280), [R(at.parent + 58), BOTTOM], true, 0, gone("child"));
+
+      slot(stage, part("root-order"), { ...TILE, x: 62, y: 40, w: 88, h: 32, base: true, fill: span(v.mark, 0, 0.3), text: "order" });
+      slot(stage, part("root-cache"), { ...TILE, x: 370, y: 40, w: 88, h: 32, base: true, fill: span(v.mark, 0, 0.3), text: "cache" });
+
+      // The sweep's cursor, and its name riding above it.
+      const sweeping = v.sweep > 0 && v.sweep < 1;
+      for (const wire of both(part("scan"))) {
+        show(wire, sweeping);
+        wire.setAttribute("d", `M${R(cursor)} 190V258`);
+      }
+      say(part("scan-name"), "Sweep", sweeping ? 1 : 0, cursor, 184);
+    },
+  };
+
+  // ── 3. The threat table ──
+  // Threat in thousands. order is 0 while the tank's row stands first and 1 once the mage's does;
+  // boss is 0 while the boss attacks the tank and 1 while it attacks the mage. taunt drains from 1 to 0.
+  const PITCH = 38;
+  const threat = {
+    values: { tank: 20, mage: 8, rogue: 6, order: 0, boss: 0, taunt: 0, spent: 0 },
+    beats: {
+      race: [{ v: "tank", to: 40, dur: 5, ease: "linear" }, { v: "mage", to: 34, dur: 5, ease: "linear" }, { v: "rogue", to: 30, dur: 5, ease: "linear" }],
+      // The mage passes the tank 0.6 of the way through, and the rows change places there.
+      pass: [{ v: "tank", to: 42, dur: 4, ease: "linear" }, { v: "mage", to: 46, dur: 4, ease: "linear" }, { v: "rogue", to: 34, dur: 4, ease: "linear" },
+        { v: "order", to: 1, at: 2.4, dur: 1, ease: "inout" }],
+      // She reaches 130% of the tank's threat 0.915 of the way through, and the boss turns there.
+      pull: [{ v: "tank", to: 44, dur: 4, ease: "linear" }, { v: "mage", to: 58, dur: 4, ease: "linear" }, { v: "rogue", to: 38, dur: 4, ease: "linear" },
+        { v: "boss", to: 1, at: 3.66, dur: 0.75, ease: "inout" }],
+      // The taunt lasts 3 seconds on the clock: 6.25 times the 480ms unit.
+      taunt: [{ v: "tank", to: 58.5, dur: 0.5 }, { v: "tank", to: 62, at: 0.5, dur: 6, ease: "linear" }, { v: "mage", to: 59, dur: 6.5, ease: "linear" },
+        { v: "rogue", to: 41, dur: 6.5, ease: "linear" }, { v: "boss", to: 0, at: 0.25, dur: 0.75, ease: "inout" }, { v: "order", to: 0, at: 0.5, dur: 1, ease: "inout" },
+        { v: "spent", to: 1, dur: 0.25 }, { v: "taunt", to: 1, dur: 0.25 }, { v: "taunt", to: 0, at: 0.25, dur: 6.25, ease: "linear" }],
+      after: [{ v: "tank", to: 70, dur: 5, ease: "linear" }, { v: "mage", to: 60, dur: 5, ease: "linear" }, { v: "rogue", to: 47, dur: 5, ease: "linear" }],
+    },
+    draw(v, { part }) {
+      const place = { tank: v.order, mage: 1 - v.order, rogue: 2 };
+      const first = { tank: 0, mage: 1, rogue: 2 };
+      for (const who of ["tank", "mage", "rogue"]) {
+        part("row-" + who).style.top = Math.round((place[who] - first[who]) * PITCH) + "px";
+        part("bar-" + who).style.setProperty("--v", v[who].toFixed(2));
+        part("val-" + who).textContent = v[who].toFixed(1) + "K";
+      }
+      // The row that is moving up passes over the other.
+      part("row-mage").style.zIndex = 2;
+      part("row-tank").style.zIndex = v.boss > 0.5 ? 1 : 3;
+      part("boss").style.top = Math.round(lerp(place.tank, place.mage, v.boss) * PITCH) + 10 + "px";
+
+      // Each row's tick stands at the threat it needs to pull the boss off its target.
+      const onMage = v.boss >= 0.5;
+      const target = onMage ? v.mage : v.tank;
+      const tick = (who, at, shown) => {
+        part("mark-" + who).hidden = !shown;
+        part("mark-" + who).style.setProperty("--at", at.toFixed(2));
+      };
+      tick("tank", 1.1 * target, onMage);
+      tick("mage", 1.3 * target, !onMage);
+      tick("rogue", 1.1 * target, true);
+
+      part("bar-taunt").style.setProperty("--v", (100 * v.taunt).toFixed(2));
+      part("val-taunt").textContent = v.taunt > 0 ? (3 * v.taunt).toFixed(1) + "s" : v.spent >= 1 ? "On cooldown" : "Ready";
+    },
+  };
+
+  Film.add({ "lock-film": lock, "heap-film": heap, "threat-film": threat });
+})();
+</script>
+</body>
+</html>

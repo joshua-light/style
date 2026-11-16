@@ -1007,6 +1007,37 @@
     </div>
   </section>
 
+  <h3>Film</h3>
+  <!-- Film: figure.panel.film[data-film] with an id. A stage (an SVG .chart drawn 926 wide, parts named with
+       data-part), a p.film-caption, the beats as an ol.film-script (each li has data-beat and data-name), and an
+       empty .panel-foot[data-film-transport] that film.js fills. The main button plays one beat and stops.
+       A <mark data-key> in a sentence names the part with that key and takes its colour; hovering it dims the
+       rest of the stage. The film's script is at the end of this page, after film.js. For a whole page of films
+       see gc-film.html. -->
+  <p>A film is a figure that plays one beat at a time. Each beat is one sentence and one change, and the reader sets the pace.</p>
+  <figure class="panel film" id="film-sample" data-film data-link>
+    <div class="panel-head">Each term is a shape <span class="tag" data-film-count>1 / 4</span></div>
+    <div class="panel-body">
+      <svg class="chart stage" viewBox="0 0 926 290" role="img" aria-label="The equation x squared plus 10x equals 39 over its picture: a square with side x, and beside it a strip x tall and 10 wide.">
+        <rect class="zone" x="0.5" y="0.5" width="925" height="72"/>
+        <g data-part="eq"></g>
+        <g data-part="sq" data-key="sq" data-tip="The square" data-tip-note="x wide, x tall" style="--fill:var(--c1)"></g>
+        <g data-part="strip" data-key="strip" data-tip="The strip" data-tip-note="10 wide, x tall" style="--fill:var(--c2)"></g>
+        <g data-part="m-x"></g>
+        <g data-part="m-xl"></g>
+        <g data-part="m-b"></g>
+      </svg>
+      <p class="film-caption" aria-live="polite"></p>
+      <ol class="film-script">
+        <li data-beat="start" data-name="The puzzle">A square plus ten of its sides makes 39. The dashed boxes are not drawn yet.</li>
+        <li data-beat="sq" data-name="The square"><code class="math">x<sup>2</sup></code> is the <mark data-key="sq">square</mark> itself: x wide and x tall.</li>
+        <li data-beat="strip" data-name="The strip"><code class="math">10x</code> is a <mark data-key="strip">strip</mark>: just as tall, and 10 wide.</li>
+        <li data-beat="total" data-name="The total">Together they cover 39. Find the side x and the puzzle is solved.</li>
+      </ol>
+    </div>
+    <div class="panel-foot" data-film-transport></div>
+  </figure>
+
   <!-- ── Controls ── -->
   <h2 id="controls">Controls</h2>
   <div class="grid">
@@ -1984,5 +2015,47 @@ wrote report.html, 412 KB
   </template>
 
 </main>
+<!-- Films: film.js at the end of the body, then the page's own script, which registers each film by its
+     figure's id. values are the film's numbers on its first frame; beats names the tweens each beat plays;
+     draw turns the numbers into the picture, and keeps no state of its own. -->
+<script src="../skills/guide/assets/film.js"></script>
+<script>
+(() => {
+  const { slot, measure, equation } = Film;
+  // One unit is U px. The square's corner sits at (OX, OY), and it is drawn SIDE units wide.
+  const U = 22, OX = 330, OY = 124, SIDE = 6;
+  const term = (id, text, kind, fill, key) => ({ id, text, kind, fill, key });
+  Film.add({
+    "film-sample": {
+      values: { sq: 0, strip: 0, mx: 0, mb: 0, eq: 0 },
+      beats: {
+        sq: [{ v: "sq", to: 1, dur: 1.5 }, { v: "eq", to: 1, dur: 1.5 }, { v: "mx", to: 1, at: 1, dur: 1 }],
+        strip: [{ v: "strip", to: 1, dur: 2 }, { v: "eq", to: 2, dur: 2 }, { v: "mb", to: 1, at: 1.5, dur: 1 }],
+        total: [{ v: "eq", to: 3, dur: 1.5 }],
+      },
+      draw(v, { stage, part }) {
+        const S = SIDE * U;
+        const tile = { cls: "tile", rise: 6, y: OY, h: S, frame: 1 };
+        // A slot is a dashed box that is inked from its left edge. fill is the share inked.
+        slot(stage, part("sq"), { ...tile, x: OX, w: S, fill: v.sq, text: "x^2" });
+        slot(stage, part("strip"), { ...tile, x: OX + S, w: 10 * U, fill: v.strip, text: "10x" });
+        measure(part("m-x"), { x1: OX, x2: OX + S, y1: OY, y2: OY, off: -10, text: "x", p: v.mx });
+        measure(part("m-xl"), { x1: OX, x2: OX, y1: OY, y2: OY + S, off: -10, text: "x", p: v.mx });
+        measure(part("m-b"), { x1: OX + S, x2: OX + S + 10 * U, y1: OY, y2: OY, off: -10, text: "10", p: v.mb });
+        // The equation: a term is a dashed chip until its shape is inked, then takes the shape's colour.
+        const row = (inked) => [
+          term("sq", "x^2", inked >= 1 ? "chip" : "ghost", "var(--c1)", "sq"),
+          term("p1", "+", "op"),
+          term("bx", "10x", inked >= 2 ? "chip" : "ghost", "var(--c2)", "strip"),
+          term("eq", "=", "op"),
+          term("c", "39", inked >= 3 ? "neutral" : "ghost"),
+        ];
+        const at = Math.min(2, Math.floor(v.eq));
+        equation(stage, part("eq"), 463, 36, row(at), row(at + 1), v.eq - at);
+      },
+    },
+  });
+})();
+</script>
 </body>
 </html>
