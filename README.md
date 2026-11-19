@@ -2,7 +2,7 @@
 
 ![A raid report in the style: stat tiles, a damage meter, a table, and two charts](assets/screenshots/dashboard.png)
 
-My visual style, packaged as a plugin for Claude Code and Codex. It is listed in the [`joshua-light` marketplace](https://github.com/joshua-light/marketplace). It steers reports, explainers, animated explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings.
+My visual style, packaged as a plugin for Claude Code and Codex. It is listed in the [`joshua-light` marketplace](https://github.com/joshua-light/marketplace). It steers reports, explainers, animated explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings. It steers the words too: headings of one or two words, short captions, and a figure before a paragraph.
 
 <p>
   <img src="assets/screenshots/deck.png" width="49%" alt="A deck slide: a line chart with two events and a dashed forecast">
@@ -57,7 +57,7 @@ Embedding Expressway in pages you publish may need a web licence from Typodermic
 | `skills/guide/assets/icons/remix-fill.json` | Remix Icon's fill set, one icon per line. |
 | `skills/guide/assets/fonts/` | Fira Sans, the fallback face, and its licence. Your Expressway files go here too; git ignores them. |
 | `skills/guide/scripts/build.py` | Inlines the stylesheet, the scripts, and the fonts into a page. |
-| `skills/guide/scripts/lint.py` | Checks a page's own CSS, markup, and text against the rules, and names each breach by line. |
+| `skills/guide/scripts/lint.py` | Checks a page's own CSS, markup, and text against the rules, and names each breach by line. Counts words too: a long heading, caption, or sentence is a warning. |
 | `skills/guide/scripts/shot.py` | Screenshots a page, a part of it, or a deck's slides, every mark finished, or a film held at any moment. Needs Chrome or Chromium. |
 | `skills/guide/scripts/icon.py` | Prints the markup for an icon, or looks one up by name. |
 | `skills/guide/scripts/highlight.py` | Prints a code sample as highlighted markup, with numbered or lit lines, or as a diff. Needs Pygments. |

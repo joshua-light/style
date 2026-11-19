@@ -1,25 +1,90 @@
 ---
 name: guide
-description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look). Use before creating or restyling anything meant to be looked at — reports, explainers, animated explainers (films), dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
+description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look), and few words: one- or two-word headings, figures before prose. Use before creating or restyling anything meant to be looked at — reports, explainers, animated explainers (films), dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
 ---
 
 # Visual style guide
 
 The look comes from ElvUI and EllesmereUI, the World of Warcraft interfaces: dark gray panels, one-pixel black borders, square corners, flat dark heads, a tan accent on text, flat colour fills, and Expressway text with black-outlined headings. It reads like an inked comic panel.
 
-Apply these rules to every visual output. Where another design skill disagrees on palette, font, rounding, or light mode, these rules win. Use other skills for method only, such as choosing a chart form.
+Apply these rules to every visual output. They cover the words as well as the look: short names, few sentences, figures first (see Words). Where another design skill disagrees on palette, font, rounding, or light mode, these rules win. Use other skills for method only, such as choosing a chart form.
 
 ## Build a page
 
 Paths are relative to this skill's directory.
 
 1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck. For an animated explainer, read `../../examples/gc-film.html` too: the reference for films.
-2. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups. A page with a film also loads `film.js`, at the end of its body (see Films).
-3. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css`, `assets/style.js`, and `assets/film.js` where the page loads it, and embeds the fonts, so the page stands alone.
-4. Run `python3 scripts/lint.py page.html`. It reads the page's own CSS, markup, and text, and names each breach of these rules by line. Fix every error. A warning is a rule with exceptions: check each by eye.
-5. Run `python3 scripts/shot.py page.html` and read the images it writes. A page comes as screens 1500px tall and a deck as one image per slide, every mark finished as on paper. `--select CSS` shoots one part. A film shows its last frame; `--at` holds it at another (see Films). Check them against the rules below: the linter reads the source, and only the picture shows spacing, overlap, and empty room.
+2. Plan the page as a list of figures, each with a name of one or two words (see Words). Prose comes last.
+3. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups. A page with a film also loads `film.js`, at the end of its body (see Films).
+4. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css`, `assets/style.js`, and `assets/film.js` where the page loads it, and embeds the fonts, so the page stands alone.
+5. Run `python3 scripts/lint.py page.html`. It reads the page's own CSS, markup, and text, and names each breach of these rules by line. It counts words too: a long heading, caption, or sentence is a warning. Fix every error. A warning is a rule with exceptions: check each by eye.
+6. Run `python3 scripts/shot.py page.html` and read the images it writes. A page comes as screens 1500px tall and a deck as one image per slide, every mark finished as on paper. `--select CSS` shoots one part. A film shows its last frame; `--at` holds it at another (see Films). Check them against the rules below: the linter reads the source, and only the picture shows spacing, overlap, and empty room.
 
 Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. Never silence the linter to pass. A `lint-ok: RULE` comment on a line exempts it, and is only for an exception this guide names: write the reason beside it. Where Expressway's files are absent, `build.py` sets the page in Fira Sans, the bundled fallback, and says so. That is the intended look on such a machine.
+
+## Words
+
+A page is looked at before it is read. Figures carry the content and words name them. Every sentence costs the reader: a long one most of all.
+
+### Show before you say
+
+Before writing a sentence, look for the figure that holds it.
+
+| The sentence would give | Show |
+| --- | --- |
+| A number that matters | A stat. |
+| Several facts about one thing: a sample, a setup, a method | A key-value list. |
+| A ranking or a comparison | A meter, columns, or a table. |
+| A share of a whole | A stacked bar, a pie, or a waffle. |
+| What happened, in order | A timeline. |
+| What to do next | Steps or a status list. |
+| A belief and whether it held | Claims. |
+| A cause, a flow, a mechanism | A diagram. |
+| A change in steps: before and after, a process | A stepper. |
+| A change whose pace or path is the point: a lag, a race, a queue | A film (see Films). |
+| A choice and its reason | A decision callout. |
+| A caveat or a risk | A callout of one sentence. |
+| Where a number came from, how it was checked | A tooltip, a margin note, or a disclosure. |
+
+- Plan the page as a list of figures. Write prose last, and only for what no figure holds: why a finding matters, how two figures connect.
+- Say a fact once. Prose never walks through the values of a figure beside it.
+- Detail the reader may skip leaves the main line: a tooltip, a margin note, a `details.more`. Never park it in a caption.
+- Report what was found, not how the work went: no "I read", no "we then checked". A method is a key-value list.
+- When a page reads as text with charts between, it is not done. Cut words until the figures lead.
+
+### Lengths
+
+Names:
+
+| Text | Most | Write | Not |
+| --- | --- | --- | --- |
+| Title | 4 words | Raid report | Week 12: eight kills, and Dimensius is next |
+| Heading, panel title | 2 words, 3 at a push | Damage | Damage done by each player |
+| Label, tag | 3 words | Top 6 | The six highest of 20 |
+
+Sentences:
+
+| Text | Most |
+| --- | --- |
+| Caption, panel foot, stat note | 1 sentence of 12 words |
+| Lead | 20 words |
+| Sentence | 20 words |
+| Paragraph | 40 words |
+| Paragraphs in a row | 2 |
+
+- A heading is a name: one or two words, a noun. It has no verb, no question, and no comma, colon, or full stop. It never opens with "The", "How", "Where", "What", or "Why": "Where the damage goes" is "Damage".
+- The words a heading drops have their own places. A count or a unit goes in the tag on the border: "Top 6", "24 pulls". The scale goes in the caption. The finding goes in the lead.
+- The title names the piece. The eyebrow holds its context: project, period, version. The lead states the finding.
+- A caption says how to read the figure: its unit, its scale, what a mark stands for. It never adds a fact the figure does not show. A figure whose title and labels say it all takes no caption.
+  - Write "Peak per hour, server time."
+  - Not "Hour of day in server time. Most pulls come after 21:00, when the second tank logs in."
+- A label names one thing. A second fact about it goes in its value, a tag, or a tooltip: "Healers" with 3 as its value, never "Healers in the raid, 3 of 20".
+- A table cell is a name or a value. A column of sentences wants to be `ul.claims`.
+- A sentence runs to about 12 words. One over 20 is rare and chosen: one a section at most, where splitting it would break the thought.
+- A paragraph is one to three short sentences. Never run more than two paragraphs together: a third wants to be a figure.
+- A callout or a list item holds one or two sentences.
+- An explainer has more sentences than a report, never longer ones.
+- A slide's title is the one heading that states a finding (see Slides and decks): a slide has no lead to hold it.
 
 ## Surfaces and ink
 

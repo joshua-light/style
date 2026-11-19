@@ -52,7 +52,7 @@
   </nav>
 
   <h2 id="text">Text</h2>
-  <p>Prose runs at 18px on a 30px line, a shade dimmer than headings, and never wider than 560px. Headings and titles wear the black outline that <a href="#">ElvUI</a> draws around its text; running text stays plain. <strong>Bold marks emphasis</strong>; nothing is italic. A struck value was replaced: <del>two</del> <ins>three</ins> healers.</p>
+  <p>Prose runs at 18px on a 30px line, a shade dimmer than headings, and stops at 560px. Headings wear the outline <a href="#">ElvUI</a> draws; running text stays plain. <strong>Bold marks emphasis</strong>; nothing is italic. A struck value was replaced: <del>two</del> <ins>three</ins> healers.</p>
   <!-- mark: the name of a thing inside a sentence. Names only, never numbers; running text only, never titles. -->
   <p>A highlight colours the name of a thing: <mark>Tukz</mark> topped the meter, and 24 pulls went into <mark>Dimensius</mark>.</p>
 
@@ -98,7 +98,7 @@
   <h3>Maths</h3>
   <!-- Maths: inline in code.math, with real <sup> and <sub>. A formula on its own line is p.formula, one span
        per term; a fraction in an exponent is sup.frac holding the numerator and the denominator. -->
-  <p>Maths sits in the text face with real exponents: enrage damage doubles every 30 seconds, so after <code class="math">t</code> seconds the boss hits for <code class="math">2<sup>t/30</sup></code> times its opening damage.</p>
+  <p>Maths sits in the text face with real exponents. Enrage damage doubles every 30 seconds: after <code class="math">t</code> seconds the boss hits for <code class="math">2<sup>t/30</sup></code> times its opening damage.</p>
   <p class="formula" role="math" aria-label="1.2 M times 2 to the power t over 30"><span>1.2M</span><span>·</span><span>2<sup class="frac"><span>t</span><span>30</span></sup></span></p>
 
   <p>Inline <code>code</code> and blocks use a monospace face:</p>
@@ -244,7 +244,7 @@
     <!-- Line chart: inline SVG on a 440×200 viewBox. Plot area x 32–428, y 8–168.
          Each line carries pathLength="1" so .anim can trace it. Series are labelled at the line end. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS by pull</div>
+      <div class="panel-head">DPS by pull</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull for two nights">
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
@@ -351,7 +351,7 @@
           <span class="tag" style="--fill:var(--c6)">c6</span>
           <span class="tag" style="--fill:var(--c-other)">other</span>
         </div>
-        <p class="note">Assign in this order. A seventh series folds into "other".</p>
+        <p class="note">Assigned in this order; a seventh folds into "other".</p>
       </div>
     </div>
   </div>
@@ -415,7 +415,7 @@
 
     <!-- Area: the line chart with a filled .area under the line. One series only: areas hide each other. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS, Thursday</div>
+      <div class="panel-head">Thursday DPS</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull on Thursday, rising from 9M to 24M">
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
@@ -457,7 +457,7 @@
     <!-- Diverging: .bar.diverge grows from the middle. --v is a share of one half; .neg grows left.
          Gains are green and losses red, always with the signed value beside them. -->
     <figure class="panel span-6">
-      <div class="panel-head">Change since last week</div>
+      <div class="panel-head">Weekly change</div>
       <div class="panel-body">
         <div class="meter stagger">
           <div class="meter-row"><span class="meter-label">Ellesmere</span><div class="bar diverge"><span class="bar-fill" style="--v:72"></span></div><span class="meter-value">+0.61M</span></div>
@@ -477,7 +477,7 @@
     <!-- Forecast: a second path with .line.ghost continues the measured line in the same colour, with no pathLength.
          It ends in a hollow marker: circle.dot.ghost with r="3". A target is a <line class="target">. Label both on the chart. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS by week</div>
+      <div class="panel-head">DPS by week</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by week: 25M in week six, forecast to pass the 28M goal in week eight">
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
@@ -553,7 +553,7 @@
         </div>
         <div class="legend">
           <span class="legend-item"><span class="swatch" style="--fill:var(--c-other)"></span>Done</span>
-          <span class="legend-item"><span class="swatch ghost" style="--fill:var(--c-other)"></span>On pace by Sunday</span>
+          <span class="legend-item"><span class="swatch ghost" style="--fill:var(--c-other)"></span>Pace by Sunday</span>
         </div>
       </div>
     </figure>
@@ -564,7 +564,7 @@
   <div class="grid">
     <!-- Context: the series the page is about keeps its colour; the rest take --c-other, drawn first, with dim labels. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS by pull</div>
+      <div class="panel-head">DPS by pull</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by pull on Thursday, against three earlier nights">
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
@@ -597,7 +597,7 @@
 
     <!-- Notes: <line class="event"> is a moment, <rect class="band"> a period, drawn first. Label both at the top of the plot. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS by week</div>
+      <div class="panel-head">DPS by week</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by week, with a patch after week three and a holiday break in weeks six and seven">
           <rect class="band" x="255" y="8" width="99" height="160"/>
@@ -627,7 +627,7 @@
 
     <!-- Range: a closed <path class="range"> under the line, in the line's --fill. Say what it spans on the chart. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS, typical pull</div>
+      <div class="panel-head">Typical pull</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Typical raid DPS by week, with the range from the worst pull to the best">
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
@@ -655,7 +655,7 @@
 
     <!-- Replaced values: <del> the old value, then <ins> the new one. -->
     <section class="panel span-6">
-      <div class="panel-head">With a third healer</div>
+      <div class="panel-head">Third healer</div>
       <div class="panel-body flush">
         <table class="table">
           <thead><tr><th>Measure</th><th class="num">Was, now</th></tr></thead>
@@ -674,7 +674,7 @@
   <div class="grid">
     <!-- Diagram: a chain of .node boxes joined by .link arrows. .diagram.down runs it top to bottom. -->
     <figure class="panel span-12">
-      <div class="panel-head">How a pull runs</div>
+      <div class="panel-head">Pull order</div>
       <div class="panel-body">
         <div class="diagram">
           <div class="node"><strong>Ready check</strong><span>Everyone confirms</span></div>
@@ -693,7 +693,7 @@
     <!-- A diagram that branches is an SVG: .box rectangles, .wire paths and .arrow heads, drawn at the width it renders.
          Label a branch beside its wire. -->
     <figure class="panel span-6">
-      <div class="panel-head">What ends a pull</div>
+      <div class="panel-head">Pull endings</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 176" role="img" aria-label="A pull ends in a kill if the boss dies before the enrage timer, and in a wipe if not">
           <path class="wire" d="M72 88 H116"/>
@@ -792,7 +792,7 @@
         <rect x="88.5" y="80.5" width="236" height="16" fill="var(--azure)" stroke="var(--ink)"/>
         <rect x="324.5" y="80.5" width="92" height="16" fill="var(--sunken)" stroke="var(--ink)"/>
       </svg>
-      <figcaption>A unit frame: portrait, health bar, power bar. The frame around a picture is the same 1px ink.</figcaption>
+      <figcaption>A unit frame: portrait, health bar, power bar.</figcaption>
     </figure>
 
     <!-- Empty state: one dim line in the middle of a panel that has nothing to show. Say what would fill it. -->
@@ -806,7 +806,7 @@
          The pressed tab takes its step's colour, so a .step-ref can cite a state. Panel foot: .panel-foot is a strip under
          the body for the figure's controls or its takeaway. -->
     <figure class="panel stepper span-12" data-step="1">
-      <div class="panel-head">One pull of Dimensius
+      <div class="panel-head">Dimensius pull
         <span class="tabs">
           <button class="tab" type="button" data-go="1" aria-pressed="true">Pull</button>
           <button class="tab" type="button" data-go="2" aria-pressed="false">Phase two</button>
@@ -842,7 +842,7 @@
          on the panel too, so the figure is right before the script runs. In a label.meter-row the slider wears its name
          and value on its top edge. -->
     <figure class="panel span-6" style="--healers:3">
-      <div class="panel-head">How many healers?</div>
+      <div class="panel-head">Healers</div>
       <div class="panel-body">
         <div class="meter">
           <label class="meter-row"><span class="meter-label">Healers</span><input class="slider" type="range" min="1" max="5" value="3" data-bind="--healers"><output class="meter-value" data-show="--healers">3</output></label>
@@ -857,7 +857,7 @@
     <!-- Tree: .tree holds a parent .node and its .tree-kids, joined by a bus of 2px ink rules. A child may be a .tree itself;
          --span on a child gives it more columns. -->
     <figure class="panel span-6">
-      <div class="panel-head">Who is in the raid</div>
+      <div class="panel-head">Roster</div>
       <div class="panel-body">
         <div class="tree">
           <div class="node"><strong>Raid</strong><span>20 players</span></div>
@@ -880,7 +880,7 @@
          set the widths. .base is a slab others stand on. .fallen marks a block knocked out and whatever stood on it:
          say so in a tag too. -->
     <figure class="panel span-6">
-      <div class="panel-head">What a kill rests on</div>
+      <div class="panel-head">Kill requirements</div>
       <div class="panel-body">
         <div class="layers" style="--cols:3">
           <div class="layer fallen" style="--span:3"><span class="tag bad">Wipe</span><strong>Kill</strong><span>Needs all three checks</span></div>
@@ -908,7 +908,7 @@
          The notes are an ol.steps, so a pin matches its note by number and colour. data-link on the box and a shared
          data-key light a pin and its note together. -->
     <figure class="panel span-6">
-      <div class="panel-head">Reading a unit frame</div>
+      <div class="panel-head">Unit frame</div>
       <div class="panel-body" data-link>
         <div class="frame">
           <div class="pins">
@@ -988,7 +988,7 @@
   <!-- Margin note: <aside class="margin"> as a child of .page, written before the paragraph it belongs to. It sits in
        the room the prose measure leaves at the right. -->
   <aside class="margin"><p>A margin note holds an aside, a source or a small figure. It stays out of the main line.</p></aside>
-  <p>Some parts of an explainer live in the text itself. A note beside a paragraph keeps an aside out of the reader's way, and a disclosure holds depth that only some readers want.</p>
+  <p>Some parts of an explainer live in the text itself. A margin note keeps an aside out of the reader's way. A disclosure holds depth that only some readers want.</p>
   <!-- Disclosure: <details class="more"> with a <summary>. Closed by default. -->
   <details class="more">
     <summary>Why three healers and not four?</summary>
@@ -1016,7 +1016,7 @@
        see gc-film.html. -->
   <p>A film is a figure that plays one beat at a time. Each beat is one sentence and one change, and the reader sets the pace.</p>
   <figure class="panel film" id="film-sample" data-film data-link>
-    <div class="panel-head">Each term is a shape <span class="tag" data-film-count>1 / 4</span></div>
+    <div class="panel-head">Terms as shapes <span class="tag" data-film-count>1 / 4</span></div>
     <div class="panel-body">
       <svg class="chart stage" viewBox="0 0 926 290" role="img" aria-label="The equation x squared plus 10x equals 39 over its picture: a square with side x, and beside it a strip x tall and 10 wide.">
         <rect class="zone" x="0.5" y="0.5" width="925" height="72"/>
@@ -1189,7 +1189,7 @@
           <text class="series" x="200" y="16">Ellesmere</text>
           <text class="series end" x="378" y="60">Elv</text>
         </svg>
-        <figcaption>Each circle is a player. Two are named: the ones the text is about.</figcaption>
+        <figcaption>Each circle is a player; the text is about the two named.</figcaption>
       </div>
     </figure>
 
@@ -1207,13 +1207,13 @@
           <div class="col"><span class="col-value">5</span><span class="col-fill" style="--v:5"></span><span class="col-label">6m</span></div>
           <div class="col"><span class="col-value">2</span><span class="col-fill" style="--v:2"></span><span class="col-label">7m</span></div>
         </div>
-        <figcaption>70 pulls in bins of one minute. The bins touch: the scale under them is continuous.</figcaption>
+        <figcaption>70 pulls in one-minute bins on a continuous scale.</figcaption>
       </div>
     </figure>
 
     <!-- Range bar: .bar.range runs its fill from --from to --v. A .bar-mark stands at the middle value. -->
     <figure class="panel span-6">
-      <div class="panel-head">Pull length by boss</div>
+      <div class="panel-head">Pull length</div>
       <div class="panel-body">
         <div class="meter stagger">
           <div class="meter-row"><span class="meter-label">Plexus Sentinel</span><div class="bar range" style="--from:20; --v:40"><span class="bar-fill"></span><span class="bar-mark" style="--at:31"></span></div><span class="meter-value">2m to 4m</span></div>
@@ -1221,14 +1221,14 @@
           <div class="meter-row"><span class="meter-label">Forgeweaver Araz</span><div class="bar range" style="--from:10; --v:70"><span class="bar-fill"></span><span class="bar-mark" style="--at:48"></span></div><span class="meter-value">1m to 7m</span></div>
           <div class="meter-row"><span class="meter-label">Dimensius</span><div class="bar range" style="--from:5; --v:90"><span class="bar-fill"></span><span class="bar-mark" style="--at:35"></span></div><span class="meter-value">0m 30s to 9m</span></div>
         </div>
-        <figcaption>Shortest to longest pull, on a scale of 10 minutes. The tick is the median.</figcaption>
+        <figcaption>Shortest to longest pull over 10 minutes; the tick is the median.</figcaption>
       </div>
     </figure>
 
     <!-- Signed columns: .cols.signed. --v on each .col is the size of the value and .neg hangs it under the zero line.
          --max and --min set the scale. Gains are green and losses red; each column shows its signed value. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS against the night before</div>
+      <div class="panel-head">Nightly change</div>
       <div class="panel-body">
         <div class="cols signed stagger" style="--max:30; --min:-20; --h:120px">
           <div class="col" style="--v:12"><span class="col-value">+12%</span><span class="col-fill"></span><span class="col-label">Mon</span></div>
@@ -1257,13 +1257,13 @@
           <figure class="multiple"><div class="multiple-head"><span>Repooc</span><span>1.84M</span></div><svg class="spark" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true"><path class="line" d="M0 25 L10 23 L20 24 L30 21 L40 22 L50 20 L60 20"/></svg></figure>
           <figure class="multiple"><div class="multiple-head"><span>Luckyone</span><span>1.61M</span></div><svg class="spark" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true"><path class="line" d="M0 26 L10 26 L20 24 L30 25 L40 23 L50 22 L60 21"/></svg></figure>
         </div>
-        <figcaption>Every chart runs from pull 1 to pull 7 on one scale, 0 to 5M.</figcaption>
+        <figcaption>Pulls 1 to 7 on one scale, 0 to 5M.</figcaption>
       </div>
     </figure>
 
     <!-- Diverging heat: .heat.diverge. A cell with .neg is a loss; --v is the size of either. Two hues around a sunken zero. -->
     <figure class="panel span-6">
-      <div class="panel-head">Damage against last week</div>
+      <div class="panel-head">Damage change</div>
       <div class="panel-body">
         <div class="heat diverge" style="--cols:5">
           <span></span><span class="heat-x">Mon</span><span class="heat-x">Tue</span><span class="heat-x">Wed</span><span class="heat-x">Thu</span><span class="heat-x">Fri</span>
@@ -1281,7 +1281,7 @@
     <!-- A named point: a circle.dot on the point and a .series label beside it; a .leader joins the two where they sit apart.
          A gap in the data: stop the line, and bridge the gap with a .line.ghost in the same colour. Say "No logs" beside it. -->
     <figure class="panel span-6">
-      <div class="panel-head">Raid DPS by week</div>
+      <div class="panel-head">DPS by week</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="Raid DPS by week: a rise to week four, no logs for weeks five and six, and a peak of 38.2M in week eight">
           <line class="gridline" x1="32" x2="428" y1="8" y2="8"/>
@@ -1307,7 +1307,7 @@
           <circle class="dot" cx="379" cy="15" r="4" data-tip="Week 8" data-tip-value="38.2M"/>
           <text class="series mid" x="379" y="88">Peak 38.2M</text>
         </svg>
-        <figcaption>The dashed stretch joins the weeks around a gap. It is not data.</figcaption>
+        <figcaption>The dashed stretch bridges a gap; it is not data.</figcaption>
       </div>
     </figure>
   </div>
@@ -1317,7 +1317,7 @@
   <div class="grid">
     <!-- Zones: <rect class="zone"> groups boxes; its name is a text.zone-name on its top border. Draw zones first. -->
     <figure class="panel span-6">
-      <div class="panel-head">Where a page is built</div>
+      <div class="panel-head">Page build</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 184" role="img" aria-label="In the repo, style.css is inlined into page.html; build.py sends one file to the reader's browser">
           <rect class="zone" x="8.5" y="16.5" width="200" height="152"/>
@@ -1343,7 +1343,7 @@
     <!-- Sequence: a box per actor, a <line class="life"> under each, and a wire per message, top to bottom in time.
          A reply is a solid wire back: a dash would say it has not happened. -->
     <figure class="panel span-6">
-      <div class="panel-head">What a hover does</div>
+      <div class="panel-head">Hover</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="The page sends pointerover to style.js, which shows the tooltip; the tooltip reports its place, and style.js lights the mark">
           <line class="life" x1="72" x2="72" y1="40" y2="192"/>
@@ -1374,7 +1374,7 @@
     <!-- States: boxes joined by wires, each wire named for what causes it. <rect class="start"> marks where it begins;
          a state that ends it holds a second, inner box. -->
     <figure class="panel span-6">
-      <div class="panel-head">States of a pull</div>
+      <div class="panel-head">Pull states</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 200" role="img" aria-label="A pull starts idle and goes to combat. If the boss dies it ends in a kill. If the raid dies it is a wipe, and the raid runs back to idle">
           <path class="wire" d="M17 88 H32"/>
@@ -1406,7 +1406,7 @@
 
     <!-- Lanes: one zone per actor, stacked, with its name on its top border. Each box sits in the lane of who does it. -->
     <figure class="panel span-6">
-      <div class="panel-head">Who starts a pull</div>
+      <div class="panel-head">Pull start</div>
       <div class="panel-body">
         <svg class="chart" viewBox="0 0 440 232" role="img" aria-label="The raid lead calls the pull, the raiders answer a ready check, and the addon starts the timer">
           <rect class="zone" x="8.5" y="16.5" width="424" height="56"/>
@@ -1706,7 +1706,7 @@ wrote report.html, 412 KB
   <div class="grid">
     <!-- For and against: ul.pros and ul.cons, each in a panel named on its border. The sign is drawn; the font has none. -->
     <section class="panel span-6">
-      <div class="panel-head">For a third raid night</div>
+      <div class="panel-head">For Sunday raids</div>
       <div class="panel-body">
         <ul class="pros">
           <li>About 20 more pulls a week on Dimensius.</li>
@@ -1728,7 +1728,7 @@ wrote report.html, 412 KB
     <!-- Options: a table with one column per option. .pick lights the chosen column, and a .tag.good in its head says so.
          A yes or no cell is a .state: a small square in the state colour and a word. -->
     <section class="panel span-12">
-      <div class="panel-head">Where the logs come from</div>
+      <div class="panel-head">Log source</div>
       <div class="panel-body flush">
         <table class="table">
           <thead><tr><th></th><th class="pick">Warcraft Logs <span class="tag good">Pick</span></th><th>Details export</th><th>Hand-kept sheet</th></tr></thead>
@@ -1788,12 +1788,12 @@ wrote report.html, 412 KB
 
   <!-- ── Page furniture ── -->
   <h2 id="furniture">Page furniture</h2>
-  <h3>Head of a page</h3>
+  <h3>Page head</h3>
   <!-- Crumbs: nav.crumbs above the eyebrow. Byline: p.byline under the lead: who, when, how long, which draft. -->
   <nav class="crumbs" aria-label="Path"><a href="#">Reports</a><a href="#">Season 3</a><span>Week 12</span></nav>
-  <p class="eyebrow">Raid report</p>
-  <p class="heading">Flips arrived on day seven</p>
-  <p class="lead">The title, then the lead, then one line that says who wrote it and when.</p>
+  <p class="eyebrow">Season 3 · Week 12</p>
+  <p class="heading">Raid report</p>
+  <p class="lead">The eyebrow gives the context, the title names the piece, and the lead states the finding.</p>
   <p class="byline">Joshua Light · 15 Nov 2026 · 6 min read · Draft 3</p>
 
   <h3>Notes and sources</h3>
@@ -1832,7 +1832,7 @@ wrote report.html, 412 KB
 21:02:16  Tukz dies
 21:02:17  Simpy casts Resurrection on Tukz</code></pre>
 
-  <h3>Foot of a page</h3>
+  <h3>Page foot</h3>
   <!-- Foot: <hr>, then the footnotes, then footer.page-foot with the source and the date the page was made. An <hr> has no other use. -->
   <hr>
   <ol class="footnotes">
@@ -1861,7 +1861,7 @@ wrote report.html, 412 KB
           </section>
         </div>
       </div>
-      <figcaption>An image exported for a light place: page gray, 24px of padding, an ink frame.</figcaption>
+      <figcaption>Exported for a light place: page gray, 24px padding, ink frame.</figcaption>
     </figure>
 
     <!-- A terminal's 16 colours, mapped to tokens. There is no cyan in the palette: silver takes its place. -->
@@ -1886,17 +1886,17 @@ wrote report.html, 412 KB
     <!-- Mermaid: assets/mermaid.json is the theme. Pass it to mermaid.initialize, or to mmdc with -c. -->
     <figure class="frame span-12">
       <img src="showcase-mermaid.png" width="896" height="470" alt="A Mermaid flowchart with two groups and a sequence diagram, both in the theme">
-      <figcaption>Mermaid with assets/mermaid.json: inset boxes, sunken groups, ink edges, square corners, solid replies.</figcaption>
+      <figcaption>Mermaid with assets/mermaid.json: inset boxes, sunken groups, ink edges, solid replies.</figcaption>
     </figure>
     <!-- plotly: scripts/plotly_style.py registers the template. It cannot draw the ink ring or an outlined title. -->
     <figure class="frame span-12">
       <img src="showcase-plotly.png" width="896" height="384" alt="A plotly bar chart and line chart in the template">
-      <figcaption>plotly with scripts/plotly_style.py: flat fills, ink edges, round markers. No ink ring on lines: plotly cannot draw one.</figcaption>
+      <figcaption>plotly with scripts/plotly_style.py: flat fills, ink edges, round markers, no ink ring.</figcaption>
     </figure>
 
     <!-- Where no stylesheet goes: what each place keeps, and what to send it. -->
     <section class="panel span-12">
-      <div class="panel-head">Where the stylesheet cannot go</div>
+      <div class="panel-head">Other places</div>
       <div class="panel-body flush">
         <table class="table">
           <thead><tr><th>Place</th><th>What it keeps</th><th>Send</th></tr></thead>
@@ -2000,8 +2000,8 @@ wrote report.html, 412 KB
 
   <!-- Dialog and toast for the App controls section. A dialog is a panel: title on the border, actions in the foot. -->
   <dialog class="panel" id="confirm" aria-labelledby="confirm-title">
-    <div class="panel-head" id="confirm-title">Reset the roster?</div>
-    <div class="panel-body"><p>This clears every filter and the saved order. It does not remove players.</p></div>
+    <div class="panel-head" id="confirm-title">Reset roster</div>
+    <div class="panel-body"><p>Clear every filter and the saved order? No player is removed.</p></div>
     <div class="panel-foot">
       <button class="button primary push" type="button" data-close>Reset</button>
       <button class="button" type="button" data-close>Keep it</button>

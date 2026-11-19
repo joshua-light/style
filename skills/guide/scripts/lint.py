@@ -7,6 +7,10 @@ Reads the page's own CSS (its <style> blocks and style attributes), its markup,
 and its text. The stylesheet and scripts that build.py inlines are skipped: they
 are the style. Works on a page before or after build.py.
 
+Words are counted too, by the guide's Words section: a title, heading, label,
+caption, lead, sentence, or paragraph over its length is a warning, and so is
+a third paragraph in a row. Slides, film beats, and transcripts are left out.
+
 Prints one finding per line: PAGE:LINE: LEVEL RULE: what is wrong and what to
 write instead. An error breaks a rule the guide states as "never". A warning
 is a rule with exceptions the guide allows: check each by eye.
@@ -69,6 +73,21 @@ SCRIPTED = {"data-tip", "data-key", "data-tab", "data-go", "data-bind", "data-bu
 SCRIPTED_CLASSES = {"deck", "stepper", "sortable", "rail", "quiz", "menu"}
 # Driven by film.js: a page with a film needs that script too.
 FILMED = {"data-film", "data-film-transport"}
+
+# The guide's Words section: the most words each kind of text holds.
+MOST_WORDS = {"title": 4, "heading": 3, "label": 3, "caption": 12, "lead": 20, "prose": 40}
+SENTENCE = 20     # words in one sentence
+PROSE_RUN = 2     # paragraphs in a row
+WORD = re.compile(r"[^\W_]")
+SENTENCE_END = re.compile(r"(?<=[.!?])[\"')\]]*\s+(?=[\"'(\[]*[A-Z0-9])")
+CLAUSE = re.compile(r"[,:;!?]|\.(?=\s|$)")
+HEADINGS = {"h2", "h3", "h4"}
+HEADING_CLASSES = {"panel-head", "heading", "subheading"}
+LABEL_CLASSES = {"stat-label", "meter-label", "legend-item", "col-label", "tag"}
+CAPTION_CLASSES = {"note", "stat-note", "panel-foot"}
+# Text of its own, counted with nothing: a value beside a label, a control, a footnote mark.
+APART_CLASSES = {"legend-value", "button", "tab", "fn", "step-ref", "verdict", "byline", "eyebrow", "page-foot",
+                 "film-caption", "formula", "delta", "glyph", "icon", "swatch"}
 
 LIMITS = [
     # (container class, counted class or tag, most allowed, rule, message)
@@ -147,6 +166,8 @@ class Page(HTMLParser):
         self.titles = []
         self.used = []         # (class, line)
         self.mark = None       # [line, text] of the open <mark>
+        self.blocks = []       # open pieces of text: [depth, kind, line, text]
+        self.run = []          # paragraphs in a row: [parent depth, count]
 
     # ── Findings ──
 
@@ -251,6 +272,9 @@ class Page(HTMLParser):
         else:
             return
         depth = len(self.stack)
+        while self.blocks and self.blocks[-1][0] > depth:
+            _, kind, line, text = self.blocks.pop()
+            self.check_words(kind, text, line)
         while self.scopes and self.scopes[-1][0] > depth:
             _, _, most, rule, message, count, line = self.scopes.pop()
             if count > most:
@@ -335,6 +359,13 @@ class Page(HTMLParser):
             if nested >= 3:
                 self.add(WARN, "list-depth", "lists nest three levels at most", line)
 
+        # Words: each piece of text is counted when it closes.
+        if self.in_body and tag not in VOID:
+            kind = self.text_kind(tag, classes)
+            if kind:
+                self.blocks.append([depth, kind, line, ""])
+            self.count_run(tag, classes, attr, kind, depth, line)
+
         # Elements the style has no place for.
         if tag in ("i", "em"):
             self.add(WARN, "italic", f"<{tag}>: nothing is italic, use <strong> for emphasis", line)
@@ -392,6 +423,8 @@ class Page(HTMLParser):
             return
         if self.mark is not None:
             self.mark[1] += data
+        if self.blocks and not self.inside("pre", "script", "style", "textarea", "svg"):
+            self.blocks[-1][3] += data
         if self.inside("math") and tag in ("code", "span") and re.search(r"\^|\w_\w", data):
             self.add(ERROR, "maths", "exponents and indices are real <sup> and <sub>: never type ^ or _", line)
         if self.inside(*VERBATIM):
@@ -415,6 +448,75 @@ class Page(HTMLParser):
                 found = pattern.search(text)
                 if found:
                     self.add(WARN, "number-form", f'"{found.group()}": {message}', line)
+
+    # ── Words ──
+
+    def text_kind(self, tag, classes):
+        """Name the kind of text an element holds, by the guide's Words section. None for an element that only wraps."""
+        if classes & APART_CLASSES or tag in ("button", "summary", "cite", "del", "label", "output", "figure"):
+            return "apart"
+        if self.inside("slide", "popup", "film-script", "chat", "footnotes", "math"):
+            return None  # a slide's title states a finding, a beat is a sentence of its film, a transcript is quoted
+        if tag == "h1":
+            return "title"
+        if tag in HEADINGS or classes & HEADING_CLASSES or (tag == "div" and "callout-head" in classes):
+            return "heading"
+        if tag in ("th", "dt") or classes & LABEL_CLASSES:
+            return "label"
+        if tag == "figcaption" or tag == "small" or (classes & CAPTION_CLASSES and "callout" not in classes):
+            return "caption"
+        if "lead" in classes:
+            return "lead"
+        if tag in ("p", "li", "blockquote") and not self.inside("blockquote"):
+            return "prose"
+        return None
+
+    def count_run(self, tag, classes, attr, kind, depth, line):
+        """Count plain paragraphs that follow one another with no figure between."""
+        while self.run and self.run[-1][0] >= depth:
+            self.run.pop()
+        if not self.run or self.run[-1][0] != depth - 1:
+            self.run.append([depth - 1, 0])
+        if tag == "p" and kind == "prose" and not classes:
+            if {"data-on", "data-vis", "data-tab-panel"} & set(attr):
+                return  # one of several that take turns in the same place
+            self.run[-1][1] += 1
+            if self.run[-1][1] == PROSE_RUN + 1:
+                self.add(WARN, "prose-run", "three paragraphs in a row: show one as a figure, a list, or a key-value list", line)
+        elif tag not in ("aside", "a", "br") or "margin" not in classes:
+            self.run[-1][1] = 0
+
+    def check_words(self, kind, text, line):
+        text = " ".join(text.split())
+        if kind == "apart" or not text:
+            return
+        count = sum(1 for part in text.split() if WORD.search(part))
+        most = MOST_WORDS[kind]
+        shown = text if len(text) < 48 else text[:45].rstrip() + "…"
+        if kind in ("title", "heading", "label"):
+            if count > most:
+                rule = {"title": "title-length", "heading": "heading-length", "label": "label-length"}[kind]
+                what = {"title": "a title names the piece in four words at most: the finding goes in the lead",
+                        "heading": "a heading is a name of one or two words, three at most",
+                        "label": "a label is a name of three words at most: a second fact goes in the value, a tag, or a tooltip"}[kind]
+                self.add(WARN, rule, f'{what} ("{shown}", {count} words)', line)
+            elif kind != "label" and CLAUSE.search(text):
+                self.add(WARN, "heading-clause", f'a heading is a name, not a clause: no comma, colon, or full stop ("{shown}")', line)
+            return
+        sentences = [part for part in SENTENCE_END.split(text) if WORD.search(part)]
+        if kind == "caption":
+            if count > most or len(sentences) > 1:
+                self.add(WARN, "caption-length", f"a caption is one sentence of 12 words at most, and says only how to read the figure ({count} words, {len(sentences)} sentence{'s' * (len(sentences) != 1)})", line)
+            return
+        if count > most:
+            rule = "lead-length" if kind == "lead" else "long-paragraph"
+            what = "the lead is the finding in 20 words at most" if kind == "lead" else "a paragraph holds 40 words at most: cut it, or show part of it as a figure"
+            self.add(WARN, rule, f"{what} ({count} words)", line)
+        for sentence in sentences:
+            words = sum(1 for part in sentence.split() if WORD.search(part))
+            if words > SENTENCE:
+                start = sentence if len(sentence) < 48 else sentence[:45].rstrip() + "…"
+                self.add(WARN, "long-sentence", f'a sentence over 20 words is rare: split it, or check that it earns its length ("{start}", {words} words)', line)
 
     # ── Whole page ──
 
