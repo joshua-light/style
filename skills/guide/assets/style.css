@@ -1647,6 +1647,9 @@ label.meter-row { display: block; }
 .more[open] > summary { border-bottom: var(--border); }
 .more > :not(summary) { margin: var(--s3) var(--s4); }
 .more > p { max-width: none; }
+/* A table is 100% wide, so side margins would push it past the border.
+   It runs edge to edge instead, as in a flush panel body. */
+.more > .table { margin: 0; }
 
 /* A quiz is a callout that asks. The reader picks an option: the right one
    turns green, a wrong pick red, and .verdict says which in words. The
