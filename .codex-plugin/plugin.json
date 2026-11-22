@@ -1,6 +1,6 @@
 {
   "name": "style",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Personal visual style guide for slides, designs, charts, and diagrams.",
   "author": { "name": "Joshua Light" },
   "repository": "https://github.com/joshua-light/style",

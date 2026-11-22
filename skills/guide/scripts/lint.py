@@ -9,7 +9,8 @@ are the style. Works on a page before or after build.py.
 
 Words are counted too, by the guide's Words section: a title, heading, label,
 caption, lead, sentence, or paragraph over its length is a warning, and so is
-a third paragraph in a row. Slides, film beats, and transcripts are left out.
+a third paragraph in a row. A "Problem:" or "Appendix:" heading counts the
+words after its prefix. Slides, film beats, and transcripts are left out.
 
 Prints one finding per line: PAGE:LINE: LEVEL RULE: what is wrong and what to
 write instead. An error breaks a rule the guide states as "never". A warning
@@ -75,7 +76,9 @@ SCRIPTED_CLASSES = {"deck", "stepper", "sortable", "rail", "quiz", "menu"}
 FILMED = {"data-film", "data-film-transport"}
 
 # The guide's Words section: the most words each kind of text holds.
-MOST_WORDS = {"title": 4, "heading": 3, "label": 3, "caption": 12, "lead": 20, "prose": 40}
+MOST_WORDS = {"title": 4, "heading": 3, "label": 6, "caption": 12, "lead": 30, "prose": 40}
+# The two headings that say where a section sits in the story take a prefix and a colon.
+STORY_PREFIX = re.compile(r"^(Problem|Appendix):\s+")
 SENTENCE = 20     # words in one sentence
 PROSE_RUN = 2     # paragraphs in a row
 WORD = re.compile(r"[^\W_]")
@@ -493,12 +496,16 @@ class Page(HTMLParser):
         count = sum(1 for part in text.split() if WORD.search(part))
         most = MOST_WORDS[kind]
         shown = text if len(text) < 48 else text[:45].rstrip() + "…"
+        if kind == "heading" and STORY_PREFIX.match(text):
+            text = STORY_PREFIX.sub("", text).rstrip("?")  # "Problem: who builds the harness?" may be a question
+            count = sum(1 for part in text.split() if WORD.search(part))
+            most = 5
         if kind in ("title", "heading", "label"):
             if count > most:
                 rule = {"title": "title-length", "heading": "heading-length", "label": "label-length"}[kind]
                 what = {"title": "a title names the piece in four words at most: the finding goes in the lead",
                         "heading": "a heading is a name of one or two words, three at most",
-                        "label": "a label is a name of three words at most: a second fact goes in the value, a tag, or a tooltip"}[kind]
+                        "label": "a label names one thing in six words at most: a second fact goes in the value, a tag, or a tooltip"}[kind]
                 self.add(WARN, rule, f'{what} ("{shown}", {count} words)', line)
             elif kind != "label" and CLAUSE.search(text):
                 self.add(WARN, "heading-clause", f'a heading is a name, not a clause: no comma, colon, or full stop ("{shown}")', line)
@@ -510,7 +517,7 @@ class Page(HTMLParser):
             return
         if count > most:
             rule = "lead-length" if kind == "lead" else "long-paragraph"
-            what = "the lead is the finding in 20 words at most" if kind == "lead" else "a paragraph holds 40 words at most: cut it, or show part of it as a figure"
+            what = "the lead is the goal in 30 words at most: the question the page answers" if kind == "lead" else "a paragraph holds 40 words at most: cut it, or show part of it as a figure"
             self.add(WARN, rule, f"{what} ({count} words)", line)
         for sentence in sentences:
             words = sum(1 for part in sentence.split() if WORD.search(part))

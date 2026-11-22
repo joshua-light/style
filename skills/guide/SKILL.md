@@ -1,30 +1,82 @@
 ---
 name: guide
-description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look), and few words: one- or two-word headings, figures before prose. Use before creating or restyling anything meant to be looked at — reports, explainers, animated explainers (films), dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
+description: Joshua Light's personal visual style — dark gray surfaces, black borders, no rounding, Warrior-tan accent, flat colour fills, Expressway text with outlined headings (the ElvUI / EllesmereUI look). Every page is told as a story, one step at a time from the simplest case, with one chart form repeated, each term defined where it arrives, and one colour per recurring thing. Use before creating or restyling anything meant to be looked at — reports, explainers, animated explainers (films), dashboards, slides, charts, diagrams, HTML/SVG/image output. Also use when the user gives feedback on how something looks, so the preference gets recorded.
 ---
 
 # Visual style guide
 
 The look comes from ElvUI and EllesmereUI, the World of Warcraft interfaces: dark gray panels, one-pixel black borders, square corners, flat dark heads, a tan accent on text, flat colour fills, and Expressway text with black-outlined headings. It reads like an inked comic panel.
 
-Apply these rules to every visual output. They cover the words as well as the look: short names, few sentences, figures first (see Words). Where another design skill disagrees on palette, font, rounding, or light mode, these rules win. Use other skills for method only, such as choosing a chart form.
+Apply these rules to every visual output. They cover the order and the words as well as the look: a story told one step at a time (see Story), in short sentences (see Words), with colours that keep one meaning (see Colour code). Where another design skill disagrees on palette, font, rounding, or light mode, these rules win. Use other skills for method only, such as choosing a chart form.
 
 ## Build a page
 
 Paths are relative to this skill's directory.
 
-1. Read `../../examples/showcase.html`. It holds the markup for every component. For a deck, read `../../examples/voyager-deck.html` too: the reference deck. For an animated explainer, read `../../examples/gc-film.html` too: the reference for films.
-2. Plan the page as a list of figures, each with a name of one or two words (see Words). Prose comes last.
+1. Read `../../examples/showcase.html`. It holds the markup for every component. For any page read by people, read `../../examples/story-report.html` too: the reference story, with every step in the same form. For a deck, read `../../examples/voyager-deck.html` too: the reference deck. For an animated explainer, read `../../examples/gc-film.html` too: the reference for films.
+2. Plan the page as a story (see Story): the goal, the subject, then one section per step, each with its question, its figure, and its takeaway. Give each recurring thing its colour before drawing anything (see Colour code).
 3. Write the page with `<link rel="stylesheet" href="style.css">` and `<script src="style.js" defer></script>` in its head and the showcase's classes in its body. Use these plain names, though the examples link both files by their repo path: `build.py` finds either. The script drives tooltips, hover highlighting, reveal on scroll, tabs, sortable tables, steppers, quizzes, bound sliders, menus, toasts, dialogs, the contents rail, and stepping through a deck, its builds, and its popups. A page with a film also loads `film.js`, at the end of its body (see Films).
 4. Run `python3 scripts/build.py page.html`. It inlines `assets/style.css`, `assets/style.js`, and `assets/film.js` where the page loads it, and embeds the fonts, so the page stands alone.
 5. Run `python3 scripts/lint.py page.html`. It reads the page's own CSS, markup, and text, and names each breach of these rules by line. It counts words too: a long heading, caption, or sentence is a warning. Fix every error. A warning is a rule with exceptions: check each by eye.
 6. Run `python3 scripts/shot.py page.html` and read the images it writes. A page comes as screens 1500px tall and a deck as one image per slide, every mark finished as on paper. `--select CSS` shoots one part. A film shows its last frame; `--at` holds it at another (see Films). Check them against the rules below: the linter reads the source, and only the picture shows spacing, overlap, and empty room.
+7. Read it cold. Give the screenshots to a subagent that knows nothing of the work. Ask it what the page found, and which words or marks it could not decode. Each one it names is a term to define where it arrives, or a figure to simplify.
 
 Page-specific CSS goes in a second `<style>` and uses the tokens (`var(--s4)`, `var(--panel)`), never raw values. Never silence the linter to pass. A `lint-ok: RULE` comment on a line exempts it, and is only for an exception this guide names: write the reason beside it. Where Expressway's files are absent, `build.py` sets the page in Fira Sans, the bundled fallback, and says so. That is the intended look on such a machine.
 
+## Story
+
+A page is read by someone who was not there when the work was done, and who holds little at once. Tell it as a story. Start from the simplest case, change one thing per section, and let each section stand on the one before. Each step then costs little to read, because the step before set it up.
+
+This is the default for every page: a report, an explainer, a deck, a write-up of a project. `../../examples/story-report.html` is the reference: it uses every rule below. A dashboard is the one exception: it is scanned, not read, and keeps its summary at the top.
+
+### Outline
+
+| Part | Holds | Example |
+| --- | --- | --- |
+| Goal | The question the page answers, in the lead. | How well do models handle a large task, and what does it cost? |
+| Subject | What is studied, shown: a picture of the real thing, a flow of boxes, what success means. | A screenshot of the cow; agent, game, cow, 43 checks. |
+| Baseline | The simplest case: the obvious approach, the default, the first version. | Prompt: just ask for the cow. |
+| Steps | One section per change, each adding one thing to the case before. | Detailed prompt, Plan, Tests, Harness. |
+| Problem | What the steps leave open. Often the largest caveat. | Who builds the harness? |
+| Current work | What is being tried now. Results not in yet stay in their figure as TBD. | Harness builder. |
+| Appendix | Side stories: detail per item, methods, what did not work. | Anatomy of a session; navigation aids. |
+
+- Order the sections by the story, from the simplest case to the most built up. Never sort them by result: the best result may come last.
+- One change per step. A section that changes two things is two sections.
+- Name a step for its change: "Prompt", "Detailed prompt", "Plan".
+- Define a term in the section where it first matters. Never open with a glossary: the reader cannot hold terms before they mean anything.
+- Show the subject before the first result: a screenshot, a model, icons, a flow of boxes. A paragraph that describes the subject is a figure not drawn yet.
+- Put a caveat beside the number it qualifies. A caveat that changes the conclusion is not a footnote: it is the story's Problem.
+- An appendix comes after the main line, headed "Appendix: " and its name. The main line reads whole without it.
+- A deck tells the same story: one step per slide or per few slides (see Slides and decks).
+
+### A step
+
+Every step section has the same four parts, in this order:
+
+1. **Question.** One or two sentences that name the change, usually "What if …?". Define any new term here.
+2. **Schematic.** A `.diagram` of who does what in this step, each box led by a tile (see Explainers).
+3. **Result.** The step's figure, in the same form as every other step's.
+4. **Takeaway.** One bold sentence after the figure (`<p><strong>`): what the change did, against the step before.
+
+A variation inside a step is an `h3` sub-step, such as "More iterations", with the same parts, smaller.
+
+### One form, repeated
+
+- Steps share one figure form: the same panels, the same measures, the same row order, the same scales. The reader learns it once and then only compares.
+- Say the shared scale once, under the first figure: "Bars share one scale in every section: checks out of 43, cost up to $20."
+- Keep each item in the same row everywhere, such as small model to large.
+- A step with one result keeps the whole form, with one row. Do not switch it to a stat.
+- A result not in yet keeps the form: a `.tag` "TBD" on each panel's border and an `.empty` frame that says what will fill it.
+
+### Tried and dropped
+
+- **A compressed dashboard.** Stats at the top, every dataset charted, one-word headings, three-word labels. Readers met coined terms ("spec plus verify", "solo") and a dozen chart forms, and could not follow it. Cutting words had moved the cost into decoding.
+- **An answer-first briefing.** The conclusion in the lead, a glossary up front, winners before losers. Faster to scan, but the reader had to hold every term before any result meant something, and the largest caveat sat in a callout instead of driving the story.
+
 ## Words
 
-A page is looked at before it is read. Figures carry the content and words name them. Every sentence costs the reader: a long one most of all.
+Words carry the story between figures: a question before each figure, a takeaway after it. Every sentence costs the reader: a long one most of all.
 
 ### Show before you say
 
@@ -46,11 +98,12 @@ Before writing a sentence, look for the figure that holds it.
 | A caveat or a risk | A callout of one sentence. |
 | Where a number came from, how it was checked | A tooltip, a margin note, or a disclosure. |
 
-- Plan the page as a list of figures. Write prose last, and only for what no figure holds: why a finding matters, how two figures connect.
+- A step's prose is its question and its takeaway (see Story). Other prose holds only what no figure can: why a finding matters, how two figures connect.
 - Say a fact once. Prose never walks through the values of a figure beside it.
-- Detail the reader may skip leaves the main line: a tooltip, a margin note, a `details.more`. Never park it in a caption.
+- Detail the reader may skip leaves the main line: a tooltip, a margin note, a `details.more`, an appendix. Never park it in a caption.
 - Report what was found, not how the work went: no "I read", no "we then checked". A method is a key-value list.
-- When a page reads as text with charts between, it is not done. Cut words until the figures lead.
+- Use the reader's words. Never coin a short name to fit a length: "spec plus verify" means nothing until a section has shown it.
+- A question that takes more than two sentences changes too much: split the step.
 
 ### Lengths
 
@@ -58,23 +111,26 @@ Names:
 
 | Text | Most | Write | Not |
 | --- | --- | --- | --- |
-| Title | 4 words | Raid report | Week 12: eight kills, and Dimensius is next |
-| Heading, panel title | 2 words, 3 at a push | Damage | Damage done by each player |
-| Label, tag | 3 words | Top 6 | The six highest of 20 |
+| Title | 4 words | What a cow costs | Week 12: eight kills, and Dimensius is next |
+| Heading, panel title | 2 words, 3 at a push | Detailed prompt | Adding a spec to the prompt |
+| Label, tag | 6 words, in plain words: never a coined short name | Opus low tests, Haiku medium builds | Spec+V, solo |
 
 Sentences:
 
 | Text | Most |
 | --- | --- |
 | Caption, panel foot, stat note | 1 sentence of 12 words |
-| Lead | 20 words |
+| Lead | 30 words: the goal, and how the page gets there |
+| Question, takeaway | 2 sentences |
 | Sentence | 20 words |
 | Paragraph | 40 words |
 | Paragraphs in a row | 2 |
 
-- A heading is a name: one or two words, a noun. It has no verb, no question, and no comma, colon, or full stop. It never opens with "The", "How", "Where", "What", or "Why": "Where the damage goes" is "Damage".
-- The words a heading drops have their own places. A count or a unit goes in the tag on the border: "Top 6", "24 pulls". The scale goes in the caption. The finding goes in the lead.
-- The title names the piece. The eyebrow holds its context: project, period, version. The lead states the finding.
+- A heading is a name: one or two words, a noun. A step's heading names its change. It has no verb, no question, and no comma, colon, or full stop. It never opens with "The", "How", "Where", "What", or "Why": "Where the damage goes" is "Damage".
+- Two headings take a prefix and a colon, which say where the section sits in the story: "Problem: who builds the harness?" and "Appendix: navigation". The Problem's heading may be its question.
+- The words a heading drops have their own places. A count or a unit goes in the tag on the border: "Top 6", "24 pulls". The scale goes in the caption. The question opens the section and the finding closes it.
+- The title names the piece. The eyebrow holds its context: project, period, version. The lead states the goal: the question the page answers, and that it builds the answer step by step.
+- A takeaway is not a caption. It is a bold sentence in the flow after the figure, and it says what changed against the step before.
 - A caption says how to read the figure: its unit, its scale, what a mark stands for. It never adds a fact the figure does not show. A figure whose title and labels say it all takes no caption.
   - Write "Peak per hour, server time."
   - Not "Hour of day in server time. Most pulls come after 21:00, when the second tank logs in."
@@ -183,9 +239,10 @@ Each size has one meaning. Pick the size by meaning, never by looks, and never u
 - Highlight the names of things inside running text with `<mark>`, as game text colours an item's name: an item, a player, a category ("Buy <mark>of Shadow Wrath</mark>"). A mark is accent-coloured, with no background and no underline. The one exception is a linked mark (`<mark data-key>`, see Explainers): it wears a dotted rule, so the reader knows the name can be hovered.
   - Mark names only. Never mark a number, a verdict, or a whole phrase, and never give a mark a state colour.
   - A name from a domain palette takes that colour: an item's name in its quality colour (see Domain palettes).
-  - Mark running text only: body, leads, list items. Titles and headings stay white.
-  - Keep it sparse: most sentences have no mark. When highlighting starts to compete with the content, remove marks.
-- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour. The exceptions are a mark in a domain colour, a state word in terminal output (see Code), and a name in a film's sentence (see Films).
+  - Mark running text only: body, leads, list items, takeaways. Titles and headings stay white.
+  - A thing with a colour code (see Colour code) is marked in its code wherever its name appears: "<mark style="--fill:var(--sonnet)">Sonnet low</mark> did it for $3.49". The reader then finds it in every figure by colour.
+  - Mark nothing else often: most sentences without a coded name have no mark. When highlighting starts to compete with the content, remove marks.
+- Other coloured text: links and eyebrows (accent) and deltas (green up, red down). Text never wears a series colour. The exceptions are a mark in a domain colour or a colour code, a state word in terminal output (see Code), and a name in a film's sentence (see Films).
 - A short form the reader may not know is `<abbr data-tip="DPS" data-tip-note="Damage per second">`. It wears the dotted rule, as a linked mark does: hover for more.
 - Uppercase with extra tracking appears only at note size: eyebrows, tags, stat labels.
 - Table heads are uppercase too, at 11px on a 16px line. That is the one size below the scale: a row of capitals at note size read larger than the cells under it. Nothing else uses it.
@@ -294,12 +351,32 @@ Where a subject has colours its readers already know, those stand in for the ser
 - Name the class or quality in a label, a legend, or a tooltip. The colour alone is not enough.
 - A new domain palette is softened like every colour here.
 
+### Colour code
+
+Colour is the page's highlighter. Before drawing, give each kind of thing the page keeps returning to a colour, and keep it wherever that thing appears.
+
+| Coded thing | Colour | Where it shows |
+| --- | --- | --- |
+| Haiku | `--c1` azure | Its bars, its robot tile, its tab swatch, its name in a sentence. |
+| Sonnet | `--c2` gold | The same. |
+| Opus | `--c3` amethyst | The same. |
+| Testing: tests, verify, the harness | `--c4` copper | Its tiles, its timeline spans, the word in a sentence. |
+| A baseline to compare with | `--c-other` | The "no aid" row, the "alone" bar. |
+
+- Name the codes as page tokens, so a change is one line: `:root { --haiku: var(--c1); --check: var(--c4); }`.
+- One meaning per hue on a page. A hue that codes a model never also codes an activity.
+- Show the key before the first coded figure: a panel named "Colours" holding a `.legend`. Say what each colour means, not only its name: "Opus: largest, priciest".
+- A row made by two things takes the colour of the one that made the result, and the figure says so: "Two-model rows take the colour of the model that built the cow."
+- Six series colours are the budget. Where a page needs more codes, merge kinds (three activities, not six), or leave the rarer ones gray. Never add a hue.
+- State colours stay state. Green and red never code a thing.
+- Decoration takes no code. A tile that only dresses a list item may wear any series colour, but where the page has codes, keep tiles neutral unless they carry one.
+
 - Every colour here is a pure hue mixed 12% toward mid gray (`#707070`, in OKLab), so fills sit with the softened text. Soften a new colour by the same share; never paste in a pure hue.
 - Never add an amber, lime, or second yellow. None separates from gold, least of all for colour-blind readers. `--yellow` separates only because it is much lighter: never darken it.
 - Set a fill with `style="--fill: var(--c2)"`.
 - A colour follows its entity across every chart on the page, whatever its rank.
 - To keep the reader on one series, mute the others: set them to `--c-other`, draw them first, and leave their labels dim. The series the chart is about keeps its colour and a `.series` label. Mute all the others or none, and still label each.
-- A chart with one series uses one colour.
+- A chart with one series uses one colour: that series' code, where it has one. A chart whose rows are coded things colours each row by its code.
 - Status colours mark state only, and always sit next to a word.
 - Colour never carries identity alone: label the mark or add a `.legend`.
 
@@ -403,6 +480,7 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 - Gains and losses: `.bar.diverge`. The fill grows right from the middle for a gain and left (`.bar-fill.neg`) for a loss; `--v` is a share of one half. Gains are green, losses red, and the signed value sits beside each bar.
 - Two dimensions, such as day by hour: `.heat`. Each `.heat-cell` takes `--v` from 0 to 100. One hue only, set with `--fill`; never a rainbow. Put a `.heat-scale` key under it, and give every cell a tooltip.
 - Parts of a whole: `.bar.stack` with a legend, or a `.pie`.
+- Spans in time, such as what an agent did minute by minute: `.bar.spans`. Each `.bar-fill` sets `--at`, its start, and `--v`, its length, both in percent of the bar; a gap is time with nothing in it. Put a `.bar-scale` under it, and draw every bar of a set on one scale, the longest. A `.bar.stack` cannot do this: its parts always fill the bar.
 - A share the reader should count, such as "37 in 100": a `.waffle`. It is one element: ten squares to a row, the first `--v` filled. `--rows: 2` shows a share of 20. One colour, set with `--fill`; name the share in a `.legend.list` beside it.
 - A pie holds five slices at most, starts at 12 o'clock, and runs clockwise from the largest slice, with "other" last. Every boundary gets a black cut line. Names and values go in a `.legend.list` beside it, never on the slices. No donuts, no exploded slices, no 3D.
 - A single trend where the amount matters: add an `.area` under the line. One series only: areas hide each other.
@@ -418,6 +496,8 @@ Code is set in the monospace face inside a `--sunken` box with a black border.
 ## Explainers
 
 - **Diagram** (`.diagram`): a chain of `.node` boxes joined by `.link` arrows. `.diagram.down` runs top to bottom. A node holds a `<strong>` name and an optional `<span>` note. `.node.ghost` is a part not there yet, with `.link.ghost` as the arrow into it; say "Planned" or "Optional" in its note.
+  - A step's schematic is a diagram of three to five nodes: who does what, in order. "Opus low, writes the harness", "Harness, spec + checks + verify", "Sonnet high, builds with it", "Cow, scored by 43 checks".
+  - **Tiled node** (`.node.tiled`): a tile, then a `<div>` holding the `<strong>` and the `<span>`. The tile says what kind of thing the box is, in its colour code: a `robot-2` tile in the model's colour, a copper `checkbox-multiple` tile for a test, a neutral `file-text` tile for a document, a picture icon of the subject itself. Use tiles in every node of a diagram, or in none.
 - A diagram that branches or loops is an inline SVG `.chart` with `.box` rectangles, `.wire` paths, and `.arrow` heads. Wires are 2px light gray with an ink ring and mitered corners, and run only horizontally and vertically. Label a branch beside its wire. Draw it at the width it renders. Make each box at least 12px wider than its label on both sides: measure the label, never guess.
 - Four more diagram forms use the same SVG parts:
   - **Zones**: `<rect class="zone">` groups boxes. It is a sunken well, drawn first, with its name in a `text.zone-name` on its top border.
@@ -484,7 +564,7 @@ A panel says what state its data is in, in a word.
 
 For pages that are used, not only read.
 
-- **Tabs** (`.tabs` of `.tab` buttons): a row of joined tags; the pressed one is lit. A `disabled` tab is faint. `data-tab="name"` shows the element with `data-tab-panel="name"` in the same panel. In a `.panel-head` the tabs sit on the top border at the right. Mark the first tab `aria-pressed="true"` and give the other panels `hidden`.
+- **Tabs** (`.tabs` of `.tab` buttons): a row of joined tags; the pressed one is lit. A `disabled` tab is faint. A tab for a coded thing leads with a `.swatch` in its code. Use tabs for one view per item, such as one panel per model, when the items share a form and the reader compares them one at a time. `data-tab="name"` shows the element with `data-tab-panel="name"` in the same panel. In a `.panel-head` the tabs sit on the top border at the right. Mark the first tab `aria-pressed="true"` and give the other panels `hidden`.
 - **Button** (`.button`): 28px tall, raised gray. One `.button.primary` per view: a colour fill with ink text.
 - **Input** (`.input`, also on `<select>`): 28px tall, sunken. Label it with `<label class="field">`.
 - **Slider** (`input.slider`, a range input): a status bar the reader drags, with a flat fill up to a square handle. Label it with `.field`, or put it in a `label.meter-row` with a `.meter-label` and an `<output class="meter-value">`, where it wears its name and value on its top edge.
@@ -507,7 +587,7 @@ For pages that are used, not only read.
 
 A slide (`.slide`) is a 16:9 panel with 48px padding. It holds one title, one supporting line, and one figure.
 
-A deck shows one thing at a time. The viewer never meets a full slide: each piece of information arrives on its own click, and it arrives by growing, the way a progress bar fills. `../../examples/voyager-deck.html` is the reference deck. Read it before writing one: it uses every rule below.
+A deck tells its story the way a page does (see Story): the goal, the subject, then the steps, from the simplest case up. A deck shows one thing at a time. The viewer never meets a full slide: each piece of information arrives on its own click, and it arrives by growing, the way a progress bar fills. `../../examples/voyager-deck.html` is the reference deck. Read it before writing one: it uses every rule below.
 
 ### Slides
 

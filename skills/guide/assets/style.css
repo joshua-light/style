@@ -1019,6 +1019,11 @@ figure > * + figcaption { margin-top: var(--s2); }
 /* Stacked: segments share one bar and split it by weight. A segment is all
    fill, so it may hold an ink label. */
 .bar.stack { height: 24px; }
+/* Spans: fills placed by start and length, so gaps show time with nothing in it.
+   A stack cannot: its segments always fill the bar. */
+.bar.spans { height: 24px; }
+.bar.spans > .bar-fill { left: calc(var(--at, 0) * 1%); }
+.bar-scale { display: flex; justify-content: space-between; margin-top: var(--s1); font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .bar-seg {
   flex: var(--v, 1) 0 0;
   display: flex;
@@ -1414,6 +1419,14 @@ figure > * + figcaption { margin-top: var(--s2); }
 .node { flex: 1 1 0; min-width: 0; padding: var(--s2) var(--s3); background: var(--panel); border: var(--border); }
 .node > strong { display: block; }
 .node > span { display: block; font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+/* A tiled node leads with a tile that says what kind of thing the box is.
+   The text sits in a wrapper, so .node > span above does not reach the tile:
+   it would set the tile to display: block and undo its centring grid. */
+.node.tiled { display: flex; align-items: center; gap: var(--s2); }
+.node.tiled > div { min-width: 0; }
+.node.tiled > div > strong, .node.tiled > div > span { display: block; }
+.node.tiled > div > span { font-size: var(--fs-note); line-height: var(--lh-note); color: var(--text-dim); }
+.node.tiled > .icon { flex: none; }
 /* The arrow: a light line with an ink ring, like a chart line. Expressway has
    no arrow glyphs, so the head is drawn from borders. */
 .link { position: relative; flex: none; width: var(--s6); height: 8px; filter: var(--ink-ring); }
@@ -1518,6 +1531,7 @@ figure > * + figcaption { margin-top: var(--s2); }
   transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
 }
 .tab + .tab { margin-left: -1px; }
+.tab > .swatch { display: inline-block; width: 10px; height: 10px; margin-right: var(--s1); vertical-align: -1px; }
 .tab:hover { color: var(--text); }
 .tab[aria-pressed="true"] { background: var(--raised); color: var(--text); }
 .tab:disabled { color: var(--text-faint); cursor: default; }

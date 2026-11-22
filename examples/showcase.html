@@ -522,6 +522,42 @@
       </div>
     </figure>
 
+    <!-- Tiled node: .node.tiled leads with a tile (icon.py --tile NAME --fill TOKEN), then a <div> holding the <strong>
+         and the <span>. The tile says what kind of thing the box is, in its colour code. A step's schematic. -->
+    <figure class="panel span-12">
+      <div class="panel-head">One pull</div>
+      <div class="panel-body">
+        <div class="diagram">
+          <div class="node tiled"><span class="icon" style="--fill:var(--class-warrior)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3.783 2.826L12 1l8.217 1.826a1 1 0 0 1 .783.976v9.987a6 6 0 0 1-2.672 4.992L12 23l-6.328-4.219A6 6 0 0 1 3 13.79V3.802a1 1 0 0 1 .783-.976"/></svg></span><div><strong>Elv</strong><span>Tanks the boss</span></div></div><span class="link"></span>
+          <div class="node tiled"><span class="icon" style="--fill:var(--class-priest)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.5 3C19.538 3 22 5.5 22 9c0 7-7.5 11-10 12.5c-1.978-1.186-7.084-3.937-9.131-8.5h4.697l.934-1.556l3 5L13.566 13H17v-2h-4.566l-.934 1.556l-3-5L6.434 11H2.21A9.6 9.6 0 0 1 2 9c0-3.5 2.5-6 5.5-6C9.36 3 11 4 12 5c1-1 2.64-2 4.5-2"/></svg></span><div><strong>Melli</strong><span>Heals the tank</span></div></div><span class="link"></span>
+          <div class="node tiled"><span class="icon" style="--fill:var(--class-mage)"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="m7.048 13.406l3.535 3.536l-1.413 1.414l1.415 1.415l-1.414 1.414l-2.475-2.475l-2.829 2.829l-1.414-1.414l2.829-2.83l-2.475-2.474l1.414-1.414l1.414 1.413zM3 3l3.546.003l11.817 11.818l1.415-1.414l1.415 1.414l-2.475 2.475l2.828 2.829l-1.414 1.414l-2.829-2.829l-2.474 2.475l-1.415-1.414l1.414-1.415L3.002 6.531zm14.457 0L21 3.003l.002 3.523l-4.053 4.052l-3.536-3.535z"/></svg></span><div><strong>Tukz</strong><span>Burns the boss</span></div></div><span class="link"></span>
+          <div class="node tiled"><span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2c5.523 0 10 4.477 10 10v3.764a2 2 0 0 1-1.106 1.789L18 19v1a3 3 0 0 1-2.824 2.995L14.95 23q.033-.161.044-.33L15 22.5V22a2 2 0 0 0-1.85-1.994L13 20h-2a2 2 0 0 0-1.995 1.85L9 22v.5q0 .258.05.5H9a3 3 0 0 1-3-3v-1l-2.894-1.447A2 2 0 0 1 2 15.763V12C2 6.477 6.477 2 12 2m-4 9a2 2 0 1 0 0 4a2 2 0 0 0 0-4m8 0a2 2 0 1 0 0 4a2 2 0 0 0 0-4"/></svg></span><div><strong>Dimensius</strong><span>Dies at 9 min</span></div></div>
+        </div>
+      </div>
+    </figure>
+
+    <!-- Spans: .bar.spans places each .bar-fill by --at (start) and --v (length), in percent; a gap is time with
+         nothing in it. .bar-scale under it. A tab for a coded thing leads with a .swatch in its code. -->
+    <section class="panel span-12">
+      <div class="panel-head">Pull timeline
+        <span class="tabs">
+          <button class="tab" type="button" data-tab="elv" aria-pressed="true"><span class="swatch" style="--fill:var(--class-warrior)"></span>Elv</button>
+          <button class="tab" type="button" data-tab="melli" aria-pressed="false"><span class="swatch" style="--fill:var(--class-priest)"></span>Melli</button>
+        </span>
+      </div>
+      <div class="panel-body">
+        <div data-tab-panel="elv">
+          <div class="bar spans"><span class="bar-fill" style="--at:0; --v:40; --fill:var(--c1)" data-tip="Tanking" data-tip-value="4 min" data-tip-note="Minute 0 to 4"></span><span class="bar-fill" style="--at:40; --v:10; --fill:var(--c5)" data-tip="Moving" data-tip-value="1 min" data-tip-note="Minute 4 to 5"></span><span class="bar-fill" style="--at:50; --v:40; --fill:var(--c1)" data-tip="Tanking" data-tip-value="4 min" data-tip-note="Minute 5 to 9"></span></div>
+          <div class="bar-scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10 min</span></div>
+        </div>
+        <div data-tab-panel="melli" hidden>
+          <div class="bar spans"><span class="bar-fill" style="--at:0; --v:30; --fill:var(--c1)" data-tip="Healing" data-tip-value="3 min" data-tip-note="Minute 0 to 3"></span><span class="bar-fill" style="--at:30; --v:10; --fill:var(--c5)" data-tip="Moving" data-tip-value="1 min" data-tip-note="Minute 3 to 4"></span><span class="bar-fill" style="--at:40; --v:20; --fill:var(--c1)" data-tip="Healing" data-tip-value="2 min" data-tip-note="Minute 4 to 6"></span><span class="bar-fill" style="--at:70; --v:20; --fill:var(--c1)" data-tip="Healing" data-tip-value="2 min" data-tip-note="Minute 7 to 9"></span></div>
+          <div class="bar-scale"><span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10 min</span></div>
+        </div>
+      </div>
+      <div class="panel-foot"><div class="legend"><span class="legend-item"><span class="swatch" style="--fill:var(--c1)"></span>Doing their role</span><span class="legend-item"><span class="swatch" style="--fill:var(--c5)"></span>Moving</span><span class="legend-item"><span class="swatch" style="--fill:var(--sunken)"></span>Dead or idle</span></div></div>
+    </section>
+
     <!-- Hatched: .ghost on a .col-fill, .bar-seg or .swatch lays ink hatching over its colour. Its edges stay solid. -->
     <figure class="panel span-6">
       <div class="panel-head">Kills by week</div>

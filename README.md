@@ -2,14 +2,14 @@
 
 ![A raid report in the style: stat tiles, a damage meter, a table, and two charts](assets/screenshots/dashboard.png)
 
-My visual style, packaged as a plugin for Claude Code and Codex. It is listed in the [`joshua-light` marketplace](https://github.com/joshua-light/marketplace). It steers reports, explainers, animated explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings. It steers the words too: headings of one or two words, short captions, and a figure before a paragraph.
+My visual style, packaged as a plugin for Claude Code and Codex. It is listed in the [`joshua-light` marketplace](https://github.com/joshua-light/marketplace). It steers reports, explainers, animated explainers, dashboards, slides, and charts toward one look: dark gray panels, black borders, square corners, a Warrior-tan accent, flat colour fills, and Expressway text with outlined headings. It steers the telling too: every page is a story built one step at a time from the simplest case, with one chart form repeated, each term defined where it arrives, and one colour per recurring thing.
 
 <p>
   <img src="assets/screenshots/deck.png" width="49%" alt="A deck slide: a line chart with two events and a dashed forecast">
   <img src="assets/screenshots/explainer.png" width="49%" alt="Explainer components: a slider bound to bars, a tree, stacked layers, and a list of claims">
 </p>
 
-The screenshots come from the pages in `examples/`, set in Fira Sans, the face an install shows. Open `examples/showcase.html` in a browser to see every component. Open `examples/voyager-deck.html` to see a deck: step through it with the arrow keys or a click. Open `examples/gc-film.html` to see an animated explainer: press Play on a film, then Next for each beat.
+The screenshots come from the pages in `examples/`, set in Fira Sans, the face an install shows. Open `examples/showcase.html` in a browser to see every component. Open `examples/story-report.html` to see a report told as a story, one step at a time. Open `examples/voyager-deck.html` to see a deck: step through it with the arrow keys or a click. Open `examples/gc-film.html` to see an animated explainer: press Play on a film, then Next for each beat.
 
 ## Credits
 
@@ -65,6 +65,7 @@ Embedding Expressway in pages you publish may need a web licence from Typodermic
 | `skills/guide/scripts/plotly_style.py` | Registers the plotly template. |
 | `examples/showcase.html` | Reference markup for every component. The guide reads it before it builds a page. |
 | `examples/showcase-mermaid.png`, `examples/showcase-plotly.png` | The showcase's samples of the Mermaid and plotly themes. |
+| `examples/story-report.html` | The reference story: an experiment on what AI models cost, told from the simplest approach up, each step in the same form. |
 | `examples/voyager-deck.html` | The reference deck: builds, growth, a popup, motion to scale, and a speed slider for review. |
 | `examples/gc-film.html` | The reference for films: the .NET garbage collector explained in seven films, with two quizzes and a recap. |
 | `examples/film-reel.html` | Three short films on a canal lock, a garbage collector, and a raid boss's threat table, each built on a different kind of motion. |
